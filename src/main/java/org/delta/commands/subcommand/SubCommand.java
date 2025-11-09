@@ -6,4 +6,5 @@ public interface SubCommand {
     String getName();
     void execute(Player player, String[] args);
     boolean requiresPermission();
+    void showUsage(Player player);
 }

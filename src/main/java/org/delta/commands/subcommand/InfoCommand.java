@@ -57,4 +57,9 @@ public class InfoCommand implements SubCommand {
     public boolean requiresPermission() {
         return false;
     }
+
+    @Override
+    public void showUsage(Player player) {
+        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+    }
 }

@@ -332,4 +332,9 @@ public class RuletaCommand implements SubCommand {
     public boolean requiresPermission() {
         return true;
     }
+
+    @Override
+    public void showUsage(Player player) {
+
+    }
 }

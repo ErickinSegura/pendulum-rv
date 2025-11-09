@@ -77,4 +77,9 @@ public class RetoCommand implements SubCommand {
     public boolean requiresPermission() {
         return false;
     }
+
+    @Override
+    public void showUsage(Player player) {
+
+    }
 }

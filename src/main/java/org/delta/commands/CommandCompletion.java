@@ -20,7 +20,7 @@ public class CommandCompletion implements TabCompleter {
     private void initializeCompletions() {
         // Comandos básicos disponibles para todos
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "entregar"
+                "reto", "info", "entregar", "lives"
         );
         subCommandCompletions.put("basic", basicCommands);
 
@@ -35,9 +35,10 @@ public class CommandCompletion implements TabCompleter {
                 "premio", "item", "totem"
         ));
 
-        subCommandCompletions.put("spawn", Arrays.asList(
-                "zombie", "skeleton", "creeper"
+        subCommandCompletions.put("lives", Arrays.asList(
+                "set", "reset"
         ));
+
     }
 
     @Override
@@ -69,8 +70,8 @@ public class CommandCompletion implements TabCompleter {
                 if (giveCompletions != null) {
                     return filterCompletions(giveCompletions, args[1]);
                 }
-            } else if (args[0].equalsIgnoreCase("spawn") && checkPermission(player)) {
-                List<String> spawnCompletions = subCommandCompletions.get("spawn");
+            } else if (args[0].equalsIgnoreCase("lives") && checkPermission(player)) {
+                List<String> spawnCompletions = subCommandCompletions.get("lives");
                 if (spawnCompletions != null) {
                     return filterCompletions(spawnCompletions, args[1]);
                 }

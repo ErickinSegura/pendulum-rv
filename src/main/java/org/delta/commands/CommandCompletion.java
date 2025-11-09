@@ -20,22 +20,18 @@ public class CommandCompletion implements TabCompleter {
     private void initializeCompletions() {
         // Comandos básicos disponibles para todos
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "entregar", "lives"
+                "reto", "info", "entregar", "relojs"
         );
         subCommandCompletions.put("basic", basicCommands);
 
         // Comandos de admin (ejemplo - agregar los que necesites)
         List<String> adminCommands = Arrays.asList(
-                "reset_reto", "ruleta", "give"
+                "reset_reto", "ruleta", "dia"
         );
         subCommandCompletions.put("admin", adminCommands);
 
-        // Completions para subcomandos específicos
-        subCommandCompletions.put("give", Arrays.asList(
-                "premio", "item", "totem"
-        ));
 
-        subCommandCompletions.put("lives", Arrays.asList(
+        subCommandCompletions.put("relojs", Arrays.asList(
                 "set", "reset"
         ));
 
@@ -65,13 +61,8 @@ public class CommandCompletion implements TabCompleter {
 
         // Completar segundo argumento según el subcomando
         if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("give") && checkPermission(player)) {
-                List<String> giveCompletions = subCommandCompletions.get("give");
-                if (giveCompletions != null) {
-                    return filterCompletions(giveCompletions, args[1]);
-                }
-            } else if (args[0].equalsIgnoreCase("lives") && checkPermission(player)) {
-                List<String> spawnCompletions = subCommandCompletions.get("lives");
+            if (args[0].equalsIgnoreCase("relojs") && checkPermission(player)) {
+                List<String> spawnCompletions = subCommandCompletions.get("relojs");
                 if (spawnCompletions != null) {
                     return filterCompletions(spawnCompletions, args[1]);
                 }

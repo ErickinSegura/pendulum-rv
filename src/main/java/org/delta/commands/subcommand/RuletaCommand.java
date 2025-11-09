@@ -13,7 +13,6 @@ import org.delta.listeners.RetoListener;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Random;
 
 public class RuletaCommand implements SubCommand {

@@ -7,6 +7,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Team;
 import org.delta.libs.MessageUtils;
+import org.delta.libs.PendulumSettings;
 
 public class InfoCommand implements SubCommand {
 
@@ -19,6 +20,7 @@ public class InfoCommand implements SubCommand {
     public void execute(Player player, String[] args) {
         Team team = player.getScoreboard().getEntryTeam(player.getName());
         String equipo = (team != null) ? team.getPrefix() : "&cSin equipo";
+        int dia = PendulumSettings.getInstance().getDia();
 
         boolean retoCumplido = false;
         Objective retoObjective = player.getScoreboard().getObjective("reto");
@@ -40,6 +42,7 @@ public class InfoCommand implements SubCommand {
         sendStatistic(player, "Jugadores Online", "&d" + playersOnline + " &7conectados");
         sendStatistic(player, "Tu Equipo", equipo);
         sendStatistic(player, "Estado del Reto", getRetoStatus(retoCumplido));
+        sendStatistic(player, "Día del servidor", "&e" + dia);
 
         // Sonido de finalización
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, 1.0f);

@@ -11,7 +11,7 @@ public class LivesCommand implements SubCommand {
 
     @Override
     public String getName() {
-        return "lives";
+        return "relojs";
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.delta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
+import org.delta.libs.ClockEvents;
 import org.delta.libs.LifeManager;
 import org.delta.libs.PendulumSettings;
 import org.delta.listeners.DeathListener;
@@ -41,6 +42,7 @@ public final class pendulum extends JavaPlugin {
     }
 
     public void registerEvents() {
+        ClockEvents.setPlugin(this);
         getServer().getPluginManager().registerEvents(new RetoListener(), this);
         getServer().getPluginManager().registerEvents(new LifeListener(lifeManager), this);
         getServer().getPluginManager().registerEvents(new DeathListener(lifeManager), this);

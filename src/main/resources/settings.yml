@@ -1,0 +1,81 @@
+mundo:
+  dia: 20
+  jugadoresNoche: 1
+
+permisos:
+  - iPancrema
+
+reto:
+  retoActualIndex: 0  # Índice del reto actual en la lista
+  premio: 2 tótems de la inmortalidad
+  castigo: Tu equipo tendrá que regalar 3 totems
+  cantidadPremio: 2
+  materialPremio: TOTEM_OF_UNDYING
+
+  castigos:
+    - Perderá tu equipo 1 contenedor de vida
+    - Tu equipo no podrá usar Elytra por 1 día
+    - Tu equipo tendrá que donar 5 diamantes
+    - Tu equipo perderá acceso al End por 1 día
+    - Tu equipo deberá construir un monumento
+    - Tu equipo tendrá que regalar 3 totems
+    - Tu equipo no podrá usar portales del Nether por 1 día
+    - Tu equipo deberá organizar un evento PvP
+
+  retos:
+    # Retos de items
+    - tipo: ITEM
+      titulo: Consigue 64 piedra
+      cantidad: 64
+      material: STONE
+
+    - tipo: ITEM
+      titulo: Consigue 128 troncos de roble
+      cantidad: 128
+      material: OAK_LOG
+
+    - tipo: ITEM
+      titulo: Consigue 16 diamantes
+      cantidad: 16
+      material: DIAMOND
+
+    # Retos de logros
+    - tipo: LOGRO
+      titulo: Obtén el logro "The End?"
+      logro: end/root  # Key del advancement
+
+    - tipo: LOGRO
+      titulo: Obtén el logro "Diamonds!"
+      logro: story/mine_diamond
+
+    # Retos de matar mobs
+    - tipo: MATAR_MOBS
+      titulo: Mata 50 zombies
+      cantidad: 50
+      mob: ZOMBIE
+
+    - tipo: MATAR_MOBS
+      titulo: Mata 10 enderman
+      cantidad: 10
+      mob: ENDERMAN
+
+    - tipo: MATAR_MOBS
+      titulo: Mata 5 blazes
+      cantidad: 5
+      mob: BLAZE
+
+    # Retos de minar bloques
+    - tipo: MINAR_BLOQUES
+      titulo: Mina 200 bloques de piedra
+      cantidad: 200
+      material: STONE
+
+    - tipo: MINAR_BLOQUES
+      titulo: Mina 100 bloques de obsidiana
+      cantidad: 100
+      material: OBSIDIAN
+
+    - tipo: MINAR_BLOQUES
+      titulo: Mina 500 bloques de netherrack
+      cantidad: 500
+      material: NETHERRACK

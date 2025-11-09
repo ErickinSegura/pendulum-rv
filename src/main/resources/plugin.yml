@@ -1,0 +1,10 @@
+name: Pendulum
+version: '1.0-SNAPSHOT'
+main: org.delta.pendulum
+api-version: '1.21'
+authors: [ Erick Segura ]
+description: Plugin para el servidor Pendulum
+commands:
+  pendulum:
+    description: Comando principal del plugin de Pendulum.
+    aliases: pdl

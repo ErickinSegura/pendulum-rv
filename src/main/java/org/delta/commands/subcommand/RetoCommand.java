@@ -1,5 +1,4 @@
 package org.delta.commands.subcommand;
-
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.delta.libs.MessageUtils;
@@ -52,12 +51,8 @@ public class RetoCommand implements SubCommand {
             player.sendMessage(MessageUtils.color("&8   &7Usa &d/pdl entregar &7cuando completes el reto"));
         }
 
-        // Descripción del reto
-        if (!retoCumplido) {
-            player.sendMessage("");
-            player.sendMessage(MessageUtils.color("&8└ &7Objetivo:"));
-            player.sendMessage(MessageUtils.color("&8   &d" + reto.getDescripcion()));
-        }
+        // Pie de página
+        player.sendMessage("");
 
         // Sonido final
         float pitch = retoCumplido ? 1.5f : 1.0f;
@@ -68,11 +63,6 @@ public class RetoCommand implements SubCommand {
         player.sendMessage(MessageUtils.color("&8└ " + icon + " &7" + label + ": &d" + value));
     }
 
-    private String getCurrentTime() {
-        java.time.LocalTime now = java.time.LocalTime.now();
-        return String.format("%02d:%02d", now.getHour(), now.getMinute());
-    }
-
     @Override
     public boolean requiresPermission() {
         return false;
@@ -80,6 +70,5 @@ public class RetoCommand implements SubCommand {
 
     @Override
     public void showUsage(Player player) {
-
     }
 }

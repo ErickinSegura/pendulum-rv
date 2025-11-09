@@ -6,7 +6,8 @@ permisos:
   - iPancrema
 
 reto:
-  retoActualIndex: 0  # Índice del reto actual en la lista
+  retoActualIndex: 0
+  castigoActualIndex: 0
   premio: 2 tótems de la inmortalidad
   castigo: Tu equipo tendrá que regalar 3 totems
   cantidadPremio: 2

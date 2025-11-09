@@ -15,7 +15,9 @@ public class PendulumSettings {
     private static final PendulumSettings instance = new PendulumSettings();
 
     private String[] op;
-    private String premio, castigo;
+    private String premio;
+    private String castigoActual;
+    private String[] castigos;
     private int dia;
     private int jugadoresNoche;
     private ItemStack stackPremio;
@@ -81,17 +83,28 @@ public class PendulumSettings {
             }
         }
 
+        // Cargar castigos disponibles
+        List<String> castigosConfig = config.getStringList("reto.castigos");
+        System.out.println("[Pendulum Debug] Cantidad de castigos encontrados: " + castigosConfig.size());
+        castigos = castigosConfig.toArray(new String[0]);
+
         // Cargar reto actual (índice en el config)
         int indiceRetoActual = config.getInt("reto.retoActualIndex", 0);
         if (indiceRetoActual < retosDisponibles.length) {
             retoActual = retosDisponibles[indiceRetoActual];
         }
 
+        // Cargar castigo actual (índice en el config)
+        int indiceCastigoActual = config.getInt("reto.castigoActualIndex", 0);
+        if (indiceCastigoActual < castigos.length) {
+            castigoActual = castigos[indiceCastigoActual];
+        } else {
+            // Fallback al castigo del config (para retrocompatibilidad)
+            castigoActual = config.getString("reto.castigo", "Sin castigo definido");
+        }
 
         // Cargar resto de configuraciones
         premio = config.getString("reto.premio");
-        castigo = config.getString("reto.castigo");
-        dia = config.getInt("mundo.dia");
 
         int cantidadPremio = config.getInt("reto.cantidadPremio");
         String materialPremioString = config.getString("reto.materialPremio");
@@ -105,10 +118,13 @@ public class PendulumSettings {
 
         op = config.getStringList("permisos").toArray(new String[0]);
         jugadoresNoche = config.getInt("mundo.jugadoresNoche");
+        dia = config.getInt("mundo.dia");
 
         System.out.println("[Pendulum Debug] Carga completada:");
         System.out.println("- Retos disponibles: " + (retosDisponibles != null ? retosDisponibles.length : 0));
         System.out.println("- Reto actual: " + (retoActual != null ? retoActual.getTitulo() : "ninguno"));
+        System.out.println("- Castigos disponibles: " + (castigos != null ? castigos.length : 0));
+        System.out.println("- Castigo actual: " + castigoActual);
     }
 
     // Getters
@@ -125,7 +141,11 @@ public class PendulumSettings {
     }
 
     public String getCastigo() {
-        return castigo;
+        return castigoActual;
+    }
+
+    public String[] getCastigos() {
+        return castigos;
     }
 
     public ItemStack getStackPremio() {

@@ -1,24 +1,16 @@
-package org.delta.libs;
+package org.delta.libs.death;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.delta.libs.MessageUtils;
 import org.delta.pendulum;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import static org.bukkit.Bukkit.getServer;
-import static org.delta.libs.ChestEvents.placeDeathChest;
+import static org.delta.libs.death.ChestEvents.placeDeathChest;
 
 public class DeathEvents {
     pendulum plugin = pendulum.getInstance();

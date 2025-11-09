@@ -1,4 +1,4 @@
-package org.delta.listeners;
+package org.delta.listeners.players;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -6,6 +6,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.delta.libs.*;
+import org.delta.libs.reto.Reto;
+import org.delta.libs.reto.RetoMinar;
+import org.delta.libs.reto.RetoMobs;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;

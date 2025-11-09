@@ -1,4 +1,4 @@
-package org.delta.listeners;
+package org.delta.listeners.players;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,7 +17,7 @@ import java.util.Random;
 
 import static org.bukkit.Bukkit.getServer;
 
-public class GenericPlayerListener implements Listener {
+public class TotemListener implements Listener {
     pendulum plugin = pendulum.getInstance();
     private final PendulumSettings settings = PendulumSettings.getInstance();
     private final Random random = new Random();

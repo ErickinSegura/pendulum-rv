@@ -8,8 +8,8 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
-import org.delta.libs.Reto;
-import org.delta.libs.RetoItem;
+import org.delta.libs.reto.Reto;
+import org.delta.libs.reto.RetoItem;
 
 public class EntregarCommand implements SubCommand {
 

@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.delta.libs.reto.*;
 import org.delta.pendulum;
 
 import java.io.File;
@@ -13,12 +14,11 @@ import java.util.Map;
 public class PendulumSettings {
     private static final PendulumSettings instance = new PendulumSettings();
 
-    private String[] castigosDia0, op;
+    private String[] op;
     private String premio, castigo;
     private int dia;
     private int jugadoresNoche;
     private ItemStack stackPremio;
-    private String[] castigos;
     private Reto retoActual;
     private Reto[] retosDisponibles;
 
@@ -87,9 +87,6 @@ public class PendulumSettings {
             retoActual = retosDisponibles[indiceRetoActual];
         }
 
-        // Cargar castigos
-        castigos = config.getStringList("reto.castigos").toArray(new String[0]);
-        castigosDia0 = config.getStringList("reto.castigos.dia0").toArray(new String[0]);
 
         // Cargar resto de configuraciones
         premio = config.getString("reto.premio");
@@ -135,24 +132,12 @@ public class PendulumSettings {
         return stackPremio;
     }
 
-    public String[] getCastigos() {
-        return castigos;
-    }
-
-    public String[] getCastigosDia0() {
-        return castigosDia0;
-    }
-
     public String[] getOp() {
         return op;
     }
 
     public int getDia() {
         return dia;
-    }
-
-    public int getJugadoresNoche() {
-        return jugadoresNoche;
     }
 
     public static PendulumSettings getInstance() {

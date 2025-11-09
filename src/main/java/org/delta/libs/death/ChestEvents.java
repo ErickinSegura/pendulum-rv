@@ -1,4 +1,4 @@
-package org.delta.libs;
+package org.delta.libs.death;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -8,8 +8,8 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
-import org.delta.libs.Reto;
-import org.delta.listeners.RetoListener;
+import org.delta.libs.reto.Reto;
+import org.delta.listeners.players.RetoListener;
 
 import java.io.File;
 import java.io.IOException;

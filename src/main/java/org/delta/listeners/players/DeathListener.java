@@ -1,13 +1,13 @@
-package org.delta.listeners;
+package org.delta.listeners.players;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.delta.libs.ClockEvents;
-import org.delta.libs.DeathEvents;
-import org.delta.libs.LifeManager;
+import org.delta.libs.death.ClockEvents;
+import org.delta.libs.death.DeathEvents;
+import org.delta.libs.death.LifeManager;
 
 public class DeathListener implements Listener {
     private final LifeManager lifeManager;

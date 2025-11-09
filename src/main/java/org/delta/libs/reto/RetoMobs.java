@@ -1,4 +1,4 @@
-package org.delta.libs;
+package org.delta.libs.reto;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;

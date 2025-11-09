@@ -4,7 +4,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
-import org.delta.libs.Reto;
+import org.delta.libs.reto.Reto;
 
 public class RetoCommand implements SubCommand {
     @Override

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.delta.libs.MessageUtils;
-import org.delta.listeners.RetoListener;
+import org.delta.listeners.players.RetoListener;
 
 public class ResetRetoCommand implements SubCommand {
 

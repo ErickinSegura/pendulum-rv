@@ -5,6 +5,7 @@ import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
 import org.delta.libs.LifeManager;
 import org.delta.libs.PendulumSettings;
+import org.delta.listeners.DeathListener;
 import org.delta.listeners.LifeListener;
 import org.delta.listeners.RetoListener;
 
@@ -42,6 +43,7 @@ public final class pendulum extends JavaPlugin {
     public void registerEvents() {
         getServer().getPluginManager().registerEvents(new RetoListener(), this);
         getServer().getPluginManager().registerEvents(new LifeListener(lifeManager), this);
+        getServer().getPluginManager().registerEvents(new DeathListener(lifeManager), this);
     }
 
     private void registerCommands() {

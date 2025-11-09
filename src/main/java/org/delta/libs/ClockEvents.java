@@ -3,6 +3,7 @@ package org.delta.libs;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.BanList;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -22,9 +23,16 @@ public class ClockEvents {
     public static void handlePlayerClockLoss(Player player, int currentLives, Location location, PlayerDeathEvent event) {
         broadcastClockMessages(player, currentLives);
         placeDeathChest(player, location, event);
+        broadcastClockSound();
+        temporaryBanPlayer(player);
 
-        if (currentLives >= 0) {
-            temporaryBanPlayer(player);
+
+    }
+
+    private static void broadcastClockSound() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.playSound(player.getLocation(), "minecraft:ambient.cave", 1, 1);
+            player.playSound(player.getLocation(), "minecraft:block.glass.break", 1, 0.5f);
         }
     }
 
@@ -52,7 +60,7 @@ public class ClockEvents {
                 public void run() {
                     if (player.isOnline()) {
                         BanList banList = getServer().getBanList(BanList.Type.PROFILE);
-                        Duration banDuration = Duration.ofSeconds(30);
+                        Duration banDuration = Duration.ofSeconds(5);
                         //Duration banDuration = Duration.ofHours(1);
                         String banSource = "Sistema de Relojes";
 
@@ -70,7 +78,7 @@ public class ClockEvents {
                         player.kick(kickMessage);
                     }
                 }
-            }.runTaskLater(plugin, 40L); // 1 segundo = 20 ticks
+            }.runTaskLater(plugin, 120L); // 1 segundo = 20 ticks
         }
     }
 

@@ -1,13 +1,17 @@
 package org.delta.libs.death;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.delta.libs.Icons;
 
 public class LifeManager {
 
@@ -66,9 +70,9 @@ public class LifeManager {
 
         for (int i = 0; i < MAX_LIVES; i++) {
             if (i < lives) {
-                actionBar = actionBar.append(Component.text("⏰ ", TextColor.color(0x55FF55)));
+                actionBar = actionBar.append(Icons.ACTIVE_CLOCK);
             } else {
-                actionBar = actionBar.append(Component.text("⏰ ", TextColor.color(0x555555)));
+                actionBar = actionBar.append(Icons.INACTIVE_CLOCK);
             }
         }
 

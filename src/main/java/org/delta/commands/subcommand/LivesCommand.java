@@ -1,11 +1,15 @@
 package org.delta.commands.subcommand;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.delta.libs.Icons;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.delta.pendulum;
+
+import javax.swing.*;
 
 public class LivesCommand implements SubCommand {
 
@@ -75,7 +79,7 @@ public class LivesCommand implements SubCommand {
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lTUS VIDAS&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8└ &7Vidas restantes: " + getLifeDisplay(lives)));
+        player.sendMessage(MessageUtils.color("&8└ &7Vidas restantes: ").append(getLifeDisplay(lives)));
         player.sendMessage("");
     }
 
@@ -94,7 +98,7 @@ public class LivesCommand implements SubCommand {
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lVIDAS DE " + target.getName().toUpperCase() + "&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8└ &7Vidas restantes: " + getLifeDisplay(lives)));
+        player.sendMessage(MessageUtils.color("&8└ &7Vidas restantes: ").append(getLifeDisplay(lives)));
         player.sendMessage("");
     }
 
@@ -125,8 +129,7 @@ public class LivesCommand implements SubCommand {
         pendulum.getInstance().getLifeManager().setLives(target, amount);
 
         player.sendMessage(MessageUtils.color("&aHas establecido las vidas de &e" + target.getName() + " &aa &d" + amount + "&a."));
-        target.sendMessage(MessageUtils.color("&eTus vidas han sido establecidas a " + getLifeDisplay(amount) + "&e."));
-
+        target.sendMessage(MessageUtils.color("&eTus vidas han sido establecidas a ").append(getLifeDisplay(amount)).append(MessageUtils.color("&e.")));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.2f);
     }
@@ -143,23 +146,18 @@ public class LivesCommand implements SubCommand {
         pendulum.getInstance().getLifeManager().resetLives(target);
 
         player.sendMessage(MessageUtils.color("&aHas reseteado las vidas de &e" + target.getName() + " &aa &d3&a."));
-        target.sendMessage(MessageUtils.color("&eTus vidas han sido reseteadas a " + getLifeDisplay(3) + "&e."));
+        target.sendMessage(MessageUtils.color("&eTus vidas han sido reseteadas a ").append(getLifeDisplay(3)).append(MessageUtils.color("&e.")));
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.2f);
     }
 
-    private String getLifeDisplay(int lives) {
-        StringBuilder display = new StringBuilder();
+    private Component getLifeDisplay(int lives) {
+        Component display = Component.empty();
         for (int i = 0; i < 3; i++) {
-            if (i < lives) {
-                display.append("&a⏰");
-            } else {
-                display.append("&8⏰");
-            }
-            if (i < 2) display.append(" ");
+            display = display.append(i < lives ? Icons.ACTIVE_CLOCK : Icons.INACTIVE_CLOCK);
         }
-        return display.toString();
+        return display;
     }
 
     private boolean isAdmin(Player player) {

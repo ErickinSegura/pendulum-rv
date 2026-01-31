@@ -160,7 +160,8 @@ public class EntregarCommand implements SubCommand {
                     double y = ticks * 0.08;
 
                     Location particleLoc = loc.clone().add(x, y, z);
-                    world.spawnParticle(Particle.EFFECT, particleLoc, 1, 0, 0, 0, 0);
+                    world.spawnParticle(Particle.DUST, particleLoc, 1,
+                            new Particle.DustOptions(Color.ORANGE, 1.0f));
                     world.spawnParticle(Particle.HAPPY_VILLAGER, particleLoc, 1, 0, 0, 0, 0);
                     world.spawnParticle(Particle.ENCHANT, particleLoc, 2, 0, 0, 0, 0.5);
                 }

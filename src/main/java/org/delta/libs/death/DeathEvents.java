@@ -1,9 +1,6 @@
 package org.delta.libs.death;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,18 +21,15 @@ public class DeathEvents {
 
     private static final int CLOCK_CYCLES = 1;
     private static final long TICKS_PER_FRAME = 1L;
-    private static final int FRAME_SKIP = 1;
 
     private static final boolean SYNC_DAY_NIGHT = true;
     private static final long DAY_NIGHT_SPEED = 2L;
 
-    private static final TextColor PURPLE_LIGHT = TextColor.fromHexString("#D896FF");
-    private static final TextColor PURPLE_DARK = TextColor.fromHexString("#8B5CF6");
-
     public void handlePlayerDeath(Player player, Location location, PlayerDeathEvent event) {
         displayDeathClockAnimation(player);
+        PilarEvents.placeDeathPilar(player, location, event);
         placeDeathChest(player, location, event);
-        broadcastDeathMessages(player, location);
+        broadcastDeathMessages(player);
     }
 
     private void displayDeathClockAnimation(Player player) {
@@ -115,7 +109,7 @@ public class DeathEvents {
         }, totalAnimationTicks);
     }
 
-    private void broadcastDeathMessages(Player player, Location location) {
+    private void broadcastDeathMessages(Player player) {
         if (player != null) {
             String playerName = player.getName();
             player.sendMessage(MessageUtils.color("&cTe quedaste sin relojs"));

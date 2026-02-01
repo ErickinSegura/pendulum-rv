@@ -24,11 +24,10 @@ public class ClockEvents {
 
     public static void handlePlayerClockLoss(Player player, int currentLives, Location location, PlayerDeathEvent event) {
         broadcastClockMessages(player, currentLives);
+        PilarEvents.placeDeathPilar(player, location, event);
         placeDeathChest(player, location, event);
         broadcastClockSound();
-        temporaryBanPlayer(player);
-
-
+        //temporaryBanPlayer(player);
     }
 
     private static void broadcastClockSound() {

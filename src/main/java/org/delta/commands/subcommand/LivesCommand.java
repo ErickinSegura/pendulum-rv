@@ -62,12 +62,12 @@ public class LivesCommand implements SubCommand {
         player.sendMessage(MessageUtils.color("&c&l⚠ Sintaxis incorrecta"));
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&7Usos disponibles:"));
-        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum lives &8- &7Ver tus vidas"));
-        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum lives <jugador> &8- &7Ver vidas de otro"));
+        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs &8- &7Ver tus vidas"));
+        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs <jugador> &8- &7Ver vidas de otro"));
 
         if (isAdmin(player)) {
-            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum lives set <jugador> <cantidad> &8- &7Setear vidas"));
-            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum lives reset <jugador> &8- &7Resetear vidas"));
+            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs set <jugador> <cantidad> &8- &7Setear vidas"));
+            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs reset <jugador> &8- &7Resetear vidas"));
         }
         player.sendMessage("");
     }

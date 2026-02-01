@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
 import org.delta.libs.death.ClockEvents;
+import org.delta.libs.death.DeathEvents;
 import org.delta.libs.death.LifeManager;
 import org.delta.libs.PendulumSettings;
 import org.delta.listeners.players.DeathListener;
@@ -17,12 +18,14 @@ public final class pendulum extends JavaPlugin {
 
     public static String prefix = "&d&lPendulum&r";
     private LifeManager lifeManager;
+    private DeathEvents deathEvents;
 
     @Override
     public void onEnable() {
         String version = getPluginMeta().getVersion();
         PendulumSettings.getInstance().load();
         lifeManager = new LifeManager(this);
+        deathEvents = new DeathEvents();
 
         registerEvents();
         registerCommands();
@@ -61,5 +64,9 @@ public final class pendulum extends JavaPlugin {
 
     public LifeManager getLifeManager() {
         return lifeManager;
+    }
+
+    public DeathEvents getDeathEvents() {
+        return deathEvents;
     }
 }

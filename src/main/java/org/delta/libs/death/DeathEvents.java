@@ -18,12 +18,17 @@ import static org.delta.libs.death.ChestEvents.placeDeathChest;
 
 public class DeathEvents {
     pendulum plugin = pendulum.getInstance();
+    private PlayerDeathMessages deathMessages;
 
     private static final int CLOCK_CYCLES = 1;
     private static final long TICKS_PER_FRAME = 1L;
 
     private static final boolean SYNC_DAY_NIGHT = true;
     private static final long DAY_NIGHT_SPEED = 2L;
+
+    public DeathEvents() {
+        this.deathMessages = new PlayerDeathMessages(plugin);
+    }
 
     public void handlePlayerDeath(Player player, Location location, PlayerDeathEvent event) {
         displayDeathClockAnimation(player);
@@ -114,6 +119,13 @@ public class DeathEvents {
             String playerName = player.getName();
             player.sendMessage(MessageUtils.color("&cTe quedaste sin relojs"));
             getServer().broadcast(MessageUtils.color("&dA &5&l" + playerName + "&r&d se le ha acabado el tiempo..."));
+
+            if (deathMessages.hasCustomMessage(playerName)) {
+                String customMessage = deathMessages.getCustomDeathMessage(playerName);
+                getServer().broadcast(MessageUtils.color("&7"+customMessage));
+            } else {
+                getServer().broadcast(MessageUtils.color("&7" + playerName + " hasta aquí llegó"));
+            }
         }
     }
 }

@@ -2,12 +2,19 @@ package org.delta.libs.death;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.delta.libs.Icons;
 import org.delta.libs.MessageUtils;
 import org.delta.pendulum;
+
+import java.time.Duration;
 
 import static org.bukkit.Bukkit.getServer;
 import static org.delta.libs.death.ChestEvents.placeDeathChest;
@@ -15,23 +22,103 @@ import static org.delta.libs.death.ChestEvents.placeDeathChest;
 public class DeathEvents {
     pendulum plugin = pendulum.getInstance();
 
+    private static final int CLOCK_CYCLES = 1;
+    private static final long TICKS_PER_FRAME = 1L;
+    private static final int FRAME_SKIP = 1;
+
+    private static final boolean SYNC_DAY_NIGHT = true;
+    private static final long DAY_NIGHT_SPEED = 2L;
+
+    private static final TextColor PURPLE_LIGHT = TextColor.fromHexString("#D896FF");
+    private static final TextColor PURPLE_DARK = TextColor.fromHexString("#8B5CF6");
 
     public void handlePlayerDeath(Player player, Location location, PlayerDeathEvent event) {
-        displayDeathTitle();
+        displayDeathClockAnimation(player);
         placeDeathChest(player, location, event);
         broadcastDeathMessages(player, location);
     }
 
-    private void displayDeathTitle() {
+    private void displayDeathClockAnimation(Player player) {
+        if (player == null || !player.isOnline()) return;
+
+        World world = player.getWorld();
+        long originalTime = world.getTime();
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            animateClockForPlayer(onlinePlayer, player.getName(), world, originalTime);
+        }
+    }
+
+    private void animateClockForPlayer(Player viewer, String deadPlayerName, World world, long originalTime) {
+        final int framesPerCycle = 63;
+        final int totalFrames = framesPerCycle * CLOCK_CYCLES;
+
+        final long totalAnimationTicks = totalFrames * TICKS_PER_FRAME;
+        final long timePerTick = SYNC_DAY_NIGHT ? (24000L * CLOCK_CYCLES) / totalAnimationTicks : 0;
+
+        Component subtitle = MessageUtils.color("&dA &5&l" + deadPlayerName + "&r&d se le terminó el tiempo");
+
+        for (int i = 0; i < totalFrames; i++) {
+            final int frameIndex;
+            if (i < 31) {
+                frameIndex = 33 + i;
+            } else {
+                frameIndex = i - 31;
+            }
+
+            final long delay = i * TICKS_PER_FRAME;
+            final int frameNumber = i;
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (viewer.isOnline()) {
+                    Component clockFrame = Icons.getClockFrame(frameIndex);
+
+                    Title title = Title.title(
+                            clockFrame,
+                            subtitle,
+                            Title.Times.times(
+                                    Duration.ZERO,
+                                    Duration.ofMillis(150),
+                                    Duration.ZERO
+                            )
+                    );
+
+                    viewer.showTitle(title);
+
+                    if (SYNC_DAY_NIGHT) {
+                        long newTime = (originalTime + (timePerTick * frameNumber * DAY_NIGHT_SPEED)) % 24000;
+                        world.setTime(newTime);
+                    }
+                }
+            }, delay);
+        }
+
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "animation true 1 0 48");
-        }, 20L);
+            if (SYNC_DAY_NIGHT) {
+                world.setTime(originalTime);
+            }
+
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                if (onlinePlayer.isOnline()) {
+                    Title finalTitle = Title.title(
+                            Icons.INACTIVE_CLOCK,
+                            subtitle,
+                            Title.Times.times(
+                                    Duration.ZERO,
+                                    Duration.ofMillis(800),
+                                    Duration.ofMillis(600)
+                            )
+                    );
+                    onlinePlayer.showTitle(finalTitle);
+                }
+            }
+        }, totalAnimationTicks);
     }
 
     private void broadcastDeathMessages(Player player, Location location) {
         if (player != null) {
             String playerName = player.getName();
-            player.sendMessage(Component.text("Te quedaste sin relojs", NamedTextColor.RED));
+            player.sendMessage(MessageUtils.color("&cTe quedaste sin relojs"));
             getServer().broadcast(MessageUtils.color("&dA &5&l" + playerName + "&r&d se le ha acabado el tiempo..."));
         }
     }

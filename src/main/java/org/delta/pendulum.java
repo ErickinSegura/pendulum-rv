@@ -3,6 +3,12 @@ package org.delta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
+import org.delta.listeners.bingo.BingoCollectListener;
+import org.delta.listeners.bingo.BingoInventoryListener;
+import org.delta.listeners.bingo.BingoKillListener;
+import org.delta.listeners.bingo.BingoMineListener;
+import org.delta.managers.bingo.BingoDataManager;
+import org.delta.managers.bingo.BingoProgressManager;
 import org.delta.managers.death.ClockEvents;
 import org.delta.managers.death.DeathEvents;
 import org.delta.managers.death.LifeManager;
@@ -12,6 +18,8 @@ import org.delta.listeners.player.TotemListener;
 import org.delta.listeners.player.LifeListener;
 import org.delta.listeners.player.RetoListener;
 
+import java.util.Objects;
+
 import static org.delta.libs.MessageUtils.sendConsole;
 
 public final class pendulum extends JavaPlugin {
@@ -19,13 +27,19 @@ public final class pendulum extends JavaPlugin {
     public static String prefix = "&d&lPendulum&r";
     private LifeManager lifeManager;
     private DeathEvents deathEvents;
+    private BingoDataManager bingoDataManager;
+    private BingoProgressManager bingoProgressManager;
 
     @Override
     public void onEnable() {
         String version = getPluginMeta().getVersion();
         PendulumSettings.getInstance().load();
+
+        // Inicializar managers
         lifeManager = new LifeManager(this);
         deathEvents = new DeathEvents();
+        bingoDataManager = BingoDataManager.getInstance(this);
+        bingoProgressManager = BingoProgressManager.getInstance();
 
         registerEvents();
         registerCommands();
@@ -51,11 +65,17 @@ public final class pendulum extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LifeListener(lifeManager), this);
         getServer().getPluginManager().registerEvents(new DeathListener(lifeManager), this);
         getServer().getPluginManager().registerEvents(new TotemListener(), this);
+
+        // Listeners del bingo
+        getServer().getPluginManager().registerEvents(new BingoInventoryListener(), this);
+        getServer().getPluginManager().registerEvents(new BingoCollectListener(), this);
+        getServer().getPluginManager().registerEvents(new BingoKillListener(), this);
+        getServer().getPluginManager().registerEvents(new BingoMineListener(), this);
     }
 
     private void registerCommands() {
-        getServer().getPluginCommand("pendulum").setExecutor(new PendulumCommand());
-        getServer().getPluginCommand("pendulum").setTabCompleter(new CommandCompletion());
+        Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setExecutor(new PendulumCommand());
+        Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setTabCompleter(new CommandCompletion());
     }
 
     public static pendulum getInstance(){
@@ -68,5 +88,13 @@ public final class pendulum extends JavaPlugin {
 
     public DeathEvents getDeathEvents() {
         return deathEvents;
+    }
+
+    public BingoDataManager getBingoDataManager() {
+        return bingoDataManager;
+    }
+
+    public BingoProgressManager getBingoProgressManager() {
+        return bingoProgressManager;
     }
 }

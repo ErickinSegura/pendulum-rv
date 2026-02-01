@@ -18,12 +18,9 @@ import java.util.Random;
 import static org.bukkit.Bukkit.getServer;
 
 public class TotemListener implements Listener {
-    pendulum plugin = pendulum.getInstance();
     private final PendulumSettings settings = PendulumSettings.getInstance();
     private final Random random = new Random();
 
-
-    // Constantes
     private static final double TOTEM_FAIL_CHANCE = 0.99;
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -31,7 +28,6 @@ public class TotemListener implements Listener {
         if (!(event.getEntity() instanceof Player player)) {
             return;
         }
-
 
         if (!event.isCancelled() && event.getEntity().getLastDamageCause() != null) {
 

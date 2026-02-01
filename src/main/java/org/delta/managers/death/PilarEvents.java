@@ -1,4 +1,4 @@
-package org.delta.libs.death;
+package org.delta.managers.death;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

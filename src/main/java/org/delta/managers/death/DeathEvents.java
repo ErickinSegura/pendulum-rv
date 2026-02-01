@@ -1,4 +1,4 @@
-package org.delta.libs.death;
+package org.delta.managers.death;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -14,7 +14,7 @@ import org.delta.pendulum;
 import java.time.Duration;
 
 import static org.bukkit.Bukkit.getServer;
-import static org.delta.libs.death.ChestEvents.placeDeathChest;
+import static org.delta.managers.death.ChestEvents.placeDeathChest;
 
 public class DeathEvents {
     pendulum plugin = pendulum.getInstance();

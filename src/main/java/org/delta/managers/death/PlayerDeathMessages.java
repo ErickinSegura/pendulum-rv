@@ -1,4 +1,4 @@
-package org.delta.libs.death;
+package org.delta.managers.death;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

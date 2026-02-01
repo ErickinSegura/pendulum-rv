@@ -1,4 +1,4 @@
-package org.delta.listeners.players;
+package org.delta.listeners.player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

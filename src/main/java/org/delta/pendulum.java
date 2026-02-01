@@ -3,14 +3,14 @@ package org.delta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
-import org.delta.libs.death.ClockEvents;
-import org.delta.libs.death.DeathEvents;
-import org.delta.libs.death.LifeManager;
+import org.delta.managers.death.ClockEvents;
+import org.delta.managers.death.DeathEvents;
+import org.delta.managers.death.LifeManager;
 import org.delta.libs.PendulumSettings;
-import org.delta.listeners.players.DeathListener;
-import org.delta.listeners.players.TotemListener;
-import org.delta.listeners.players.LifeListener;
-import org.delta.listeners.players.RetoListener;
+import org.delta.listeners.player.DeathListener;
+import org.delta.listeners.player.TotemListener;
+import org.delta.listeners.player.LifeListener;
+import org.delta.listeners.player.RetoListener;
 
 import static org.delta.libs.MessageUtils.sendConsole;
 

@@ -9,7 +9,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.delta.libs.reto.Reto;
-import org.delta.listeners.players.RetoListener;
+import org.delta.listeners.player.RetoListener;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package org.delta.libs.death;
+package org.delta.managers.death;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,7 +13,7 @@ import org.delta.libs.MessageUtils;
 
 import java.time.Duration;
 import static org.bukkit.Bukkit.getServer;
-import static org.delta.libs.death.ChestEvents.placeDeathChest;
+import static org.delta.managers.death.ChestEvents.placeDeathChest;
 
 public class ClockEvents {
     private static Plugin plugin;

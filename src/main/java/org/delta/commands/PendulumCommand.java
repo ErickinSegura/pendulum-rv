@@ -9,7 +9,6 @@ import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.jetbrains.annotations.NotNull;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,9 +23,6 @@ public class PendulumCommand implements CommandExecutor {
     private void registerSubCommands() {
         addSubCommand(new InfoCommand());
         addSubCommand(new RetoCommand());
-        addSubCommand(new EntregarCommand());
-        addSubCommand(new ResetRetoCommand());
-        addSubCommand(new RuletaCommand());
         addSubCommand(new LivesCommand());
         addSubCommand(new DiaCommand());
         addSubCommand(new BingoCommand());

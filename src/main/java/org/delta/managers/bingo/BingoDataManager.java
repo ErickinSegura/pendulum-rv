@@ -1,5 +1,6 @@
 package org.delta.managers.bingo;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.delta.pendulum;
@@ -13,6 +14,8 @@ public class BingoDataManager {
     private final pendulum plugin;
     private File bingoFile;
     private FileConfiguration bingoConfig;
+    private File progressFile;
+    private FileConfiguration progressConfig;
 
     private final Map<String, BingoChallenge> challenges;
 
@@ -21,6 +24,7 @@ public class BingoDataManager {
         this.challenges = new HashMap<>();
         loadConfiguration();
         loadChallenges();
+        loadProgress();
     }
 
     public static BingoDataManager getInstance(pendulum plugin) {
@@ -42,6 +46,16 @@ public class BingoDataManager {
         }
 
         bingoConfig = YamlConfiguration.loadConfiguration(bingoFile);
+
+        progressFile = new File(plugin.getDataFolder(), "bingo-progress.yml");
+        if (!progressFile.exists()) {
+            try {
+                progressFile.createNewFile();
+            } catch (IOException e) {
+                plugin.getLogger().severe("Error al crear bingo-progress.yml: " + e.getMessage());
+            }
+        }
+        progressConfig = YamlConfiguration.loadConfiguration(progressFile);
     }
 
     private void createDefaultConfig() {
@@ -63,8 +77,8 @@ public class BingoDataManager {
 
                 createDefaultChallenges(config);
 
-                config.set("bingo.messages.challenge-completed", "&a¡Tu equipo ha completado el reto: {challenge}!");
-                config.set("bingo.messages.bingo-completed", "&6&l¡BINGO! &e¡Tu equipo ha completado una línea!");
+                config.set("bingo.messages.challenge-completed", "&a¡{player} ha completado el reto: {challenge}!");
+                config.set("bingo.messages.bingo-completed", "&6&l¡BINGO! &e¡Tu equipo ha completado {line}!");
                 config.set("bingo.messages.team-progress", "&7Progreso del equipo: &a{completed}&7/&c{total}");
 
                 config.save(bingoFile);
@@ -77,7 +91,6 @@ public class BingoDataManager {
 
     private void createDefaultChallenges(FileConfiguration config) {
         String[][] defaultChallenges = {
-                // {type, target, amount, displayName, description, icon}
                 {"COLLECT_ITEM", "DIAMOND", "5", "&bDiamantes Brillantes", "&7Consigue 5 diamantes", "DIAMOND"},
                 {"COLLECT_ITEM", "EMERALD", "3", "&aEsmeraldas Valiosas", "&7Consigue 3 esmeraldas", "EMERALD"},
                 {"KILL_MOB", "ZOMBIE", "20", "&cMatador de Zombies", "&7Mata 20 zombies", "ROTTEN_FLESH"},
@@ -102,14 +115,7 @@ public class BingoDataManager {
                 {"MINE_BLOCK", "COAL_ORE", "64", "&8Carbón Abundante", "&7Mina 64 minerales de carbón", "COAL_ORE"},
                 {"COLLECT_ITEM", "GOLDEN_APPLE", "1", "&6Manzana Dorada", "&7Consigue 1 manzana dorada", "GOLDEN_APPLE"},
                 {"KILL_MOB", "CREEPER", "10", "&aExplosivo", "&7Mata 10 creepers", "GUNPOWDER"},
-                {"MINE_BLOCK", "IRON_ORE", "32", "&fHierro Forjado", "&7Mina 32 minerales de hierro", "IRON_ORE"},
-                {"COLLECT_ITEM", "ENDER_PEARL", "8", "&5Perlas del End", "&7Consigue 8 perlas de ender", "ENDER_PEARL"},
-                {"KILL_MOB", "SPIDER", "25", "&8Exterminador de Arañas", "&7Mata 25 arañas", "SPIDER_EYE"},
-                {"MINE_BLOCK", "GOLD_ORE", "16", "&6Oro Reluciente", "&7Mina 16 minerales de oro", "GOLD_ORE"},
-                {"COLLECT_ITEM", "BLAZE_ROD", "5", "&eVaras Flamígeras", "&7Consigue 5 varas de blaze", "BLAZE_ROD"},
-                {"KILL_MOB", "ENDERMAN", "5", "&5Cazador del End", "&7Mata 5 enderman", "ENDER_PEARL"},
-                {"MINE_BLOCK", "DIAMOND_ORE", "8", "&bMinero de Diamantes", "&7Mina 8 minerales de diamante", "DIAMOND_ORE"},
-                {"COLLECT_ITEM", "GHAST_TEAR", "3", "&fLágrimas Espectrales", "&7Consigue 3 lágrimas de ghast", "GHAST_TEAR"}
+                {"MINE_BLOCK", "IRON_ORE", "32", "&fHierro Forjado", "&7Mina 32 minerales de hierro", "IRON_ORE"}
         };
 
         for (int i = 0; i < defaultChallenges.length; i++) {
@@ -139,7 +145,7 @@ public class BingoDataManager {
             return;
         }
 
-        for (String key : bingoConfig.getConfigurationSection("bingo.challenges").getKeys(false)) {
+        for (String key : Objects.requireNonNull(bingoConfig.getConfigurationSection("bingo.challenges")).getKeys(false)) {
             String path = "bingo.challenges." + key;
 
             BingoChallenge challenge = new BingoChallenge(
@@ -156,6 +162,92 @@ public class BingoDataManager {
         }
 
         plugin.getLogger().info("Cargados " + challenges.size() + " retos de bingo");
+    }
+
+    public void saveProgress() {
+        try {
+            BingoProgressManager progressManager = BingoProgressManager.getInstance();
+            Map<String, Object> data = progressManager.getProgressData();
+
+            for (String key : progressConfig.getKeys(false)) {
+                progressConfig.set(key, null);
+            }
+
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                progressConfig.set(entry.getKey(), entry.getValue());
+            }
+
+            progressConfig.save(progressFile);
+            plugin.getLogger().info("Progreso de bingo guardado exitosamente");
+        } catch (IOException e) {
+            plugin.getLogger().severe("Error al guardar progreso de bingo: " + e.getMessage());
+        }
+    }
+
+    private Map<String, Object> convertConfigSectionToMap(ConfigurationSection section) {
+        Map<String, Object> result = new HashMap<>();
+
+        for (String key : section.getKeys(false)) {
+            Object value = section.get(key);
+
+            if (value instanceof ConfigurationSection) {
+                result.put(key, convertConfigSectionToMap((ConfigurationSection) value));
+            } else {
+                result.put(key, value);
+            }
+        }
+
+        return result;
+    }
+
+    public void loadProgress() {
+        try {
+            if (!progressFile.exists()) {
+                plugin.getLogger().info("No hay progreso previo de bingo para cargar");
+                return;
+            }
+
+            progressConfig = YamlConfiguration.loadConfiguration(progressFile);
+
+            Set<String> keys = progressConfig.getKeys(false);
+            if (keys.isEmpty()) {
+                plugin.getLogger().info("El archivo bingo-progress.yml está vacío");
+                return;
+            }
+
+            Map<String, Object> data = new HashMap<>();
+
+            for (String key : keys) {
+                Object value = progressConfig.get(key);
+
+                if (value instanceof ConfigurationSection) {
+                    data.put(key, convertConfigSectionToMap((ConfigurationSection) value));
+                } else {
+                    data.put(key, value);
+                }
+            }
+
+            BingoProgressManager.getInstance().loadProgress(data);
+            plugin.getLogger().info("Progreso de bingo cargado exitosamente");
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error al cargar progreso de bingo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void resetProgress() {
+        BingoProgressManager.getInstance().resetAllProgress();
+
+        try {
+            for (String key : progressConfig.getKeys(false)) {
+                progressConfig.set(key, null);
+            }
+            progressConfig.save(progressFile);
+
+            plugin.getLogger().info("Progreso de bingo reseteado");
+        } catch (IOException e) {
+            plugin.getLogger().severe("Error al resetear progreso: " + e.getMessage());
+        }
     }
 
     public Map<String, BingoChallenge> getChallenges() {
@@ -177,5 +269,4 @@ public class BingoDataManager {
     public String getMessage(String key) {
         return bingoConfig.getString("bingo.messages." + key, "&cMensaje no configurado");
     }
-
 }

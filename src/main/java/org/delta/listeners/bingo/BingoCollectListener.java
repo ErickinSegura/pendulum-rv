@@ -7,8 +7,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
-import org.delta.libs.MessageUtils;
-import org.delta.libs.builders.ItemBuilder;
 import org.delta.managers.bingo.BingoChallenge;
 import org.delta.managers.bingo.BingoDataManager;
 import org.delta.managers.bingo.BingoProgressManager;
@@ -27,7 +25,7 @@ public class BingoCollectListener implements Listener {
         ItemStack item = event.getItem().getItemStack();
         String materialName = item.getType().name();
 
-        checkCollectChallenges(team, player, materialName, item.getAmount());
+        trackCollectProgress(team, materialName, item.getAmount());
     }
 
     @EventHandler
@@ -47,27 +45,23 @@ public class BingoCollectListener implements Listener {
             amount = getMaxCraftAmount(event, item);
         }
 
-        checkCollectChallenges(team, player, materialName, amount);
+        trackCollectProgress(team, materialName, amount);
     }
 
-    private void checkCollectChallenges(Team team, Player player, String materialName, int amount) {
+    private void trackCollectProgress(Team team, String materialName, int amount) {
         Map<String, BingoChallenge> challenges = BingoDataManager.getInstance().getChallenges();
         BingoProgressManager progressManager = BingoProgressManager.getInstance();
 
         for (BingoChallenge challenge : challenges.values()) {
             if (challenge.getChallengeType() != BingoChallenge.ChallengeType.COLLECT_ITEM) continue;
 
-            if (progressManager.isChallengeCompleted(team.getName(), challenge.getId())) continue;
+            if (progressManager.isChallengeCompleted(team.getName(), challenge.id())) continue;
 
-            if (!challenge.getTarget().equalsIgnoreCase(materialName)) continue;
+            if (!challenge.target().equalsIgnoreCase(materialName)) continue;
 
-            progressManager.addProgress(team.getName(), challenge.getId(), amount);
-            int currentProgress = progressManager.getProgress(team.getName(), challenge.getId());
+            progressManager.addProgress(team.getName(), challenge.id(), amount);
 
-            if (currentProgress >= challenge.getAmount()) {
-                progressManager.completeChallenge(team.getName(), challenge.getId());
-                notifyTeamCompletion(team, challenge);
-            }
+            BingoDataManager.getInstance().saveProgress();
         }
     }
 
@@ -81,21 +75,5 @@ public class BingoCollectListener implements Listener {
         }
 
         return maxCraft;
-    }
-
-    private void notifyTeamCompletion(Team team, BingoChallenge challenge) {
-        String message = BingoDataManager.getInstance()
-                .getMessage("challenge-completed")
-                .replace("{challenge}", ItemBuilder.format(challenge.getDisplayName()));
-
-        // Notificar a todos los miembros del equipo
-        for (String memberName : team.getEntries()) {
-            Player member = org.bukkit.Bukkit.getPlayer(memberName);
-            if (member != null && member.isOnline()) {
-                member.sendMessage(MessageUtils.color(message));
-                member.playSound(member.getLocation(),
-                        org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
-            }
-        }
     }
 }

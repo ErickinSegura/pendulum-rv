@@ -42,6 +42,13 @@ public class CommandCompletion implements TabCompleter {
                 "set", "reset"
         ));
 
+        subCommandCompletions.put("bingo", Arrays.asList(
+                "stats"
+        ));
+
+        subCommandCompletions.put("bingo_admin", Arrays.asList(
+                "reset"
+        ));
     }
 
     @Override
@@ -82,6 +89,17 @@ public class CommandCompletion implements TabCompleter {
                     return filterCompletions(relojsCompletions, args[1]);
                 }
             }
+
+            if (args[0].equalsIgnoreCase("bingo")) {
+                List<String> bingoCompletions = new ArrayList<>(subCommandCompletions.get("bingo"));
+                if (checkPermission(player)) {
+                    List<String> bingoAdminCompletions = subCommandCompletions.get("bingo_admin");
+                    if (bingoAdminCompletions != null) {
+                        bingoCompletions.addAll(bingoAdminCompletions);
+                    }
+                }
+                return filterCompletions(bingoCompletions, args[1]);
+            }
         }
 
         if (args.length == 3) {
@@ -91,6 +109,13 @@ public class CommandCompletion implements TabCompleter {
                 return getOnlinePlayerNames(args[2]);
             }
 
+            if (args[0].equalsIgnoreCase("bingo") &&
+                    args[1].equalsIgnoreCase("reset") &&
+                    checkPermission(player)) {
+                List<String> completions = new ArrayList<>(getTeamNames(args[2]));
+                completions.add("confirm");
+                return filterCompletions(completions, args[2]);
+            }
         }
 
         return Collections.emptyList();

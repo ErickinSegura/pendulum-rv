@@ -43,7 +43,7 @@ public class CommandCompletion implements TabCompleter {
         ));
 
         subCommandCompletions.put("bingo", Arrays.asList(
-                "stats"
+                "stats", "lb"
         ));
 
         subCommandCompletions.put("bingo_admin", Arrays.asList(
@@ -114,6 +114,12 @@ public class CommandCompletion implements TabCompleter {
                     checkPermission(player)) {
                 List<String> completions = new ArrayList<>(getTeamNames(args[2]));
                 completions.add("confirm");
+                return filterCompletions(completions, args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("bingo") &&
+                    args[1].equalsIgnoreCase("lb")) {
+                List<String> completions = new ArrayList<>(getTeamNames(args[2]));
                 return filterCompletions(completions, args[2]);
             }
         }

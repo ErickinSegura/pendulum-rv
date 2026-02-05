@@ -30,6 +30,8 @@ public class BingoDataManager {
     public static BingoDataManager getInstance(pendulum plugin) {
         if (instance == null) {
             instance = new BingoDataManager(plugin);
+            // Inicializar el ScoreManager después del DataManager
+            BingoScoreManager.getInstance(plugin);
         }
         return instance;
     }
@@ -178,6 +180,10 @@ public class BingoDataManager {
             }
 
             progressConfig.save(progressFile);
+
+            // También guardar los scores
+            BingoScoreManager.getInstance().saveScoreData();
+
             plugin.getLogger().info("Progreso de bingo guardado exitosamente");
         } catch (IOException e) {
             plugin.getLogger().severe("Error al guardar progreso de bingo: " + e.getMessage());
@@ -237,6 +243,7 @@ public class BingoDataManager {
 
     public void resetProgress() {
         BingoProgressManager.getInstance().resetAllProgress();
+        BingoScoreManager.getInstance().resetAllScores();
 
         try {
             for (String key : progressConfig.getKeys(false)) {

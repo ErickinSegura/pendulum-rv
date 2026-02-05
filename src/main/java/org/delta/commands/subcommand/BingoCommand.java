@@ -17,8 +17,11 @@ import org.delta.managers.bingo.BingoChallenge;
 import org.delta.managers.bingo.BingoDataManager;
 import org.delta.managers.bingo.BingoInventoryHolder;
 import org.delta.managers.bingo.BingoProgressManager;
+import org.delta.managers.bingo.BingoScoreManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +58,13 @@ public class BingoCommand implements SubCommand {
                 resetearBingo(player, args);
             }
             case "stats" -> mostrarEstadisticas(player);
+            case "leaderboard", "lb" -> {
+                if (args.length == 2) {
+                    mostrarLeaderboard(player);
+                } else {
+                    mostrarDetallesEquipo(player, args[2]);
+                }
+            }
             case "debug" -> {
                 if (!checkPermission(player)) {
                     player.sendMessage(MessageUtils.color("&c✘ No tienes permisos para este comando."));
@@ -67,6 +77,154 @@ public class BingoCommand implements SubCommand {
                 showUsage(player);
             }
         }
+    }
+
+    private void mostrarLeaderboard(Player player) {
+        BingoScoreManager scoreManager = BingoScoreManager.getInstance();
+        List<Map.Entry<String, Integer>> leaderboard = scoreManager.getSortedLeaderboard();
+
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
+
+        player.sendMessage("");
+        player.sendMessage(MessageUtils.color("&8&l≫ &6&l🏆 LEADERBOARD DE BINGO &6&l🏆 &8&l≪"));
+        player.sendMessage("");
+
+        if (leaderboard.isEmpty()) {
+            player.sendMessage(MessageUtils.color("&7Aún no hay equipos con puntos registrados"));
+            player.sendMessage("");
+            return;
+        }
+
+        int position = 1;
+        for (Map.Entry<String, Integer> entry : leaderboard) {
+            String medal = switch (position) {
+                case 1 -> "&6🥇";
+                case 2 -> "&7🥈";
+                case 3 -> "&c🥉";
+                default -> "&8#" + position;
+            };
+
+            String teamName = entry.getKey();
+            int points = entry.getValue();
+
+            player.sendMessage(MessageUtils.color(
+                    medal + " &d" + teamName + " &8- &e" + points + " pts"
+            ));
+
+            position++;
+        }
+
+        player.sendMessage("");
+        player.sendMessage(MessageUtils.color("&7Usa &d/pdl bingo lb <equipo> &7para ver detalles"));
+        player.sendMessage("");
+
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, 1.0f);
+    }
+
+    private void mostrarDetallesEquipo(Player player, String teamName) {
+        Team team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(teamName);
+
+        if (team == null) {
+            player.sendMessage(MessageUtils.color("&c✘ El equipo &f" + teamName + " &cno existe."));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        BingoScoreManager scoreManager = BingoScoreManager.getInstance();
+        List<BingoScoreManager.ScoreEntry> history = scoreManager.getScoreHistory(teamName);
+        int totalScore = scoreManager.getTotalScore(teamName);
+
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
+
+        player.sendMessage("");
+        player.sendMessage(MessageUtils.color("&8&l≫ &6&lDETALLE DE PUNTOS - &d" + teamName + " &8&l≪"));
+        player.sendMessage("");
+        player.sendMessage(MessageUtils.color("&8└ 🏆 &7Puntuación total: &e" + totalScore + " pts"));
+        player.sendMessage("");
+
+        if (history.isEmpty()) {
+            player.sendMessage(MessageUtils.color("&7Este equipo aún no ha ganado puntos"));
+            player.sendMessage("");
+            return;
+        }
+
+        // Agrupar por tipo
+        Map<String, List<BingoScoreManager.ScoreEntry>> groupedByType = new java.util.HashMap<>();
+        for (BingoScoreManager.ScoreEntry entry : history) {
+            groupedByType.computeIfAbsent(entry.type(), k -> new ArrayList<>()).add(entry);
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm");
+
+        // Mostrar retos
+        if (groupedByType.containsKey("CHALLENGE")) {
+            List<BingoScoreManager.ScoreEntry> challenges = groupedByType.get("CHALLENGE");
+            int challengeTotal = challenges.stream().mapToInt(BingoScoreManager.ScoreEntry::points).sum();
+
+            player.sendMessage(MessageUtils.color("&8└ 📊 &7Retos completados: &a" + challenges.size() + " &8(&e" + challengeTotal + " pts&8)"));
+
+            for (BingoScoreManager.ScoreEntry entry : challenges) {
+                String date = dateFormat.format(new Date(entry.timestamp()));
+                String positionStr = getPositionString(entry.position());
+
+                player.sendMessage(MessageUtils.color(
+                        "&8   ├ &f" + entry.description() +
+                                " &8[" + positionStr + "&8] &7→ &e+" + entry.points() + " pts"
+                ));
+            }
+            player.sendMessage("");
+        }
+
+        // Mostrar líneas
+        if (groupedByType.containsKey("LINE")) {
+            List<BingoScoreManager.ScoreEntry> lines = groupedByType.get("LINE");
+            int lineTotal = lines.stream().mapToInt(BingoScoreManager.ScoreEntry::points).sum();
+
+            player.sendMessage(MessageUtils.color("&8└ 🎯 &7Líneas completadas: &a" + lines.size() + " &8(&e" + lineTotal + " pts&8)"));
+
+            for (BingoScoreManager.ScoreEntry entry : lines) {
+                String date = dateFormat.format(new Date(entry.timestamp()));
+                String positionStr = getPositionString(entry.position());
+
+                player.sendMessage(MessageUtils.color(
+                        "&8   ├ &f" + entry.description() +
+                                " &8[" + positionStr + "&8] &7→ &e+" + entry.points() + " pts"
+                ));
+            }
+            player.sendMessage("");
+        }
+
+        // Mostrar bingo completo
+        if (groupedByType.containsKey("FULL_BINGO")) {
+            List<BingoScoreManager.ScoreEntry> fullBingos = groupedByType.get("FULL_BINGO");
+
+            for (BingoScoreManager.ScoreEntry entry : fullBingos) {
+                String date = dateFormat.format(new Date(entry.timestamp()));
+                String positionStr = getPositionString(entry.position());
+
+                player.sendMessage(MessageUtils.color("&8└ 🎊 &7Bingo Completo:"));
+                player.sendMessage(MessageUtils.color(
+                        "&8   └ &6¡COMPLETADO! " +
+                                " &8[" + positionStr + "&8] &7→ &e+" + entry.points() + " pts"
+                ));
+            }
+            player.sendMessage("");
+        }
+
+        player.sendMessage(MessageUtils.color("&7Última actualización: " +
+                dateFormat.format(new Date(history.get(history.size() - 1).timestamp()))));
+        player.sendMessage("");
+
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, 1.0f);
+    }
+
+    private String getPositionString(int position) {
+        return switch (position) {
+            case 1 -> "&61°";
+            case 2 -> "&72°";
+            case 3 -> "&c3°";
+            default -> "&8" + position + "°";
+        };
     }
 
     private void mostrarDebug(Player player) {
@@ -149,7 +307,7 @@ public class BingoCommand implements SubCommand {
     private void openBingoGUI(Player player, Team team) {
         int gridSize = BingoDataManager.getInstance().getGridSize();
 
-        int rows = gridSize; // +1 arriba y +1 abajo
+        int rows = gridSize;
         if (rows > 6) rows = 6;
 
         int inventorySize = rows * 9;
@@ -254,8 +412,11 @@ public class BingoCommand implements SubCommand {
         }
 
         BingoProgressManager progressManager = BingoProgressManager.getInstance();
+        BingoScoreManager scoreManager = BingoScoreManager.getInstance();
+
         Set<Integer> completados = progressManager.getCompletedChallenges(team.getName());
         int totalChallenges = BingoDataManager.getInstance().getChallenges().size();
+        int totalScore = scoreManager.getTotalScore(team.getName());
 
         Set<Integer> rowsCompletadas = progressManager.getCompletedRows(team.getName());
         Set<Integer> columnasCompletadas = progressManager.getCompletedColumns(team.getName());
@@ -270,6 +431,7 @@ public class BingoCommand implements SubCommand {
         player.sendMessage(MessageUtils.color("&8└ 🏆 &7Equipo: &d" + team.getName()));
         player.sendMessage("");
 
+        sendBingoStat(player, "🏅", "Puntuación total", totalScore + " pts");
         sendBingoStat(player, "📊", "Retos completados", completados.size() + "/" + totalChallenges);
 
         int porcentaje = totalChallenges > 0 ? (int) ((completados.size() / (double) totalChallenges) * 100) : 0;
@@ -295,6 +457,8 @@ public class BingoCommand implements SubCommand {
             }
         }
 
+        player.sendMessage("");
+        player.sendMessage(MessageUtils.color("&7Usa &d/pdl bingo lb " + team.getName() + " &7para ver detalles"));
         player.sendMessage("");
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, 1.0f);
     }
@@ -324,7 +488,8 @@ public class BingoCommand implements SubCommand {
         executor.sendMessage(MessageUtils.color("&8   ├ &7Progreso de &ctodos los equipos"));
         executor.sendMessage(MessageUtils.color("&8   ├ &7Retos &ccompletados"));
         executor.sendMessage(MessageUtils.color("&8   ├ &7Líneas de &cbingo"));
-        executor.sendMessage(MessageUtils.color("&8   └ &7Estadísticas &cgenerales"));
+        executor.sendMessage(MessageUtils.color("&8   ├ &7Estadísticas &cgenerales"));
+        executor.sendMessage(MessageUtils.color("&8   └ &7Puntuaciones y &cleaderboard"));
         executor.sendMessage("");
         executor.sendMessage(MessageUtils.color("&ePara confirmar, usa: &d/pdl bingo reset confirm"));
         executor.sendMessage("");
@@ -347,9 +512,13 @@ public class BingoCommand implements SubCommand {
         }
 
         BingoProgressManager progressManager = BingoProgressManager.getInstance();
+        BingoScoreManager scoreManager = BingoScoreManager.getInstance();
+
         int completados = progressManager.getCompletedChallenges(teamName).size();
+        int puntosAntes = scoreManager.getTotalScore(teamName);
 
         progressManager.resetTeamProgress(teamName);
+        scoreManager.resetTeamScore(teamName);
         BingoDataManager.getInstance().saveProgress();
 
         executor.playSound(executor.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
@@ -359,6 +528,7 @@ public class BingoCommand implements SubCommand {
         executor.sendMessage("");
         executor.sendMessage(MessageUtils.color("&8└ 🏆 &7Equipo: &d" + teamName));
         executor.sendMessage(MessageUtils.color("&8└ 📊 &7Retos reseteados: &d" + completados));
+        executor.sendMessage(MessageUtils.color("&8└ 🏅 &7Puntos perdidos: &d" + puntosAntes + " pts"));
         executor.sendMessage(MessageUtils.color("&8└ ✔ &7El equipo puede comenzar desde cero"));
         executor.sendMessage("");
 
@@ -377,18 +547,25 @@ public class BingoCommand implements SubCommand {
 
     private void ejecutarResetGlobal(Player executor) {
         BingoProgressManager progressManager = BingoProgressManager.getInstance();
+        BingoScoreManager scoreManager = BingoScoreManager.getInstance();
+
         int totalEquipos = 0;
         int totalCompletados = 0;
+        int totalPuntos = 0;
 
         for (Team team : Bukkit.getScoreboardManager().getMainScoreboard().getTeams()) {
             Set<Integer> completados = progressManager.getCompletedChallenges(team.getName());
-            if (!completados.isEmpty()) {
+            int puntos = scoreManager.getTotalScore(team.getName());
+
+            if (!completados.isEmpty() || puntos > 0) {
                 totalEquipos++;
                 totalCompletados += completados.size();
+                totalPuntos += puntos;
             }
         }
 
         BingoDataManager.getInstance().resetProgress();
+        scoreManager.resetAllScores();
 
         executor.playSound(executor.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
 
@@ -397,6 +574,7 @@ public class BingoCommand implements SubCommand {
         executor.sendMessage("");
         executor.sendMessage(MessageUtils.color("&8└ 🏆 &7Equipos afectados: &d" + totalEquipos));
         executor.sendMessage(MessageUtils.color("&8└ 📊 &7Total de retos reseteados: &d" + totalCompletados));
+        executor.sendMessage(MessageUtils.color("&8└ 🏅 &7Total de puntos perdidos: &d" + totalPuntos + " pts"));
         executor.sendMessage(MessageUtils.color("&8└ ✔ &7Todos los equipos comenzarán desde cero"));
         executor.sendMessage("");
 
@@ -432,6 +610,8 @@ public class BingoCommand implements SubCommand {
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&d/pdl bingo &7- Abrir el tablero de bingo"));
         player.sendMessage(MessageUtils.color("&d/pdl bingo stats &7- Ver estadísticas del equipo"));
+        player.sendMessage(MessageUtils.color("&d/pdl bingo lb &7- Ver leaderboard general"));
+        player.sendMessage(MessageUtils.color("&d/pdl bingo lb <equipo> &7- Ver detalles de un equipo"));
 
         if (checkPermission(player)) {
             player.sendMessage(MessageUtils.color("&d/pdl bingo debug &7- Ver información de debug &8(Admin)"));

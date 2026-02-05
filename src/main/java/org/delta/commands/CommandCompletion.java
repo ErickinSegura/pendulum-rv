@@ -21,7 +21,7 @@ public class CommandCompletion implements TabCompleter {
 
     private void initializeCompletions() {
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "relojs", "bingo", "health"
+                "reto", "info", "relojs", "bingo", "health", "chest"
         );
         subCommandCompletions.put("basic", basicCommands);
 
@@ -52,6 +52,10 @@ public class CommandCompletion implements TabCompleter {
 
         subCommandCompletions.put("health_admin", Arrays.asList(
                 "set", "reset", "sacrifice"
+        ));
+
+        subCommandCompletions.put("chest_admin", Arrays.asList(
+                "config", "info"
         ));
     }
 
@@ -115,6 +119,13 @@ public class CommandCompletion implements TabCompleter {
                 }
                 return filterCompletions(healthCompletions, args[1]);
             }
+
+            if (args[0].equalsIgnoreCase("chest") && checkPermission(player)) {
+                List<String> chestAdminCompletions = subCommandCompletions.get("chest_admin");
+                if (chestAdminCompletions != null) {
+                    return filterCompletions(chestAdminCompletions, args[1]);
+                }
+            }
         }
 
         if (args.length == 3) {
@@ -157,6 +168,18 @@ public class CommandCompletion implements TabCompleter {
                     checkPermission(player)) {
                 return getOnlinePlayerNames(args[2]);
             }
+
+            if (args[0].equalsIgnoreCase("chest") &&
+                    (args[1].equalsIgnoreCase("config") || args[1].equalsIgnoreCase("configurar")) &&
+                    checkPermission(player)) {
+                return getTeamNames(args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("chest") &&
+                    args[1].equalsIgnoreCase("info") &&
+                    checkPermission(player)) {
+                return getTeamNames(args[2]);
+            }
         }
 
         if (args.length == 4) {
@@ -170,6 +193,12 @@ public class CommandCompletion implements TabCompleter {
                     args[1].equalsIgnoreCase("sacrifice") &&
                     checkPermission(player)) {
                 return Collections.emptyList();
+            }
+
+            if (args[0].equalsIgnoreCase("chest") &&
+                    (args[1].equalsIgnoreCase("config") || args[1].equalsIgnoreCase("configurar")) &&
+                    checkPermission(player)) {
+                return Arrays.asList("1", "2", "3", "4", "5", "6");
             }
         }
 

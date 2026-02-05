@@ -26,6 +26,14 @@ public class DiaCommand implements SubCommand {
             return;
         }
 
+        if (args.length == 1) {
+            int diaActual = PendulumSettings.getInstance().getDia();
+            player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lDÍAS DEL SERVIDOR&r &d&l&k|&r &8&l≪"));
+            player.sendMessage(MessageUtils.color("&8└ &7Dia Actual: "+ diaActual));
+            player.sendMessage(MessageUtils.color("&8└ &7Dias Restantes: "+ (60-diaActual)));
+            return;
+        }
+
         int nuevoDia;
         try {
             nuevoDia = Integer.parseInt(args[1]);

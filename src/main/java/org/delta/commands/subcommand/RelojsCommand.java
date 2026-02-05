@@ -9,9 +9,7 @@ import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.delta.pendulum;
 
-import javax.swing.*;
-
-public class LivesCommand implements SubCommand {
+public class RelojsCommand implements SubCommand {
 
     @Override
     public String getName() {
@@ -66,13 +64,13 @@ public class LivesCommand implements SubCommand {
         player.sendMessage(MessageUtils.color("&c&l⚠ Sintaxis incorrecta"));
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&7Usos disponibles:"));
-        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs &8- &7Ver tus vidas"));
-        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs <jugador> &8- &7Ver vidas de otro"));
+        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs &8- &7Ver tus relojs"));
+        player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs <jugador> &8- &7Ver relojs de otro"));
 
         if (isAdmin(player)) {
-            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs set <jugador> <cantidad> &8- &7Setear vidas"));
-            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs reset <jugador> &8- &7Resetear vidas"));
-            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs sacrifice <sacrificador> <cantidad> <receptor> &8- &7Sacrificar vidas"));
+            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs set <jugador> <cantidad> &8- &7Setear relojs"));
+            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs reset <jugador> &8- &7Resetear relojs"));
+            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs sacrifice <sacrificador> <cantidad> <receptor> &8- &7Sacrificar relojs"));
         }
         player.sendMessage("");
     }
@@ -82,9 +80,9 @@ public class LivesCommand implements SubCommand {
 
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lTUS VIDAS&r &d&l&k|&r &8&l≪"));
+        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lTUS RELOJS&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8└ &7Vidas restantes: ").append(getLifeDisplay(lives)));
+        player.sendMessage(MessageUtils.color("&8└ &7Relojs restantes: ").append(getLifeDisplay(lives)));
         player.sendMessage("");
     }
 
@@ -101,9 +99,9 @@ public class LivesCommand implements SubCommand {
 
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lVIDAS DE " + target.getName() + "&r &d&l&k|&r &8&l≪"));
+        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lRELOJS DE " + target.getName() + "&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8└ &7Vidas restantes: ").append(getLifeDisplay(lives)));
+        player.sendMessage(MessageUtils.color("&8└ &7Relojs restantes: ").append(getLifeDisplay(lives)));
         player.sendMessage("");
     }
 
@@ -133,8 +131,8 @@ public class LivesCommand implements SubCommand {
 
         pendulum.getInstance().getLifeManager().setLives(target, amount);
 
-        player.sendMessage(MessageUtils.color("&aHas establecido las vidas de &e" + target.getName() + " &aa &d" + amount + "&a."));
-        target.sendMessage(MessageUtils.color("&eTus vidas han sido establecidas a ").append(getLifeDisplay(amount)).append(MessageUtils.color("&e.")));
+        player.sendMessage(MessageUtils.color("&aHas establecido los relojs de &e" + target.getName() + " &aa &d" + amount + "&a."));
+        target.sendMessage(MessageUtils.color("&eTus relojs han sido establecidos a ").append(getLifeDisplay(amount)).append(MessageUtils.color("&e.")));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.2f);
     }
@@ -150,8 +148,8 @@ public class LivesCommand implements SubCommand {
 
         pendulum.getInstance().getLifeManager().resetLives(target);
 
-        player.sendMessage(MessageUtils.color("&aHas reseteado las vidas de &e" + target.getName() + " &aa &d3&a."));
-        target.sendMessage(MessageUtils.color("&eTus vidas han sido reseteadas a ").append(getLifeDisplay(3)).append(MessageUtils.color("&e.")));
+        player.sendMessage(MessageUtils.color("&aHas reseteado los relojs de &e" + target.getName() + " &aa &d3&a."));
+        target.sendMessage(MessageUtils.color("&eTus relojs han sido reseteados a ").append(getLifeDisplay(3)).append(MessageUtils.color("&e.")));
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.2f);
@@ -198,16 +196,16 @@ public class LivesCommand implements SubCommand {
         int receiverLives = pendulum.getInstance().getLifeManager().getLives(receiver);
 
         if (amount > sacrificerLives) {
-            executor.sendMessage(MessageUtils.color("&cEl jugador &e" + sacrificerName + " &cno tiene suficientes vidas."));
-            executor.sendMessage(MessageUtils.color("&cVidas actuales: &d" + sacrificerLives + " &c| Intenta sacrificar: &d" + amount));
+            executor.sendMessage(MessageUtils.color("&cEl jugador &e" + sacrificerName + " &cno tiene suficientes relojs."));
+            executor.sendMessage(MessageUtils.color("&cRelojs actuales: &d" + sacrificerLives + " &c| Intenta sacrificar: &d" + amount));
             executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
             return;
         }
 
         int newReceiverLives = receiverLives + amount;
         if (newReceiverLives > 3) {
-            executor.sendMessage(MessageUtils.color("&cEl receptor superaría el límite de 3 vidas."));
-            executor.sendMessage(MessageUtils.color("&cVidas actuales: &d" + receiverLives + " &c| Resultado: &d" + newReceiverLives));
+            executor.sendMessage(MessageUtils.color("&cEl receptor superaría el límite de 3 relojs."));
+            executor.sendMessage(MessageUtils.color("&cRelojs actuales: &d" + receiverLives + " &c| Resultado: &d" + newReceiverLives));
             executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
             return;
         }
@@ -225,7 +223,7 @@ public class LivesCommand implements SubCommand {
         executor.sendMessage(MessageUtils.color("&8└ &7Nueva cantidad de relojs: ").append(getLifeDisplay(newSacrificerLives)));
         executor.sendMessage("");
         executor.sendMessage(MessageUtils.color("&8└ &7Receptor: &e" + receiver.getName()));
-        executor.sendMessage(MessageUtils.color("&8└ &7Relojs recibidoss: &a+" + amount));
+        executor.sendMessage(MessageUtils.color("&8└ &7Relojs recibidos: &a+" + amount));
         executor.sendMessage(MessageUtils.color("&8└ &7Nueva cantidad de relojs: ").append(getLifeDisplay(newReceiverLives)));
         executor.sendMessage("");
 

@@ -26,6 +26,7 @@ public class PendulumCommand implements CommandExecutor {
         addSubCommand(new LivesCommand());
         addSubCommand(new DiaCommand());
         addSubCommand(new BingoCommand());
+        addSubCommand(new HealthCommand());
     }
 
     private void addSubCommand(SubCommand command) {

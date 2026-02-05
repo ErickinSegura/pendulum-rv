@@ -21,7 +21,7 @@ public class CommandCompletion implements TabCompleter {
 
     private void initializeCompletions() {
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "relojs", "bingo"
+                "reto", "info", "relojs", "bingo", "health"
         );
         subCommandCompletions.put("basic", basicCommands);
 
@@ -39,7 +39,7 @@ public class CommandCompletion implements TabCompleter {
         ));
 
         subCommandCompletions.put("relojs", Arrays.asList(
-                "set", "reset"
+                "set", "reset", "sacrifice"
         ));
 
         subCommandCompletions.put("bingo", Arrays.asList(
@@ -48,6 +48,10 @@ public class CommandCompletion implements TabCompleter {
 
         subCommandCompletions.put("bingo_admin", Arrays.asList(
                 "reset"
+        ));
+
+        subCommandCompletions.put("health_admin", Arrays.asList(
+                "set", "reset", "sacrifice"
         ));
     }
 
@@ -100,11 +104,30 @@ public class CommandCompletion implements TabCompleter {
                 }
                 return filterCompletions(bingoCompletions, args[1]);
             }
+
+            if (args[0].equalsIgnoreCase("health")) {
+                List<String> healthCompletions = new ArrayList<>(getOnlinePlayerNames(args[1]));
+                if (checkPermission(player)) {
+                    List<String> healthAdminCompletions = subCommandCompletions.get("health_admin");
+                    if (healthAdminCompletions != null) {
+                        healthCompletions.addAll(healthAdminCompletions);
+                    }
+                }
+                return filterCompletions(healthCompletions, args[1]);
+            }
         }
 
         if (args.length == 3) {
             if (args[0].equalsIgnoreCase("reto") &&
                     args[1].equalsIgnoreCase("reset") &&
+                    checkPermission(player)) {
+                return getOnlinePlayerNames(args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("relojs") &&
+                    (args[1].equalsIgnoreCase("set") ||
+                            args[1].equalsIgnoreCase("reset") ||
+                            args[1].equalsIgnoreCase("sacrifice")) &&
                     checkPermission(player)) {
                 return getOnlinePlayerNames(args[2]);
             }
@@ -121,6 +144,46 @@ public class CommandCompletion implements TabCompleter {
                     args[1].equalsIgnoreCase("lb")) {
                 List<String> completions = new ArrayList<>(getTeamNames(args[2]));
                 return filterCompletions(completions, args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("health") &&
+                    (args[1].equalsIgnoreCase("set") || args[1].equalsIgnoreCase("reset")) &&
+                    checkPermission(player)) {
+                return getOnlinePlayerNames(args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("health") &&
+                    args[1].equalsIgnoreCase("sacrifice") &&
+                    checkPermission(player)) {
+                return getOnlinePlayerNames(args[2]);
+            }
+        }
+
+        if (args.length == 4) {
+            if (args[0].equalsIgnoreCase("relojs") &&
+                    args[1].equalsIgnoreCase("sacrifice") &&
+                    checkPermission(player)) {
+                return Collections.emptyList();
+            }
+
+            if (args[0].equalsIgnoreCase("health") &&
+                    args[1].equalsIgnoreCase("sacrifice") &&
+                    checkPermission(player)) {
+                return Collections.emptyList();
+            }
+        }
+
+        if (args.length == 5) {
+            if (args[0].equalsIgnoreCase("relojs") &&
+                    args[1].equalsIgnoreCase("sacrifice") &&
+                    checkPermission(player)) {
+                return getOnlinePlayerNames(args[4]);
+            }
+
+            if (args[0].equalsIgnoreCase("health") &&
+                    args[1].equalsIgnoreCase("sacrifice") &&
+                    checkPermission(player)) {
+                return getOnlinePlayerNames(args[4]);
             }
         }
 

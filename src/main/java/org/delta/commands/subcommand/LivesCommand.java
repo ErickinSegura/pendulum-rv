@@ -20,19 +20,16 @@ public class LivesCommand implements SubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
-        // /pendulum lives - Ver tus propias vidas
         if (args.length == 1) {
             showOwnLives(player);
             return;
         }
 
-        // /pendulum lives <jugador> - Ver vidas de otro jugador
         if (args.length == 2) {
             showPlayerLives(player, args[1]);
             return;
         }
 
-        // /pendulum lives set <jugador> <cantidad> - Setear vidas (admin)
         if (args.length == 4 && args[1].equalsIgnoreCase("set")) {
             if (!isAdmin(player)) {
                 player.sendMessage(MessageUtils.color("&cNo tienes permisos para ejecutar este comando."));
@@ -42,7 +39,6 @@ public class LivesCommand implements SubCommand {
             return;
         }
 
-        // /pendulum lives reset <jugador> - Resetear vidas (admin)
         if (args.length == 3 && args[1].equalsIgnoreCase("reset")) {
             if (!isAdmin(player)) {
                 player.sendMessage(MessageUtils.color("&cNo tienes permisos para ejecutar este comando."));
@@ -52,7 +48,15 @@ public class LivesCommand implements SubCommand {
             return;
         }
 
-        // Si no coincide con ninguna sintaxis válida, mostrar uso
+        if (args.length == 5 && args[1].equalsIgnoreCase("sacrifice")) {
+            if (!isAdmin(player)) {
+                player.sendMessage(MessageUtils.color("&cNo tienes permisos para ejecutar este comando."));
+                return;
+            }
+            sacrificeLives(player, args[2], args[3], args[4]);
+            return;
+        }
+
         showUsage(player);
     }
 
@@ -68,6 +72,7 @@ public class LivesCommand implements SubCommand {
         if (isAdmin(player)) {
             player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs set <jugador> <cantidad> &8- &7Setear vidas"));
             player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs reset <jugador> &8- &7Resetear vidas"));
+            player.sendMessage(MessageUtils.color("&8▪ &e/pendulum relojs sacrifice <sacrificador> <cantidad> <receptor> &8- &7Sacrificar vidas"));
         }
         player.sendMessage("");
     }
@@ -150,6 +155,105 @@ public class LivesCommand implements SubCommand {
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.2f);
+    }
+
+    private void sacrificeLives(Player executor, String sacrificerName, String amountStr, String receiverName) {
+        Player sacrificer = Bukkit.getPlayer(sacrificerName);
+        Player receiver = Bukkit.getPlayer(receiverName);
+
+        if (sacrificer == null) {
+            executor.sendMessage(MessageUtils.color("&cEl jugador sacrificador &e" + sacrificerName + " &cno está conectado."));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        if (receiver == null) {
+            executor.sendMessage(MessageUtils.color("&cEl jugador receptor &e" + receiverName + " &cno está conectado."));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        if (sacrificer.equals(receiver)) {
+            executor.sendMessage(MessageUtils.color("&cUn jugador no puede sacrificarse a sí mismo."));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        int amount;
+        try {
+            amount = Integer.parseInt(amountStr);
+        } catch (NumberFormatException e) {
+            executor.sendMessage(MessageUtils.color("&cLa cantidad debe ser un número válido."));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        if (amount <= 0) {
+            executor.sendMessage(MessageUtils.color("&cLa cantidad debe ser mayor a 0."));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        int sacrificerLives = pendulum.getInstance().getLifeManager().getLives(sacrificer);
+        int receiverLives = pendulum.getInstance().getLifeManager().getLives(receiver);
+
+        if (amount > sacrificerLives) {
+            executor.sendMessage(MessageUtils.color("&cEl jugador &e" + sacrificerName + " &cno tiene suficientes vidas."));
+            executor.sendMessage(MessageUtils.color("&cVidas actuales: &d" + sacrificerLives + " &c| Intenta sacrificar: &d" + amount));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        int newReceiverLives = receiverLives + amount;
+        if (newReceiverLives > 3) {
+            executor.sendMessage(MessageUtils.color("&cEl receptor superaría el límite de 3 vidas."));
+            executor.sendMessage(MessageUtils.color("&cVidas actuales: &d" + receiverLives + " &c| Resultado: &d" + newReceiverLives));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        int newSacrificerLives = sacrificerLives - amount;
+
+        pendulum.getInstance().getLifeManager().setLives(sacrificer, newSacrificerLives);
+        pendulum.getInstance().getLifeManager().setLives(receiver, newReceiverLives);
+
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&8&l≫ &5&lSACRIFICIO REALIZADO &8&l≪"));
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&8└ 💀 &7Sacrificador: &e" + sacrificer.getName()));
+        executor.sendMessage(MessageUtils.color("&8└ &7Vidas sacrificadas: &c-" + amount));
+        executor.sendMessage(MessageUtils.color("&8└ &7Nuevas vidas: ").append(getLifeDisplay(newSacrificerLives)));
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&8└ 💚 &7Receptor: &e" + receiver.getName()));
+        executor.sendMessage(MessageUtils.color("&8└ &7Vidas recibidas: &a+" + amount));
+        executor.sendMessage(MessageUtils.color("&8└ &7Nuevas vidas: ").append(getLifeDisplay(newReceiverLives)));
+        executor.sendMessage("");
+
+        executor.playSound(executor.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.2f);
+
+        if (!sacrificer.equals(executor)) {
+            sacrificer.sendMessage("");
+            sacrificer.sendMessage(MessageUtils.color("&8&l≫ &c&lHAS SACRIFICADO VIDAS &8&l≪"));
+            sacrificer.sendMessage("");
+            sacrificer.sendMessage(MessageUtils.color("&8└ 💀 &7Has sacrificado: &c-" + amount + " vida(s)"));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Tus nuevas vidas: ").append(getLifeDisplay(newSacrificerLives)));
+            sacrificer.sendMessage(MessageUtils.color("&8└ 💚 &7Receptor: &e" + receiver.getName()));
+            sacrificer.sendMessage(MessageUtils.color("&8└ ⚡ &7Ejecutado por: &e" + executor.getName()));
+            sacrificer.sendMessage("");
+            sacrificer.playSound(sacrificer.getLocation(), Sound.ENTITY_WITHER_HURT, 0.6f, 0.8f);
+        }
+
+        if (!receiver.equals(executor)) {
+            receiver.sendMessage("");
+            receiver.sendMessage(MessageUtils.color("&8&l≫ &a&lHAS RECIBIDO VIDAS &8&l≪"));
+            receiver.sendMessage("");
+            receiver.sendMessage(MessageUtils.color("&8└ 💚 &7Has recibido: &a+" + amount + " vida(s)"));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Tus nuevas vidas: ").append(getLifeDisplay(newReceiverLives)));
+            receiver.sendMessage(MessageUtils.color("&8└ 💀 &7Sacrificado por: &e" + sacrificer.getName()));
+            receiver.sendMessage(MessageUtils.color("&8└ ⚡ &7Ejecutado por: &e" + executor.getName()));
+            receiver.sendMessage("");
+            receiver.playSound(receiver.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.5f);
+        }
     }
 
     private Component getLifeDisplay(int lives) {

@@ -101,7 +101,7 @@ public class LivesCommand implements SubCommand {
 
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lVIDAS DE " + target.getName().toUpperCase() + "&r &d&l&k|&r &8&l≪"));
+        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lVIDAS DE " + target.getName() + "&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&8└ &7Vidas restantes: ").append(getLifeDisplay(lives)));
         player.sendMessage("");
@@ -218,42 +218,45 @@ public class LivesCommand implements SubCommand {
         pendulum.getInstance().getLifeManager().setLives(receiver, newReceiverLives);
 
         executor.sendMessage("");
-        executor.sendMessage(MessageUtils.color("&8&l≫ &5&lSACRIFICIO REALIZADO &8&l≪"));
+        executor.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lSACRIFICIO REALIZADO&r &d&l&k|&r &8&l≪"));
         executor.sendMessage("");
-        executor.sendMessage(MessageUtils.color("&8└ 💀 &7Sacrificador: &e" + sacrificer.getName()));
-        executor.sendMessage(MessageUtils.color("&8└ &7Vidas sacrificadas: &c-" + amount));
-        executor.sendMessage(MessageUtils.color("&8└ &7Nuevas vidas: ").append(getLifeDisplay(newSacrificerLives)));
+        executor.sendMessage(MessageUtils.color("&8└ &7Sacrificador: &e" + sacrificer.getName()));
+        executor.sendMessage(MessageUtils.color("&8└ &Relojs sacrificados: &c-" + amount));
+        executor.sendMessage(MessageUtils.color("&8└ &7Nueva cantidad de relojs: ").append(getLifeDisplay(newSacrificerLives)));
         executor.sendMessage("");
-        executor.sendMessage(MessageUtils.color("&8└ 💚 &7Receptor: &e" + receiver.getName()));
-        executor.sendMessage(MessageUtils.color("&8└ &7Vidas recibidas: &a+" + amount));
-        executor.sendMessage(MessageUtils.color("&8└ &7Nuevas vidas: ").append(getLifeDisplay(newReceiverLives)));
+        executor.sendMessage(MessageUtils.color("&8└ &7Receptor: &e" + receiver.getName()));
+        executor.sendMessage(MessageUtils.color("&8└ &7Relojs recibidoss: &a+" + amount));
+        executor.sendMessage(MessageUtils.color("&8└ &7Nueva cantidad de relojs: ").append(getLifeDisplay(newReceiverLives)));
         executor.sendMessage("");
 
         executor.playSound(executor.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.2f);
 
         if (!sacrificer.equals(executor)) {
             sacrificer.sendMessage("");
-            sacrificer.sendMessage(MessageUtils.color("&8&l≫ &c&lHAS SACRIFICADO VIDAS &8&l≪"));
+            sacrificer.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lHAS SACRIFICADO RELOJS&r &d&l&k|&r &8&l≪"));
             sacrificer.sendMessage("");
-            sacrificer.sendMessage(MessageUtils.color("&8└ 💀 &7Has sacrificado: &c-" + amount + " vida(s)"));
-            sacrificer.sendMessage(MessageUtils.color("&8└ &7Tus nuevas vidas: ").append(getLifeDisplay(newSacrificerLives)));
-            sacrificer.sendMessage(MessageUtils.color("&8└ 💚 &7Receptor: &e" + receiver.getName()));
-            sacrificer.sendMessage(MessageUtils.color("&8└ ⚡ &7Ejecutado por: &e" + executor.getName()));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Has sacrificado: &c-" + amount + " reloj(s)"));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Tus nueva cantidad de relojs: ").append(getLifeDisplay(newSacrificerLives)));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Receptor: &e" + receiver.getName()));
             sacrificer.sendMessage("");
             sacrificer.playSound(sacrificer.getLocation(), Sound.ENTITY_WITHER_HURT, 0.6f, 0.8f);
         }
 
         if (!receiver.equals(executor)) {
             receiver.sendMessage("");
-            receiver.sendMessage(MessageUtils.color("&8&l≫ &a&lHAS RECIBIDO VIDAS &8&l≪"));
+            receiver.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lHAS RECIBIDO RELOJS&r &d&l&k|&r &8&l≪"));
             receiver.sendMessage("");
-            receiver.sendMessage(MessageUtils.color("&8└ 💚 &7Has recibido: &a+" + amount + " vida(s)"));
-            receiver.sendMessage(MessageUtils.color("&8└ &7Tus nuevas vidas: ").append(getLifeDisplay(newReceiverLives)));
-            receiver.sendMessage(MessageUtils.color("&8└ 💀 &7Sacrificado por: &e" + sacrificer.getName()));
-            receiver.sendMessage(MessageUtils.color("&8└ ⚡ &7Ejecutado por: &e" + executor.getName()));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Has recibido: &a+" + amount + " reloj(s)"));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Tus nueva cantidad de relojs: ").append(getLifeDisplay(newReceiverLives)));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Sacrificado por: &e" + sacrificer.getName()));
             receiver.sendMessage("");
             receiver.playSound(receiver.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.5f);
         }
+
+        Component anuncio = MessageUtils.color("&8&l≫ &d&l&k|&r &6&lSACRIFICIO DE RELOJS&r &d&l&k|&r &8&l≪ &7" + sacrificer.getName() + " &eha sacrificado &c" + amount + " reloj(s) &epara &a" + receiver.getName());
+        Bukkit.broadcast(Component.empty());
+        Bukkit.broadcast(anuncio);
+        Bukkit.broadcast(Component.empty());
     }
 
     private Component getLifeDisplay(int lives) {

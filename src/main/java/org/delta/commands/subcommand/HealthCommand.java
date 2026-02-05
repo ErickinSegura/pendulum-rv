@@ -1,5 +1,6 @@
 package org.delta.commands.subcommand;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -112,18 +113,18 @@ public class HealthCommand implements SubCommand {
             playSuccessEffects(target);
 
             executor.sendMessage("");
-            executor.sendMessage(MessageUtils.color("&8&l≫ &a&lVIDA MODIFICADA &8&l≪"));
+            executor.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lVIDA MODIFICADA&r &d&l&k|&r &8&l≪"));
             executor.sendMessage("");
-            executor.sendMessage(MessageUtils.color("&8└ ❤ &7Jugador: &d" + target.getName()));
-            executor.sendMessage(MessageUtils.color("&8└ ✦ &7Nueva vida: &d" + hearts + " corazones"));
+            executor.sendMessage(MessageUtils.color("&8└ &7Jugador: &d" + target.getName()));
+            executor.sendMessage(MessageUtils.color("&8└ &7Nueva vida: &d" + hearts + " corazones"));
             executor.sendMessage("");
 
             if (!target.equals(executor)) {
                 target.sendMessage("");
-                target.sendMessage(MessageUtils.color("&8&l≫ &e&lVIDA ACTUALIZADA &8&l≪"));
+                target.sendMessage(MessageUtils.color("\"&8&l≫ &d&l&k|&r &6&lVIDA ACTUALIZADA&r &d&l&k|&r &8&l≪\""));
                 target.sendMessage("");
-                target.sendMessage(MessageUtils.color("&8└ ❤ &7Tu vida máxima ha sido establecida a: &d" + hearts + " corazones"));
-                target.sendMessage(MessageUtils.color("&8└ ⚡ &7Modificado por: &d" + executor.getName()));
+                target.sendMessage(MessageUtils.color("&8└ &7Tu vida máxima ha sido establecida a: &d" + hearts + " corazones"));
+                target.sendMessage(MessageUtils.color("&8└ &7Modificado por: &d" + executor.getName()));
                 target.sendMessage("");
             }
 
@@ -158,18 +159,18 @@ public class HealthCommand implements SubCommand {
             playResetEffects(target);
 
             executor.sendMessage("");
-            executor.sendMessage(MessageUtils.color("&8&l≫ &6&lVIDA RESETEADA &8&l≪"));
+            executor.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lVIDA RESETEADA&r &d&l&k|&r &8&l≪"));
             executor.sendMessage("");
-            executor.sendMessage(MessageUtils.color("&8└ ❤ &7Jugador: &d" + target.getName()));
-            executor.sendMessage(MessageUtils.color("&8└ ✦ &7Vida restaurada a: &d10 corazones"));
+            executor.sendMessage(MessageUtils.color("&8└ &7Jugador: &d" + target.getName()));
+            executor.sendMessage(MessageUtils.color("&8└ &7Vida restaurada a: &d10 corazones"));
             executor.sendMessage("");
 
             if (!target.equals(executor)) {
                 target.sendMessage("");
-                target.sendMessage(MessageUtils.color("&8&l≫ &e&lVIDA RESETEADA &8&l≪"));
+                target.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lVIDA RESETEADA&r &d&l&k|&r &8&l≪"));
                 target.sendMessage("");
-                target.sendMessage(MessageUtils.color("&8└ ❤ &7Tu vida ha sido restaurada a: &d10 corazones"));
-                target.sendMessage(MessageUtils.color("&8└ ⚡ &7Reseteado por: &d" + executor.getName()));
+                target.sendMessage(MessageUtils.color("&8└ &7Tu vida ha sido restaurada a: &d10 corazones"));
+                target.sendMessage(MessageUtils.color("&8└ &7Reseteado por: &d" + executor.getName()));
                 target.sendMessage("");
             }
 
@@ -258,38 +259,43 @@ public class HealthCommand implements SubCommand {
         playSacrificeEffects(sacrificer, receiver);
 
         executor.sendMessage("");
-        executor.sendMessage(MessageUtils.color("&8&l≫ &5&lSACRIFICIO REALIZADO &8&l≪"));
+        executor.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lSACRIFICIO REALIZADO&r &d&l&k|&r &8&l≪"));
         executor.sendMessage("");
-        executor.sendMessage(MessageUtils.color("&8└ 💀 &7Sacrificador: &d" + sacrificer.getName()));
-        executor.sendMessage(MessageUtils.color("&8└ ❤ &7Corazones sacrificados: &c-" + hearts));
-        executor.sendMessage(MessageUtils.color("&8└ ✦ &7Nueva vida: &d" + (sacrificerMaxHearts - hearts) + " corazones"));
+        executor.sendMessage(MessageUtils.color("&8└ &7Sacrificador: &d" + sacrificer.getName()));
+        executor.sendMessage(MessageUtils.color("&8└ &7Corazones sacrificados: &c-" + hearts));
+        executor.sendMessage(MessageUtils.color("&8└ &7Nueva vida: &d" + (sacrificerMaxHearts - hearts) + " corazones"));
         executor.sendMessage("");
-        executor.sendMessage(MessageUtils.color("&8└ 💚 &7Receptor: &d" + receiver.getName()));
-        executor.sendMessage(MessageUtils.color("&8└ ❤ &7Corazones recibidos: &a+" + hearts));
-        executor.sendMessage(MessageUtils.color("&8└ ✦ &7Nueva vida: &d" + newReceiverHearts + " corazones"));
+        executor.sendMessage(MessageUtils.color("&8└ &7Receptor: &d" + receiver.getName()));
+        executor.sendMessage(MessageUtils.color("&8└ &7Corazones recibidos: &a+" + hearts));
+        executor.sendMessage(MessageUtils.color("&8└ &7Nueva vida: &d" + newReceiverHearts + " corazones"));
         executor.sendMessage("");
 
         if (!sacrificer.equals(executor)) {
             sacrificer.sendMessage("");
-            sacrificer.sendMessage(MessageUtils.color("&8&l≫ &c&lHAS SACRIFICADO VIDA &8&l≪"));
+            sacrificer.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lHAS SACRIFICADO VIDA&r &d&l&k|&r &8&l≪"));
             sacrificer.sendMessage("");
-            sacrificer.sendMessage(MessageUtils.color("&8└ 💀 &7Has sacrificado: &c-" + hearts + " corazones"));
-            sacrificer.sendMessage(MessageUtils.color("&8└ ✦ &7Tu nueva vida: &d" + (sacrificerMaxHearts - hearts) + " corazones"));
-            sacrificer.sendMessage(MessageUtils.color("&8└ 💚 &7Receptor: &d" + receiver.getName()));
-            sacrificer.sendMessage(MessageUtils.color("&8└ ⚡ &7Ejecutado por: &d" + executor.getName()));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Has sacrificado: &c-" + hearts + " corazones"));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Tu nueva vida: &d" + (sacrificerMaxHearts - hearts) + " corazones"));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Receptor: &d" + receiver.getName()));
+            sacrificer.sendMessage(MessageUtils.color("&8└ &7Ejecutado por: &d" + executor.getName()));
             sacrificer.sendMessage("");
         }
 
         if (!receiver.equals(executor)) {
             receiver.sendMessage("");
-            receiver.sendMessage(MessageUtils.color("&8&l≫ &a&lHAS RECIBIDO VIDA &8&l≪"));
+            receiver.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lHAS RECIBIDO VIDA&r &d&l&k|&r &8&l≪"));
             receiver.sendMessage("");
-            receiver.sendMessage(MessageUtils.color("&8└ 💚 &7Has recibido: &a+" + hearts + " corazones"));
-            receiver.sendMessage(MessageUtils.color("&8└ ✦ &7Tu nueva vida: &d" + newReceiverHearts + " corazones"));
-            receiver.sendMessage(MessageUtils.color("&8└ 💀 &7Sacrificado por: &d" + sacrificer.getName()));
-            receiver.sendMessage(MessageUtils.color("&8└ ⚡ &7Ejecutado por: &d" + executor.getName()));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Has recibido: &a+" + hearts + " corazones"));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Tu nueva vida: &d" + newReceiverHearts + " corazones"));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Sacrificado por: &d" + sacrificer.getName()));
+            receiver.sendMessage(MessageUtils.color("&8└ &7Ejecutado por: &d" + executor.getName()));
             receiver.sendMessage("");
         }
+
+        Component anuncio = MessageUtils.color("&8&l≫ &d&l&k|&r &6&lSACRIFICIO DE CORAZONES&r &d&l&k|&r &8&l≪ &7" + sacrificer.getName() + " &eha sacrificado &c" + hearts + " corazon(es) &epara &a" + receiver.getName());
+        Bukkit.broadcast(Component.empty());
+        Bukkit.broadcast(anuncio);
+        Bukkit.broadcast(Component.empty());
     }
 
     private void showPlayerHealth(Player viewer, Player target) {
@@ -304,18 +310,17 @@ public class HealthCommand implements SubCommand {
         double maxHealth = healthAttribute.getBaseValue();
         double currentHealth = target.getHealth();
         double hearts = maxHealth / 2.0;
-        double currentHearts = currentHealth / 2.0;
 
         viewer.playSound(viewer.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
 
         viewer.sendMessage("");
-        viewer.sendMessage(MessageUtils.color("&8&l≫ &c&lINFO DE VIDA &8&l≪"));
+        viewer.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lINFO DE VIDA&r &d&l&k|&r &8&l≪"));
         viewer.sendMessage("");
-        viewer.sendMessage(MessageUtils.color("&8└ ⚔ &7Jugador: &d" + target.getName()));
-        viewer.sendMessage(MessageUtils.color("&8└ ✦ &7Vida máxima: &d" + hearts + " corazones"));
+        viewer.sendMessage(MessageUtils.color("&8└ &7Jugador: &d" + target.getName()));
+        viewer.sendMessage(MessageUtils.color("&8└ &7Vida máxima: &d" + hearts + " corazones"));
 
         String healthBar = generateHealthBar(currentHealth, maxHealth);
-        viewer.sendMessage(MessageUtils.color("&8└ 📊 &7" + healthBar));
+        viewer.sendMessage(MessageUtils.color("&8└ &7" + healthBar));
         viewer.sendMessage("");
 
         viewer.playSound(viewer.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, 1.0f);
@@ -390,7 +395,7 @@ public class HealthCommand implements SubCommand {
     @Override
     public void showUsage(Player player) {
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8&l≫ &c&lCOMANDOS DE VIDA &8&l≪"));
+        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lCOMANDOS DE VIDA&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&d/pdl health &7- Ver tu propia vida"));
         player.sendMessage(MessageUtils.color("&d/pdl health <jugador> &7- Ver la vida de un jugador"));

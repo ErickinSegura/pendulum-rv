@@ -55,7 +55,7 @@ public class CommandCompletion implements TabCompleter {
         ));
 
         subCommandCompletions.put("chest_admin", Arrays.asList(
-                "config", "info"
+                "config", "info", "open"
         ));
     }
 
@@ -170,13 +170,19 @@ public class CommandCompletion implements TabCompleter {
             }
 
             if (args[0].equalsIgnoreCase("chest") &&
-                    (args[1].equalsIgnoreCase("config") || args[1].equalsIgnoreCase("configurar")) &&
+                    (args[1].equalsIgnoreCase("config")) &&
                     checkPermission(player)) {
                 return getTeamNames(args[2]);
             }
 
             if (args[0].equalsIgnoreCase("chest") &&
                     args[1].equalsIgnoreCase("info") &&
+                    checkPermission(player)) {
+                return getTeamNames(args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("chest") &&
+                    (args[1].equalsIgnoreCase("open")) &&
                     checkPermission(player)) {
                 return getTeamNames(args[2]);
             }

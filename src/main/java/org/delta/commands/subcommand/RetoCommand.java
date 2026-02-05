@@ -433,7 +433,7 @@ public class RetoCommand implements SubCommand {
     @Override
     public void showUsage(Player player) {
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8&l≫ &6&lCOMANDOS DE RETO &8&l≪"));
+        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lCOMANDOS DEL RETO&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&d/pdl reto &7- Ver información del reto actual"));
         player.sendMessage(MessageUtils.color("&d/pdl reto entregar &7- Entregar el reto completado"));

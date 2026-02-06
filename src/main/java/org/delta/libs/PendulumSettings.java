@@ -44,7 +44,6 @@ public class PendulumSettings {
             e.printStackTrace();
         }
 
-        // Cargar retos disponibles
         List<Map<?, ?>> retosConfig = config.getMapList("reto.retos");
         System.out.println("[Pendulum Debug] Cantidad de retos encontrados: " + retosConfig.size());
         retosDisponibles = new Reto[retosConfig.size()];
@@ -83,27 +82,22 @@ public class PendulumSettings {
             }
         }
 
-        // Cargar castigos disponibles
         List<String> castigosConfig = config.getStringList("reto.castigos");
         System.out.println("[Pendulum Debug] Cantidad de castigos encontrados: " + castigosConfig.size());
         castigos = castigosConfig.toArray(new String[0]);
 
-        // Cargar reto actual (índice en el config)
         int indiceRetoActual = config.getInt("reto.retoActualIndex", 0);
         if (indiceRetoActual < retosDisponibles.length) {
             retoActual = retosDisponibles[indiceRetoActual];
         }
 
-        // Cargar castigo actual (índice en el config)
         int indiceCastigoActual = config.getInt("reto.castigoActualIndex", 0);
         if (indiceCastigoActual < castigos.length) {
             castigoActual = castigos[indiceCastigoActual];
         } else {
-            // Fallback al castigo del config (para retrocompatibilidad)
             castigoActual = config.getString("reto.castigo", "Sin castigo definido");
         }
 
-        // Cargar resto de configuraciones
         premio = config.getString("reto.premio");
 
         int cantidadPremio = config.getInt("reto.cantidadPremio");
@@ -127,7 +121,6 @@ public class PendulumSettings {
         System.out.println("- Castigo actual: " + castigoActual);
     }
 
-    // Getters
     public Reto getRetoActual() {
         return retoActual;
     }
@@ -135,6 +128,8 @@ public class PendulumSettings {
     public Reto[] getRetosDisponibles() {
         return retosDisponibles;
     }
+
+    public int getJugadoresNoche() { return jugadoresNoche; }
 
     public String getPremio() {
         return premio;

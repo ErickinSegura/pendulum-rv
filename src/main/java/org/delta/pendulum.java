@@ -7,7 +7,7 @@ import org.delta.listeners.bingo.BingoCollectListener;
 import org.delta.listeners.bingo.BingoInventoryListener;
 import org.delta.listeners.bingo.BingoKillListener;
 import org.delta.listeners.bingo.BingoMineListener;
-import org.delta.listeners.player.PotionListener;
+import org.delta.listeners.player.*;
 import org.delta.listeners.teamChest.TeamChestListener;
 import org.delta.managers.bingo.BingoDataManager;
 import org.delta.managers.bingo.BingoProgressManager;
@@ -16,9 +16,6 @@ import org.delta.managers.death.DeathEvents;
 import org.delta.managers.death.LifeManager;
 import org.delta.libs.PendulumSettings;
 import org.delta.listeners.death.DeathListener;
-import org.delta.listeners.player.TotemListener;
-import org.delta.listeners.player.LifeListener;
-import org.delta.listeners.player.RetoListener;
 import org.delta.managers.teamChest.TeamChestManager;
 
 import java.util.Objects;
@@ -71,6 +68,7 @@ public final class pendulum extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DeathListener(lifeManager), this);
         getServer().getPluginManager().registerEvents(new TotemListener(), this);
         getServer().getPluginManager().registerEvents(new PotionListener(), this);
+        getServer().getPluginManager().registerEvents(new BedListener(), this);
 
         // Listeners de TeamChest
         getServer().getPluginManager().registerEvents(new TeamChestListener(), this);

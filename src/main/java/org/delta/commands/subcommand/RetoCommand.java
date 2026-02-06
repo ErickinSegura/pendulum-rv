@@ -274,41 +274,58 @@ public class RetoCommand implements SubCommand {
         long originalTime = world.getTime();
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            animarRuletaParaJugador(onlinePlayer, world, originalTime, retoGanador, castigoGanador, indiceRetoGanador, indiceCastigoGanador);
+            animarRuletaParaJugador(onlinePlayer, world, originalTime);
         }
-    }
 
-    private void animarRuletaParaJugador(Player viewer, World world, long originalTime,
-                                         Reto retoGanador, String castigoGanador,
-                                         int indiceReto, int indiceCastigo) {
         Plugin plugin = Bukkit.getPluginManager().getPlugin("Pendulum");
 
-        final int CLOCK_CYCLES = 3;
+        final int CLOCK_CYCLES = 2;
         final long TICKS_PER_FRAME = 1L;
-        final int framesPerCycle = 63;
+        final int framesPerCycle = 64;
+        final int totalFrames = framesPerCycle * CLOCK_CYCLES;
+
+        long totalTicks = totalFrames * TICKS_PER_FRAME;
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            finalizarRuleta(player, retoGanador, castigoGanador, indiceRetoGanador, indiceCastigoGanador);
+        }, totalTicks);
+    }
+
+    private void animarRuletaParaJugador(Player viewer, World world, long originalTime) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("Pendulum");
+        Random random = new Random();
+
+        final int CLOCK_CYCLES = 2;
+        final long TICKS_PER_FRAME = 1L;
+        final int framesPerCycle = 64;
         final int totalFrames = framesPerCycle * CLOCK_CYCLES;
         final long totalAnimationTicks = totalFrames * TICKS_PER_FRAME;
         final long timePerTick = (24000L * CLOCK_CYCLES) / totalAnimationTicks;
 
-        Component subtitle = MessageUtils.color("&dGirando la ruleta del destino...");
+        Component subtitle = MessageUtils.color("&dGirando la ruleta...");
 
         for (int i = 0; i < totalFrames; i++) {
-            final int frameIndex;
-            if (i < 31) {
-                frameIndex = 33 + i;
-            } else {
-                frameIndex = i - 31;
-            }
+            final int frameIndex = i % 64;
 
             final long delay = i * TICKS_PER_FRAME;
             final int frameNumber = i;
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (viewer.isOnline()) {
-                    Component clockFrame = Icons.getClockFrame(frameIndex);
+                    Component leftItem = Icons.getRandomItem(random);
+                    Component clock = Icons.getClockFrame(frameIndex);
+                    Component rightItem = Icons.getRandomItem(random);
+
+                    Component titleComponent = Component.text()
+                            .append(leftItem)
+                            .append(Component.text("  "))
+                            .append(clock)
+                            .append(Component.text("  "))
+                            .append(rightItem)
+                            .build();
 
                     Title title = Title.title(
-                            clockFrame,
+                            titleComponent,
                             subtitle,
                             Title.Times.times(
                                     Duration.ZERO,
@@ -343,24 +360,22 @@ public class RetoCommand implements SubCommand {
         }
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            world.setTime(originalTime);
+            if (viewer.isOnline()) {
+                world.setTime(originalTime);
 
-            Component finalSubtitle = MessageUtils.color("&a¡Reto seleccionado!");
+                Component finalSubtitle = MessageUtils.color("&a¡Reto seleccionado!");
 
-            Title finalTitle = Title.title(
-                    Icons.INACTIVE_CLOCK,
-                    finalSubtitle,
-                    Title.Times.times(
-                            Duration.ZERO,
-                            Duration.ofMillis(800),
-                            Duration.ofMillis(600)
-                    )
-            );
+                Title finalTitle = Title.title(
+                        Icons.ACTIVE_CLOCK,
+                        finalSubtitle,
+                        Title.Times.times(
+                                Duration.ZERO,
+                                Duration.ofSeconds(3),
+                                Duration.ofMillis(600)
+                        )
+                );
 
-            viewer.showTitle(finalTitle);
-
-            if (viewer.equals(Bukkit.getPlayerExact(viewer.getName()))) {
-                finalizarRuleta(viewer, retoGanador, castigoGanador, indiceReto, indiceCastigo);
+                viewer.showTitle(finalTitle);
             }
         }, totalAnimationTicks);
     }

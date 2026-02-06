@@ -26,6 +26,17 @@ public class BingoInventoryListener implements Listener {
 
         event.setCancelled(true);
 
+        if (holder.teamName().equals("GENERATING")) {
+            return;
+        }
+
+        if (holder.teamName().equals("PREVIEW")) {
+            if (event.getWhoClicked() instanceof Player player) {
+                player.sendMessage(MessageUtils.color("&7Esta es solo una vista previa. Usa &d/pdl bingo &7para abrir tu tablero."));
+            }
+            return;
+        }
+
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         ItemStack clickedItem = event.getCurrentItem();
@@ -116,16 +127,13 @@ public class BingoInventoryListener implements Listener {
             }
         }
 
-        // Marcar como completado
         progressManager.completeChallenge(team.getName(), challenge.id());
         progressManager.setProgress(team.getName(), challenge.id(), challenge.amount());
 
-        // ===== NUEVO: Registrar puntos por reto =====
         String challengeName = ItemBuilder.format(challenge.displayName());
         int points = scoreManager.registerChallengeCompletion(team.getName(), challenge.id(), challengeName);
 
         if (points > 0) {
-            // Notificar al jugador sobre los puntos ganados
             player.sendMessage("");
             player.sendMessage(MessageUtils.color("&8&l≫ &a&l✔ RETO COMPLETADO &8&l≪"));
             player.sendMessage(MessageUtils.color("&7" + challengeName));
@@ -133,13 +141,11 @@ public class BingoInventoryListener implements Listener {
                     scoreManager.getTotalScore(team.getName()) + " pts"));
             player.sendMessage("");
         }
-        // ============================================
 
         BingoDataManager.getInstance().saveProgress();
 
         checkBingoLines(team);
 
-        // Verificar si el bingo está completo
         checkFullBingo(team);
 
         return true;
@@ -190,7 +196,6 @@ public class BingoInventoryListener implements Listener {
         BingoProgressManager progressManager = BingoProgressManager.getInstance();
         BingoScoreManager scoreManager = BingoScoreManager.getInstance();
 
-        // Verificar filas
         for (int row = 0; row < gridSize; row++) {
             boolean rowComplete = true;
             for (int col = 0; col < gridSize; col++) {
@@ -204,17 +209,14 @@ public class BingoInventoryListener implements Listener {
             if (rowComplete && !progressManager.hasCompletedRow(team.getName(), row)) {
                 progressManager.markRowCompleted(team.getName(), row);
 
-                // ===== NUEVO: Registrar puntos por fila =====
                 String lineType = "row-" + row;
                 String lineName = "Fila " + (row + 1);
                 int points = scoreManager.registerLineCompletion(team.getName(), lineType, lineName);
 
                 notifyBingo(team, lineName, points);
-                // ============================================
             }
         }
 
-        // Verificar columnas
         for (int col = 0; col < gridSize; col++) {
             boolean colComplete = true;
             for (int row = 0; row < gridSize; row++) {
@@ -228,17 +230,14 @@ public class BingoInventoryListener implements Listener {
             if (colComplete && !progressManager.hasCompletedColumn(team.getName(), col)) {
                 progressManager.markColumnCompleted(team.getName(), col);
 
-                // ===== NUEVO: Registrar puntos por columna =====
                 String lineType = "col-" + col;
                 String lineName = "Columna " + (col + 1);
                 int points = scoreManager.registerLineCompletion(team.getName(), lineType, lineName);
 
                 notifyBingo(team, lineName, points);
-                // ===============================================
             }
         }
 
-        // Verificar diagonales
         boolean diagonal1 = true;
         boolean diagonal2 = true;
 
@@ -257,29 +256,25 @@ public class BingoInventoryListener implements Listener {
         if (diagonal1 && !progressManager.hasCompletedDiagonal1(team.getName())) {
             progressManager.markDiagonal1Completed(team.getName());
 
-            // ===== NUEVO: Registrar puntos por diagonal principal =====
             String lineType = "diag1";
             String lineName = "Diagonal Principal";
             int points = scoreManager.registerLineCompletion(team.getName(), lineType, lineName);
 
             notifyBingo(team, lineName, points);
-            // ===========================================================
         }
 
         if (diagonal2 && !progressManager.hasCompletedDiagonal2(team.getName())) {
             progressManager.markDiagonal2Completed(team.getName());
 
-            // ===== NUEVO: Registrar puntos por diagonal secundaria =====
             String lineType = "diag2";
             String lineName = "Diagonal Secundaria";
             int points = scoreManager.registerLineCompletion(team.getName(), lineType, lineName);
 
             notifyBingo(team, lineName, points);
-            // ============================================================
+
         }
     }
 
-    // ===== NUEVO: Método actualizado para incluir puntos =====
     private void notifyBingo(Team team, String lineType, int points) {
         BingoScoreManager scoreManager = BingoScoreManager.getInstance();
 
@@ -287,7 +282,7 @@ public class BingoInventoryListener implements Listener {
             Player member = Bukkit.getPlayer(memberName);
             if (member != null && member.isOnline()) {
                 member.sendMessage("");
-                member.sendMessage(MessageUtils.color("&8&l≫ &6&l🎯 ¡BINGO! &8&l≪"));
+                member.sendMessage(MessageUtils.color("&8&l≫ &6&l¡BINGO! &8&l≪"));
                 member.sendMessage(MessageUtils.color("&7¡Completaron la " + lineType + "!"));
 
                 if (points > 0) {
@@ -300,9 +295,7 @@ public class BingoInventoryListener implements Listener {
             }
         }
     }
-    // ==========================================================
 
-    // ===== NUEVO: Verificar si el bingo está completo =====
     private void checkFullBingo(Team team) {
         BingoProgressManager progressManager = BingoProgressManager.getInstance();
         BingoScoreManager scoreManager = BingoScoreManager.getInstance();
@@ -313,15 +306,12 @@ public class BingoInventoryListener implements Listener {
 
         int completedCount = progressManager.getCompletedChallenges(team.getName()).size();
 
-        // Verificar si se completaron todos los retos
         if (completedCount == totalChallenges) {
-            // Registrar el bingo completo y obtener puntos
             int points = scoreManager.registerFullBingoCompletion(team.getName());
 
             if (points > 0) {
-                // Notificar al servidor completo
                 Component announcement = MessageUtils.color(
-                        "&8&l≫ &6&l✨ ¡BINGO COMPLETO! ✨ &8&l≪ &7¡El equipo &d" + team.getName() +
+                        "&8&l≫ &6&l¡BINGO COMPLETO! &8&l≪ &7¡El equipo &d" + team.getName() +
                                 " &7ha completado todo el bingo! &e+" + points + " puntos"
                 );
 
@@ -331,14 +321,13 @@ public class BingoInventoryListener implements Listener {
                         scoreManager.getTotalScore(team.getName()) + " pts"));
                 Bukkit.broadcast(Component.empty());
 
-                // Efectos especiales para el equipo ganador
                 for (String memberName : team.getEntries()) {
                     Player member = Bukkit.getPlayer(memberName);
                     if (member != null && member.isOnline()) {
                         member.playSound(member.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f);
                         member.playSound(member.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 0.8f);
                         member.sendTitle(
-                                MessageUtils.color("&6&l✨ ¡BINGO COMPLETO! ✨").toString(),
+                                MessageUtils.color("&6&l¡BINGO COMPLETO!").toString(),
                                 MessageUtils.color("&e+" + points + " puntos").toString(),
                                 10, 70, 20
                         );
@@ -349,7 +338,6 @@ public class BingoInventoryListener implements Listener {
             }
         }
     }
-    // ======================================================
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {

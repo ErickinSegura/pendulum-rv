@@ -13,11 +13,8 @@ import org.bukkit.scoreboard.Team;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.delta.libs.builders.ItemBuilder;
-import org.delta.managers.bingo.BingoChallenge;
-import org.delta.managers.bingo.BingoDataManager;
-import org.delta.managers.bingo.BingoInventoryHolder;
-import org.delta.managers.bingo.BingoProgressManager;
-import org.delta.managers.bingo.BingoScoreManager;
+import org.delta.managers.bingo.*;
+import org.delta.pendulum;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +24,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class BingoCommand implements SubCommand {
+
+    private final pendulum plugin;
+
+    public BingoCommand(pendulum plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public String getName() {
@@ -57,8 +60,16 @@ public class BingoCommand implements SubCommand {
                 }
                 resetearBingo(player, args);
             }
+            case "generate" -> {
+                if (!checkPermission(player)) {
+                    player.sendMessage(MessageUtils.color("&c✘ No tienes permisos para este comando."));
+                    player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+                    return;
+                }
+                generarNuevaTabla(player, args);
+            }
             case "stats" -> mostrarEstadisticas(player);
-            case "leaderboard", "lb" -> {
+            case "lb" -> {
                 if (args.length == 2) {
                     mostrarLeaderboard(player);
                 } else {
@@ -77,6 +88,119 @@ public class BingoCommand implements SubCommand {
                 showUsage(player);
             }
         }
+    }
+
+    private void generarNuevaTabla(Player executor, String[] args) {
+        if (args.length == 3 && args[2].equalsIgnoreCase("confirm")) {
+            ejecutarGeneracionTabla(executor);
+            return;
+        }
+
+        executor.playSound(executor.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
+
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lGENERANDO NUEVA TABLA DE BINGO&r &d&l&k|&r &8&l≪"));
+        executor.sendMessage("");
+
+        BingoChallengesManager challengesManager = BingoChallengesManager.getInstance();
+        int totalDisponibles = challengesManager.getTotalChallengesAvailable();
+        int gridSize = BingoDataManager.getInstance().getGridSize();
+        int retosNecesarios = gridSize * gridSize;
+
+        executor.sendMessage(MessageUtils.color("&8└ &7Retos disponibles: &d" + totalDisponibles));
+        executor.sendMessage(MessageUtils.color("&8└ &7Tamaño de tabla: &d" + gridSize + "x" + gridSize + " &7(&d" + retosNecesarios + " &7retos)"));
+
+        if (totalDisponibles < retosNecesarios) {
+            executor.sendMessage("");
+            executor.sendMessage(MessageUtils.color("&c✘ No hay suficientes retos en bingo-challenges.yml"));
+            executor.sendMessage(MessageUtils.color("&7Se necesitan al menos &d" + retosNecesarios + " &7retos"));
+            executor.sendMessage("");
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&e⚠ ADVERTENCIA: &7Esto reseteará el progreso actual"));
+        executor.sendMessage(MessageUtils.color("&7Todos los equipos perderán su progreso y puntos"));
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&ePara confirmar, usa: &d/pdl bingo generate confirm"));
+        executor.sendMessage("");
+
+        executor.playSound(executor.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 0.5f, 0.8f);
+    }
+
+    private void ejecutarGeneracionTabla(Player executor) {
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lGENERANDO TABLA&r &d&l&k|&r &8&l≪"));
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&7Generando nueva tabla de bingo..."));
+
+        int totalEquipos = 0;
+        int totalCompletados = 0;
+        int totalPuntos = 0;
+
+        BingoProgressManager progressManager = BingoProgressManager.getInstance();
+        BingoScoreManager scoreManager = BingoScoreManager.getInstance();
+
+        for (Team team : Bukkit.getScoreboardManager().getMainScoreboard().getTeams()) {
+            Set<Integer> completados = progressManager.getCompletedChallenges(team.getName());
+            int puntos = scoreManager.getTotalScore(team.getName());
+
+            if (!completados.isEmpty() || puntos > 0) {
+                totalEquipos++;
+                totalCompletados += completados.size();
+                totalPuntos += puntos;
+            }
+        }
+
+        BingoDataManager.getInstance().resetProgress();
+
+        final int finalTotalEquipos = totalEquipos;
+        final int finalTotalCompletados = totalCompletados;
+        final int finalTotalPuntos = totalPuntos;
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            BingoGenerationAnimation animation = new BingoGenerationAnimation(plugin, online);
+            animation.startAnimation(() -> {
+            });
+        }
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            boolean exito = BingoDataManager.getInstance().generateNewBingoTable();
+
+            if (!exito) {
+                executor.sendMessage("");
+                executor.sendMessage(MessageUtils.color("&c✘ Error al generar la nueva tabla"));
+                executor.sendMessage(MessageUtils.color("&7Revisa la consola para más detalles"));
+                executor.sendMessage("");
+                executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+                return;
+            }
+
+            executor.playSound(executor.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
+
+            executor.sendMessage("");
+            executor.sendMessage(MessageUtils.color("&a✔ Nueva tabla generada exitosamente"));
+            executor.sendMessage("");
+            executor.sendMessage(MessageUtils.color("&8└ &7Progreso reseteado:"));
+            executor.sendMessage(MessageUtils.color("&8   ├ &7Equipos afectados: &d" + finalTotalEquipos));
+            executor.sendMessage(MessageUtils.color("&8   ├ &7Retos completados perdidos: &d" + finalTotalCompletados));
+            executor.sendMessage(MessageUtils.color("&8   └ &7Puntos perdidos: &d" + finalTotalPuntos + " pts"));
+            executor.sendMessage("");
+            executor.sendMessage(MessageUtils.color("&8└ &7Nueva tabla:"));
+            executor.sendMessage(MessageUtils.color("&8   ├ &7Retos totales: &d" + BingoDataManager.getInstance().getChallenges().size()));
+            executor.sendMessage(MessageUtils.color("&8   └ &7Tamaño: &d" + BingoDataManager.getInstance().getGridSize() + "x" + BingoDataManager.getInstance().getGridSize()));
+            executor.sendMessage("");
+
+            Component anuncio = MessageUtils.color("&8&l≫ &6&lNUEVA TABLA DE BINGO &8&l≪ &7¡Se ha generado una nueva tabla de bingo!");
+            Bukkit.broadcast(Component.empty());
+            Bukkit.broadcast(anuncio);
+            Bukkit.broadcast(Component.empty());
+
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.playSound(online.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.8f, 1.0f);
+            }
+        }, 62L);
     }
 
     private void mostrarLeaderboard(Player player) {
@@ -222,9 +346,14 @@ public class BingoCommand implements SubCommand {
     private void mostrarDebug(Player player) {
         Team team = BingoProgressManager.getInstance().getPlayerTeam(player.getName());
         BingoProgressManager progressManager = BingoProgressManager.getInstance();
+        BingoChallengesManager challengesManager = BingoChallengesManager.getInstance();
 
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&8&l≫ &6&lDEBUG DE BINGO &8&l≪"));
+        player.sendMessage("");
+
+        player.sendMessage(MessageUtils.color("&7Lista maestra de retos:"));
+        player.sendMessage(MessageUtils.color("&8  - Total disponibles: &d" + challengesManager.getTotalChallengesAvailable()));
         player.sendMessage("");
 
         if (team == null) {
@@ -606,6 +735,7 @@ public class BingoCommand implements SubCommand {
         player.sendMessage(MessageUtils.color("&d/pdl bingo lb <equipo> &7- Ver detalles de un equipo"));
 
         if (checkPermission(player)) {
+            player.sendMessage(MessageUtils.color("&d/pdl bingo generate &7- Generar nueva tabla de bingo &8(Admin)"));
             player.sendMessage(MessageUtils.color("&d/pdl bingo debug &7- Ver información de debug &8(Admin)"));
             player.sendMessage(MessageUtils.color("&d/pdl bingo reset &7- Resetear todo el bingo &8(Admin)"));
             player.sendMessage(MessageUtils.color("&d/pdl bingo reset <equipo> &7- Resetear un equipo &8(Admin)"));

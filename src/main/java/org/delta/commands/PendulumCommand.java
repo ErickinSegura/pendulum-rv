@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.delta.commands.subcommand.*;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
+import org.delta.pendulum;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -14,8 +15,10 @@ import java.util.Map;
 
 public class PendulumCommand implements CommandExecutor {
     private final Map<String, SubCommand> subCommands;
+    private final pendulum plugin;
 
-    public PendulumCommand() {
+    public PendulumCommand(pendulum plugin) {
+        this.plugin = plugin;
         this.subCommands = new HashMap<>();
         registerSubCommands();
     }
@@ -25,7 +28,7 @@ public class PendulumCommand implements CommandExecutor {
         addSubCommand(new RetoCommand());
         addSubCommand(new RelojsCommand());
         addSubCommand(new DiaCommand());
-        addSubCommand(new BingoCommand());
+        addSubCommand(new BingoCommand(plugin));
         addSubCommand(new HealthCommand());
         addSubCommand(new TeamChestCommand());
     }

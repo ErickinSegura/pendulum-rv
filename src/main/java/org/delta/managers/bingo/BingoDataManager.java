@@ -22,6 +22,9 @@ public class BingoDataManager {
     private BingoDataManager(pendulum plugin) {
         this.plugin = plugin;
         this.challenges = new HashMap<>();
+
+        BingoChallengesManager.getInstance(plugin);
+
         loadConfiguration();
         loadChallenges();
         loadProgress();
@@ -30,7 +33,6 @@ public class BingoDataManager {
     public static BingoDataManager getInstance(pendulum plugin) {
         if (instance == null) {
             instance = new BingoDataManager(plugin);
-            // Inicializar el ScoreManager después del DataManager
             BingoScoreManager.getInstance(plugin);
         }
         return instance;
@@ -77,7 +79,7 @@ public class BingoDataManager {
                 config.set("bingo.enabled", true);
                 config.set("bingo.grid-size", 5);
 
-                createDefaultChallenges(config);
+                generateInitialTable(config);
 
                 config.set("bingo.messages.challenge-completed", "&a¡{player} ha completado el reto: {challenge}!");
                 config.set("bingo.messages.bingo-completed", "&6&l¡BINGO! &e¡Tu equipo ha completado {line}!");
@@ -91,6 +93,44 @@ public class BingoDataManager {
         }
     }
 
+    /**
+     * Genera una tabla inicial de bingo usando el sistema de retos maestros
+     */
+    private void generateInitialTable(FileConfiguration config) {
+        int gridSize = config.getInt("bingo.grid-size", 5);
+        BingoChallengesManager challengesManager = BingoChallengesManager.getInstance();
+
+        Map<String, BingoChallenge> newTable = challengesManager.generateNewBingoTable(gridSize);
+
+        if (newTable != null) {
+            for (Map.Entry<String, BingoChallenge> entry : newTable.entrySet()) {
+                String key = entry.getKey();
+                BingoChallenge challenge = entry.getValue();
+                String path = "bingo.challenges." + key;
+
+                config.set(path + ".type", challenge.type());
+
+                if (challenge.type().equals("KILL_MOB")) {
+                    config.set(path + ".mob", challenge.target());
+                } else {
+                    config.set(path + ".material", challenge.target());
+                }
+
+                config.set(path + ".amount", challenge.amount());
+                config.set(path + ".display-name", challenge.displayName());
+                config.set(path + ".description", challenge.description());
+                config.set(path + ".icon", challenge.icon());
+            }
+            plugin.getLogger().info("Tabla inicial de bingo generada con " + newTable.size() + " retos");
+        } else {
+            plugin.getLogger().warning("No se pudo generar tabla inicial, usando retos por defecto");
+            createDefaultChallenges(config);
+        }
+    }
+
+    /**
+     * Crea retos por defecto como fallback (solo se usa si falla el sistema de retos maestros)
+     */
     private void createDefaultChallenges(FileConfiguration config) {
         String[][] defaultChallenges = {
                 {"COLLECT_ITEM", "DIAMOND", "5", "&bDiamantes Brillantes", "&7Consigue 5 diamantes", "DIAMOND"},
@@ -166,6 +206,35 @@ public class BingoDataManager {
         plugin.getLogger().info("Cargados " + challenges.size() + " retos de bingo");
     }
 
+    /**
+     * Genera una nueva tabla de bingo aleatoria
+     * @return true si se generó exitosamente, false si hubo un error
+     */
+    public boolean generateNewBingoTable() {
+        try {
+            int gridSize = getGridSize();
+            BingoChallengesManager challengesManager = BingoChallengesManager.getInstance();
+
+            Map<String, BingoChallenge> newTable = challengesManager.generateNewBingoTable(gridSize);
+
+            if (newTable == null) {
+                plugin.getLogger().severe("No se pudo generar nueva tabla de bingo");
+                return false;
+            }
+
+            challengesManager.saveBingoTableToConfig(newTable, bingoConfig, bingoFile);
+
+            loadChallenges();
+
+            plugin.getLogger().info("Nueva tabla de bingo generada y cargada exitosamente");
+            return true;
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error al generar nueva tabla de bingo: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void saveProgress() {
         try {
             BingoProgressManager progressManager = BingoProgressManager.getInstance();
@@ -181,7 +250,6 @@ public class BingoDataManager {
 
             progressConfig.save(progressFile);
 
-            // También guardar los scores
             BingoScoreManager.getInstance().saveScoreData();
 
             plugin.getLogger().info("Progreso de bingo guardado exitosamente");
@@ -266,7 +334,7 @@ public class BingoDataManager {
     }
 
     public int getGridSize() {
-        return bingoConfig.getInt("bingo.grid-size", 4);
+        return bingoConfig.getInt("bingo.grid-size", 5);
     }
 
     public boolean isEnabled() {

@@ -103,13 +103,13 @@ public class RetoCommand implements SubCommand {
         player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lDETALLES DEL RETO&r &d&l&k|&r &8&l≪"));
         player.sendMessage("");
 
-        sendRetoDetail(player, "⚔", "Desafío", reto.getTitulo());
-        sendRetoDetail(player, "✨", "Recompensa", rewardManager.obtenerDescripcionPremio());
-        sendRetoDetail(player, "☠", "Castigo", rewardManager.obtenerDescripcionCastigo());
+        sendRetoDetail(player, "", "Desafío", reto.getTitulo());
+        sendRetoDetail(player, "", "Recompensa", rewardManager.obtenerDescripcionPremio());
+        sendRetoDetail(player, "", "Castigo", rewardManager.obtenerDescripcionCastigo());
 
         player.sendMessage("");
         String progreso = retoManager.obtenerProgreso(player);
-        player.sendMessage(MessageUtils.color("&8└ 📊 &7Progreso: &d" + progreso));
+        player.sendMessage(MessageUtils.color("&8└ &7Progreso: &d" + progreso));
 
         player.sendMessage("");
         if (retoCumplido) {

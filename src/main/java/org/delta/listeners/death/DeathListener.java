@@ -1,4 +1,4 @@
-package org.delta.listeners.player;
+package org.delta.listeners.death;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -14,7 +14,7 @@ import org.delta.managers.death.ClockEvents;
 import org.delta.managers.death.DeathEvents;
 import org.delta.managers.death.LifeManager;
 import org.delta.libs.PendulumSettings;
-import org.delta.listeners.player.DeathListener;
+import org.delta.listeners.death.DeathListener;
 import org.delta.listeners.player.TotemListener;
 import org.delta.listeners.player.LifeListener;
 import org.delta.listeners.player.RetoListener;

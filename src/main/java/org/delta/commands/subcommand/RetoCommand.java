@@ -1,10 +1,13 @@
 package org.delta.commands.subcommand;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.delta.libs.Icons;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.delta.libs.reto.Reto;
@@ -13,6 +16,7 @@ import org.delta.managers.reto.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 
@@ -259,7 +263,6 @@ public class RetoCommand implements SubCommand {
     }
 
     private void animarRuleta(Player player, Reto[] retos, String[] castigos) {
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("Pendulum");
         Random random = new Random();
 
         int indiceRetoGanador = random.nextInt(retos.length);
@@ -267,120 +270,99 @@ public class RetoCommand implements SubCommand {
         Reto retoGanador = retos[indiceRetoGanador];
         String castigoGanador = castigos[indiceCastigoGanador];
 
-        new BukkitRunnable() {
-            int ticks = 0;
-            int currentRetoIndex = 0;
-            int currentCastigoIndex = 0;
-            int totalSpins = 50 + random.nextInt(30);
+        World world = player.getWorld();
+        long originalTime = world.getTime();
 
-            @Override
-            public void run() {
-                if (ticks >= totalSpins) {
-                    finalizarRuleta(player, retoGanador, castigoGanador,
-                            indiceRetoGanador, indiceCastigoGanador);
-                    cancel();
-                    return;
-                }
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            animarRuletaParaJugador(onlinePlayer, world, originalTime, retoGanador, castigoGanador, indiceRetoGanador, indiceCastigoGanador);
+        }
+    }
 
-                if (ticks == totalSpins - 1) {
-                    currentRetoIndex = indiceRetoGanador;
-                    currentCastigoIndex = indiceCastigoGanador;
-                } else {
-                    currentRetoIndex = (currentRetoIndex + 1) % retos.length;
-                    currentCastigoIndex = (currentCastigoIndex + 1) % castigos.length;
-                }
+    private void animarRuletaParaJugador(Player viewer, World world, long originalTime,
+                                         Reto retoGanador, String castigoGanador,
+                                         int indiceReto, int indiceCastigo) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("Pendulum");
 
-                mostrarRetoYCastigoActual(player, retos[currentRetoIndex],
-                        castigos[currentCastigoIndex], ticks, totalSpins);
+        final int CLOCK_CYCLES = 3;
+        final long TICKS_PER_FRAME = 1L;
+        final int framesPerCycle = 63;
+        final int totalFrames = framesPerCycle * CLOCK_CYCLES;
+        final long totalAnimationTicks = totalFrames * TICKS_PER_FRAME;
+        final long timePerTick = (24000L * CLOCK_CYCLES) / totalAnimationTicks;
 
-                mostrarBarraProgreso(player, ticks, totalSpins);
+        Component subtitle = MessageUtils.color("&dGirando la ruleta del destino...");
 
-                reproducirSonidoRuleta(player, ticks, totalSpins);
-
-                if (ticks % 3 == 0) {
-                    Location loc = player.getLocation().add(0, 2, 0);
-                    player.getWorld().spawnParticle(Particle.PORTAL, loc, 5, 0.3, 0.3, 0.3, 0.02);
-                }
-
-                ticks++;
+        for (int i = 0; i < totalFrames; i++) {
+            final int frameIndex;
+            if (i < 31) {
+                frameIndex = 33 + i;
+            } else {
+                frameIndex = i - 31;
             }
-        }.runTaskTimer(plugin, 0L, 2L);
-    }
 
-    private void mostrarRetoYCastigoActual(Player player, Reto reto, String castigo,
-                                           int tick, int total) {
-        double progress = (double) tick / total;
-        String color;
-        String simbolo;
+            final long delay = i * TICKS_PER_FRAME;
+            final int frameNumber = i;
 
-        if (progress < 0.3) {
-            color = "§a§l";
-            simbolo = "⚡";
-        } else if (progress < 0.6) {
-            color = "§e§l";
-            simbolo = "⭐";
-        } else if (progress < 0.85) {
-            color = "§6§l";
-            simbolo = "◆";
-        } else {
-            color = "§c§l";
-            simbolo = "✦";
-        }
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (viewer.isOnline()) {
+                    Component clockFrame = Icons.getClockFrame(frameIndex);
 
-        String titulo = reto.getTitulo();
-        String tituloAnimado = aplicarEfectoMatriz(titulo, progress);
-        String castigoAnimado = aplicarEfectoMatriz(castigo, progress);
+                    Title title = Title.title(
+                            clockFrame,
+                            subtitle,
+                            Title.Times.times(
+                                    Duration.ZERO,
+                                    Duration.ofMillis(150),
+                                    Duration.ZERO
+                            )
+                    );
 
-        String titleText = color + simbolo + " " + tituloAnimado + " " + simbolo;
-        String subtitleText = progress < 0.9 ? "§c☠ " + castigoAnimado : "§c§l☠ " + castigo + " ☠";
+                    viewer.showTitle(title);
 
-        player.sendTitle(titleText, subtitleText, 0, 10, 5);
-    }
+                    long newTime = (originalTime + (timePerTick * frameNumber * 2)) % 24000;
+                    world.setTime(newTime);
 
-    private String aplicarEfectoMatriz(String texto, double progress) {
-        if (progress < 0.8) {
-            int charsAleatorios = (int) ((1 - progress) * texto.length());
-            StringBuilder sb = new StringBuilder();
-            Random rand = new Random();
-            String chars = "▓▒░█▄▀■□▪▫";
+                    if (frameNumber % 3 == 0) {
+                        Location loc = viewer.getLocation().add(0, 2, 0);
+                        world.spawnParticle(Particle.PORTAL, loc, 5, 0.3, 0.3, 0.3, 0.02);
+                    }
 
-            for (int i = 0; i < texto.length(); i++) {
-                if (i < charsAleatorios && rand.nextBoolean()) {
-                    sb.append(chars.charAt(rand.nextInt(chars.length())));
-                } else {
-                    sb.append(texto.charAt(i));
+                    double progress = (double) frameNumber / totalFrames;
+                    float pitch = 0.5f + (float) progress * 1.8f;
+                    float volume = progress > 0.9 ? 0.4f : 0.6f;
+
+                    if (progress < 0.7) {
+                        viewer.playSound(viewer.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, volume, pitch);
+                    } else if (progress < 0.9) {
+                        viewer.playSound(viewer.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, volume, pitch);
+                    } else {
+                        viewer.playSound(viewer.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, volume, pitch);
+                    }
                 }
+            }, delay);
+        }
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            world.setTime(originalTime);
+
+            Component finalSubtitle = MessageUtils.color("&a¡Reto seleccionado!");
+
+            Title finalTitle = Title.title(
+                    Icons.INACTIVE_CLOCK,
+                    finalSubtitle,
+                    Title.Times.times(
+                            Duration.ZERO,
+                            Duration.ofMillis(800),
+                            Duration.ofMillis(600)
+                    )
+            );
+
+            viewer.showTitle(finalTitle);
+
+            if (viewer.equals(Bukkit.getPlayerExact(viewer.getName()))) {
+                finalizarRuleta(viewer, retoGanador, castigoGanador, indiceReto, indiceCastigo);
             }
-            return sb.toString();
-        }
-        return texto;
-    }
-
-    private void reproducirSonidoRuleta(Player player, int tick, int total) {
-        double progress = (double) tick / total;
-        float pitch = 0.5f + (float) progress * 1.8f;
-        float volume = progress > 0.9 ? 0.4f : 0.6f;
-
-        if (progress < 0.7) {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, volume, pitch);
-        } else if (progress < 0.9) {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, volume, pitch);
-        } else {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, volume, pitch);
-        }
-    }
-
-    private void mostrarBarraProgreso(Player player, int tick, int total) {
-        int barLength = 30;
-        int progress = (int) ((tick / (float) total) * barLength);
-
-        StringBuilder bar = new StringBuilder("&8[");
-        for (int i = 0; i < barLength; i++) {
-            bar.append(i < progress ? "&d▰" : "&7▱");
-        }
-        bar.append("&8]");
-
-        player.sendActionBar(MessageUtils.color(bar.toString()));
+        }, totalAnimationTicks);
     }
 
     private void finalizarRuleta(Player player, Reto retoGanador, String castigoGanador,

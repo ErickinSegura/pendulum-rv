@@ -463,7 +463,7 @@ public class BingoCommand implements SubCommand {
     }
 
     private void fillEmptySlots(Inventory gui, int gridSize, int startSlot) {
-        ItemStack glass = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
+        ItemStack glass = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE)
                 .setDisplayName(" ")
                 .build();
 

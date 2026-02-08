@@ -188,7 +188,7 @@ public class BingoGenerationAnimation {
     }
 
     private void fillEmptySlots(Inventory inventory) {
-        ItemStack glass = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
+        ItemStack glass = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE)
                 .setDisplayName(" ")
                 .build();
 

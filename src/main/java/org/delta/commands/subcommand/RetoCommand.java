@@ -404,7 +404,7 @@ public class RetoCommand implements SubCommand {
             config.set("reto.castigoActualIndex", nuevoIndiceCastigo);
             config.save(file);
 
-            Bukkit.getLogger().info("[Pendulum] Reto actualizado a índice nuevo: " + nuevoIndiceReto);
+            Bukkit.getLogger().info("[Pendulum] Reto actualizado a índice nuevo tontos todos: " + nuevoIndiceReto);
             Bukkit.getLogger().info("[Pendulum] Castigo actualizado a índice: " + nuevoIndiceCastigo);
         } catch (IOException e) {
             Bukkit.getLogger().severe("[Pendulum] Error al actualizar el config:");

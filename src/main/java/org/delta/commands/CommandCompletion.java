@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.delta.libs.PendulumSettings;
+import org.delta.managers.perks.Perk;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -21,7 +22,7 @@ public class CommandCompletion implements TabCompleter {
 
     private void initializeCompletions() {
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "relojs", "bingo", "health", "chest"
+                "reto", "info", "relojs", "bingo", "health", "chest", "perk"
         );
         subCommandCompletions.put("basic", basicCommands);
 
@@ -56,6 +57,16 @@ public class CommandCompletion implements TabCompleter {
 
         subCommandCompletions.put("chest_admin", Arrays.asList(
                 "config", "info", "open"
+        ));
+
+        subCommandCompletions.put("perk_admin", Arrays.asList(
+                "assign", "remove", "reset", "resetall", "list"
+        ));
+
+        subCommandCompletions.put("perk_perks", Arrays.asList(
+                Arrays.stream(Perk.values())
+                        .map(p -> p.name().toLowerCase())
+                        .toArray(String[]::new)
         ));
     }
 
@@ -126,6 +137,14 @@ public class CommandCompletion implements TabCompleter {
                     return filterCompletions(chestAdminCompletions, args[1]);
                 }
             }
+
+            if (args[0].equalsIgnoreCase("perk")) {
+                List<String> perkCompletions = new ArrayList<>(List.of("list"));
+                if (checkPermission(player)) {
+                    perkCompletions.addAll(subCommandCompletions.get("perk_admin"));
+                }
+                return filterCompletions(perkCompletions, args[1]);
+            }
         }
 
         if (args.length == 3) {
@@ -186,6 +205,14 @@ public class CommandCompletion implements TabCompleter {
                     checkPermission(player)) {
                 return getTeamNames(args[2]);
             }
+
+            if (args[0].equalsIgnoreCase("perk") &&
+                    (args[1].equalsIgnoreCase("assign") ||
+                            args[1].equalsIgnoreCase("remove") ||
+                            args[1].equalsIgnoreCase("reset") ||
+                            args[1].equalsIgnoreCase("list"))) {
+                return getTeamNames(args[2]);
+            }
         }
 
         if (args.length == 4) {
@@ -205,6 +232,12 @@ public class CommandCompletion implements TabCompleter {
                     (args[1].equalsIgnoreCase("config") || args[1].equalsIgnoreCase("configurar")) &&
                     checkPermission(player)) {
                 return Arrays.asList("1", "2", "3", "4", "5", "6");
+            }
+
+            if (args[0].equalsIgnoreCase("perk") &&
+                    (args[1].equalsIgnoreCase("assign") || args[1].equalsIgnoreCase("remove")) &&
+                    checkPermission(player)) {
+                return filterCompletions(subCommandCompletions.get("perk_perks"), args[3]);
             }
         }
 

@@ -84,7 +84,9 @@ public class PerkManager {
 
 
     public void assignPerk(String teamId, Perk perk) {
-        activePerks.computeIfAbsent(teamId, k -> new HashSet<>()).add(perk);
+        Set<Perk> perks = new HashSet<>();
+        perks.add(perk);
+        activePerks.put(teamId, perks);
         save();
     }
 
@@ -102,6 +104,10 @@ public class PerkManager {
     public void resetAll() {
         activePerks.clear();
         save();
+    }
+
+    public Set<Perk> getTeamPerks(String teamId) {
+        return activePerks.getOrDefault(teamId, Collections.emptySet());
     }
 
 }

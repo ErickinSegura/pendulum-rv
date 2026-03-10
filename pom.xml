@@ -46,7 +46,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.4.2</version>
                 <configuration>
-                    <outputDirectory>/home/erick/proyectos/pendulum-server/plugins</outputDirectory>
+                    <outputDirectory>C:\Users\PC\Proyectos\pendulum_server\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

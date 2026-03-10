@@ -1,6 +1,5 @@
 package org.delta;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
@@ -9,9 +8,9 @@ import org.delta.listeners.bingo.BingoInventoryListener;
 import org.delta.listeners.bingo.BingoKillListener;
 import org.delta.listeners.bingo.BingoMineListener;
 import org.delta.listeners.perks.PerkListener;
-import org.delta.listeners.perks.impl.BloodlustListener;
 import org.delta.listeners.perks.impl.FumbleListener;
 import org.delta.listeners.perks.impl.LastStandListener;
+import org.delta.listeners.perks.impl.SharedSpaceListener;
 import org.delta.listeners.player.*;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
@@ -25,7 +24,6 @@ import org.delta.listeners.death.DeathListener;
 import org.delta.managers.perks.PerkManager;
 import org.delta.managers.teamChest.TeamChestManager;
 
-import java.io.File;
 import java.util.Objects;
 
 import static org.delta.libs.MessageUtils.sendConsole;
@@ -82,9 +80,9 @@ public final class pendulum extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PerkListener(), this);
 
         // Listeners de perks
-        getServer().getPluginManager().registerEvents(new BloodlustListener(), this);
         getServer().getPluginManager().registerEvents(new LastStandListener(), this);
         getServer().getPluginManager().registerEvents(new FumbleListener(), this);
+        getServer().getPluginManager().registerEvents(new SharedSpaceListener(), this);
 
         // Listeners de TeamChest
         getServer().getPluginManager().registerEvents(new TeamChestListener(), this);

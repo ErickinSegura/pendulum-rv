@@ -1,13 +1,11 @@
 package org.delta.managers.perks;
 
-import org.bukkit.NamespacedKey;
-
 public enum Perk {
 
-    BLOODLUST("bloodlust", "Bloodlust", PerkCategory.BENEFICIAL),
     LAST_STAND("last_stand", "Last Stand", PerkCategory.BENEFICIAL),
 
-    FUMBLE("fumble", "Fumble", PerkCategory.HARMFUL);
+    FUMBLE("fumble", "Fumble", PerkCategory.HARMFUL),
+    SHARED_SPACE("shared_space", "Shared Space", PerkCategory.HARMFUL);
 
     private final String displayName;
     private final PerkCategory category;

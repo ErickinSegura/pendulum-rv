@@ -3,6 +3,7 @@ package org.delta.managers.perks;
 public enum Perk {
 
     LAST_STAND("last_stand", "Last Stand", PerkCategory.BENEFICIAL),
+    LIFE_STEAL("life_steal", "Life Steal", PerkCategory.BENEFICIAL),
 
     FUMBLE("fumble", "Fumble", PerkCategory.HARMFUL),
     SHARED_SPACE("shared_space", "Shared Space", PerkCategory.HARMFUL);

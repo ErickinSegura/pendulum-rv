@@ -2,6 +2,8 @@ package org.delta.managers.perks;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.delta.database.repositories.TeamRepository;
+import org.delta.pendulum;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,6 +89,8 @@ public class PerkManager {
         Set<Perk> perks = new HashSet<>();
         perks.add(perk);
         activePerks.put(teamId, perks);
+        var db = pendulum.getInstance().getDatabaseManager();
+        db.teams().updatePerk(teamId, perk.getId());
         save();
     }
 

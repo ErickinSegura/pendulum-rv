@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.database.repositories.PlayerRepository;
+import org.delta.database.repositories.TeamRepository;
 
 import java.io.File;
 import java.sql.Connection;
@@ -17,6 +18,7 @@ public class DatabaseManager {
     private HikariDataSource dataSource;
 
     private PlayerRepository playerRepository;
+    private TeamRepository teamRepository;
 
     public DatabaseManager(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -53,6 +55,7 @@ public class DatabaseManager {
 
             dataSource = new HikariDataSource(config);
             playerRepository = new PlayerRepository(this);
+            teamRepository = new TeamRepository(this);
             plugin.getLogger().info("Conexión a la base de datos establecida.");
         } catch (Exception e) {
             plugin.getLogger().warning("Error al conectar con la DB: " + e.getMessage());
@@ -75,5 +78,9 @@ public class DatabaseManager {
 
     public PlayerRepository players() {
         return playerRepository;
+    }
+
+    public TeamRepository teams() {
+        return teamRepository;
     }
 }

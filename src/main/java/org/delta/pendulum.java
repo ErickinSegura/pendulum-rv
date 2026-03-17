@@ -3,6 +3,7 @@ package org.delta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
+import org.delta.database.DatabaseManager;
 import org.delta.listeners.bingo.BingoCollectListener;
 import org.delta.listeners.bingo.BingoInventoryListener;
 import org.delta.listeners.bingo.BingoKillListener;
@@ -36,11 +37,22 @@ public final class pendulum extends JavaPlugin {
     private DeathEvents deathEvents;
     private BingoDataManager bingoDataManager;
     private BingoProgressManager bingoProgressManager;
+    private DatabaseManager databaseManager;
 
     @Override
     public void onEnable() {
         String version = getPluginMeta().getVersion();
+        if (!getDataFolder().exists()) getDataFolder().mkdirs();
+        reloadConfig();
         PendulumSettings.getInstance().load();
+
+        databaseManager = new DatabaseManager(this);
+        try {
+            databaseManager.connect();
+        } catch (Exception e) {
+            getLogger().warning("No se pudo conectar a la base de datos: " + e.getMessage());
+            getLogger().warning("El plugin funcionará sin persistencia de datos.");
+        }
 
         // Inicializar managers
         lifeManager = new LifeManager(this);
@@ -50,7 +62,6 @@ public final class pendulum extends JavaPlugin {
         TeamChestManager.initialize(getDataFolder());
         PerkManager.initialize(getDataFolder());
         PerkManager.getInstance();
-
 
         registerEvents();
         registerCommands();
@@ -64,6 +75,8 @@ public final class pendulum extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (databaseManager != null) databaseManager.disconnect();
+
         sendConsole("&d&m                                          ");
         sendConsole("       &l[" + prefix + "&l]");
         sendConsole("       &l&dPlugin disabled!");
@@ -86,7 +99,6 @@ public final class pendulum extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SharedSpaceListener(), this);
         getServer().getPluginManager().registerEvents(new LifestealListener(), this);
 
-
         // Listeners de TeamChest
         getServer().getPluginManager().registerEvents(new TeamChestListener(), this);
 
@@ -98,6 +110,9 @@ public final class pendulum extends JavaPlugin {
 
         // Spawn Listeners
         getServer().getPluginManager().registerEvents(new ZombieSpawner(this), this);
+
+        // Database Listeners
+        getServer().getPluginManager().registerEvents(new JoinLeaveListener(lifeManager), this);
     }
 
     private void registerCommands() {
@@ -111,5 +126,9 @@ public final class pendulum extends JavaPlugin {
 
     public LifeManager getLifeManager() {
         return lifeManager;
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }

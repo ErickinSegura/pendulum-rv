@@ -1,3 +1,10 @@
+database:
+  host: "db.xxxxxx.supabase.co"
+  port: "5432"
+  name: "postgres"
+  user: "postgres"
+  password: "tu_password"
+
 mundo:
   dia: 20
   jugadoresNoche: 1

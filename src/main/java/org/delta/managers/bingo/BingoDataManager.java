@@ -3,6 +3,7 @@ package org.delta.managers.bingo;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.delta.database.BingoSyncManager;
 import org.delta.pendulum;
 
 import java.io.File;
@@ -93,9 +94,6 @@ public class BingoDataManager {
         }
     }
 
-    /**
-     * Genera una tabla inicial de bingo usando el sistema de retos maestros
-     */
     private void generateInitialTable(FileConfiguration config) {
         int gridSize = config.getInt("bingo.grid-size", 5);
         BingoChallengesManager challengesManager = BingoChallengesManager.getInstance();
@@ -128,9 +126,7 @@ public class BingoDataManager {
         }
     }
 
-    /**
-     * Crea retos por defecto como fallback (solo se usa si falla el sistema de retos maestros)
-     */
+
     private void createDefaultChallenges(FileConfiguration config) {
         String[][] defaultChallenges = {
                 {"COLLECT_ITEM", "DIAMOND", "5", "&bDiamantes Brillantes", "&7Consigue 5 diamantes", "DIAMOND"},
@@ -206,10 +202,7 @@ public class BingoDataManager {
         plugin.getLogger().info("Cargados " + challenges.size() + " retos de bingo");
     }
 
-    /**
-     * Genera una nueva tabla de bingo aleatoria
-     * @return true si se generó exitosamente, false si hubo un error
-     */
+
     public boolean generateNewBingoTable() {
         try {
             int gridSize = getGridSize();
@@ -225,6 +218,11 @@ public class BingoDataManager {
             challengesManager.saveBingoTableToConfig(newTable, bingoConfig, bingoFile);
 
             loadChallenges();
+
+            BingoSyncManager.getInstance().onNewBingoTableGenerated(
+                    getGridSize(),
+                    getChallenges()
+            );
 
             plugin.getLogger().info("Nueva tabla de bingo generada y cargada exitosamente");
             return true;
@@ -318,6 +316,8 @@ public class BingoDataManager {
                 progressConfig.set(key, null);
             }
             progressConfig.save(progressFile);
+
+            BingoSyncManager.getInstance().resetAllProgress();
 
             plugin.getLogger().info("Progreso de bingo reseteado");
         } catch (IOException e) {

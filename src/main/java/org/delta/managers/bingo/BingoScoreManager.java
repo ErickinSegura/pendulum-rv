@@ -2,10 +2,14 @@ package org.delta.managers.bingo;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.delta.database.BingoSyncManager;
 import org.delta.pendulum;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 
 public class BingoScoreManager {
@@ -26,6 +30,8 @@ public class BingoScoreManager {
     private final List<String> fullBingoCompletions;
 
     private final Map<String, List<ScoreEntry>> teamScoreHistory;
+
+    private final Map<String, Long> teamIdCache = new HashMap<>();
 
     private BingoScoreManager(pendulum plugin) {
         this.plugin = plugin;
@@ -60,6 +66,36 @@ public class BingoScoreManager {
         scoreConfig = YamlConfiguration.loadConfiguration(scoreFile);
     }
 
+    private long resolveTeamId(String teamName) {
+        if (teamIdCache.containsKey(teamName)) {
+            return teamIdCache.get(teamName);
+        }
+
+        if (plugin.getDatabaseManager() == null || !plugin.getDatabaseManager().isConnected()) {
+            return -1L;
+        }
+
+        try (Connection conn = plugin.getDatabaseManager().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT id FROM teams WHERE name = ? LIMIT 1")) {
+
+            stmt.setString(1, teamName);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                long id = rs.getLong("id");
+                teamIdCache.put(teamName, id);
+                return id;
+            }
+
+        } catch (Exception e) {
+            plugin.getLogger().warning("[BingoSync] No se pudo resolver teamId para: " + teamName);
+        }
+
+        return -1L;
+    }
+
+
     public int registerChallengeCompletion(String teamName, int challengeId, String challengeName) {
         challengeCompletions.putIfAbsent(challengeId, new ArrayList<>());
         List<String> completions = challengeCompletions.get(challengeId);
@@ -74,6 +110,13 @@ public class BingoScoreManager {
 
         addScoreEntry(teamName, "CHALLENGE", challengeName, points, position);
         saveScoreData();
+
+        long teamId = resolveTeamId(teamName);
+        if (teamId != -1L && BingoSyncManager.getInstance() != null) {
+            BingoSyncManager.getInstance().recordChallengeScore(
+                    teamId, challengeId, challengeName, points, position
+            );
+        }
 
         return points;
     }
@@ -93,6 +136,13 @@ public class BingoScoreManager {
         addScoreEntry(teamName, "LINE", lineName, points, position);
         saveScoreData();
 
+        long teamId = resolveTeamId(teamName);
+        if (teamId != -1L && BingoSyncManager.getInstance() != null) {
+            BingoSyncManager.getInstance().recordLineScore(
+                    teamId, lineType, lineName, points, position
+            );
+        }
+
         return points;
     }
 
@@ -108,7 +158,43 @@ public class BingoScoreManager {
         addScoreEntry(teamName, "FULL_BINGO", "Bingo Completo", points, position);
         saveScoreData();
 
+        long teamId = resolveTeamId(teamName);
+        if (teamId != -1L && BingoSyncManager.getInstance() != null) {
+            BingoSyncManager.getInstance().recordFullBingoScore(teamId, points, position);
+        }
+
         return points;
+    }
+
+
+    public void resetAllScores() {
+        challengeCompletions.clear();
+        lineCompletions.clear();
+        fullBingoCompletions.clear();
+        teamScoreHistory.clear();
+        saveScoreData();
+
+        if (BingoSyncManager.getInstance() != null) {
+            BingoSyncManager.getInstance().resetAllScores();
+        }
+    }
+
+    public void resetTeamScore(String teamName) {
+        for (List<String> completions : challengeCompletions.values()) {
+            completions.remove(teamName);
+        }
+        for (List<String> completions : lineCompletions.values()) {
+            completions.remove(teamName);
+        }
+        fullBingoCompletions.remove(teamName);
+        teamScoreHistory.remove(teamName);
+        saveScoreData();
+
+        long teamId = resolveTeamId(teamName);
+        if (teamId != -1L && BingoSyncManager.getInstance() != null) {
+            BingoSyncManager.getInstance().resetTeamScores(teamId);
+            BingoSyncManager.getInstance().resetTeamProgress(teamId);
+        }
     }
 
     private int calculateChallengePoints(int position) {
@@ -126,6 +212,7 @@ public class BingoScoreManager {
         return Math.max(points, FULL_BINGO_MIN_POINTS);
     }
 
+
     private void addScoreEntry(String teamName, String type, String description, int points, int position) {
         teamScoreHistory.putIfAbsent(teamName, new ArrayList<>());
         ScoreEntry entry = new ScoreEntry(
@@ -141,10 +228,7 @@ public class BingoScoreManager {
     public int getTotalScore(String teamName) {
         List<ScoreEntry> entries = teamScoreHistory.get(teamName);
         if (entries == null) return 0;
-
-        return entries.stream()
-                .mapToInt(ScoreEntry::points)
-                .sum();
+        return entries.stream().mapToInt(ScoreEntry::points).sum();
     }
 
     public List<ScoreEntry> getScoreHistory(String teamName) {
@@ -153,14 +237,10 @@ public class BingoScoreManager {
 
     public Map<String, Integer> getLeaderboard() {
         Map<String, Integer> leaderboard = new HashMap<>();
-
         for (Map.Entry<String, List<ScoreEntry>> entry : teamScoreHistory.entrySet()) {
-            int total = entry.getValue().stream()
-                    .mapToInt(ScoreEntry::points)
-                    .sum();
+            int total = entry.getValue().stream().mapToInt(ScoreEntry::points).sum();
             leaderboard.put(entry.getKey(), total);
         }
-
         return leaderboard;
     }
 
@@ -170,26 +250,6 @@ public class BingoScoreManager {
         return sortedList;
     }
 
-    public void resetAllScores() {
-        challengeCompletions.clear();
-        lineCompletions.clear();
-        fullBingoCompletions.clear();
-        teamScoreHistory.clear();
-        saveScoreData();
-    }
-
-    public void resetTeamScore(String teamName) {
-        for (List<String> completions : challengeCompletions.values()) {
-            completions.remove(teamName);
-        }
-        for (List<String> completions : lineCompletions.values()) {
-            completions.remove(teamName);
-        }
-        fullBingoCompletions.remove(teamName);
-
-        teamScoreHistory.remove(teamName);
-        saveScoreData();
-    }
 
     public void saveScoreData() {
         try {
@@ -202,9 +262,7 @@ public class BingoScoreManager {
                 challengeCompletionsData.put(String.valueOf(entry.getKey()), entry.getValue());
             }
             scoreConfig.set("challenge-completions", challengeCompletionsData);
-
             scoreConfig.set("line-completions", lineCompletions);
-
             scoreConfig.set("full-bingo-completions", fullBingoCompletions);
 
             Map<String, List<Map<String, Object>>> historyData = new HashMap<>();
@@ -281,7 +339,6 @@ public class BingoScoreManager {
                                 if (obj instanceof Map) {
                                     @SuppressWarnings("unchecked")
                                     Map<String, Object> entryMap = (Map<String, Object>) obj;
-
                                     ScoreEntry scoreEntry = new ScoreEntry(
                                             (String) entryMap.get("type"),
                                             (String) entryMap.get("description"),
@@ -305,6 +362,7 @@ public class BingoScoreManager {
         }
     }
 
+
     public record ScoreEntry(
             String type,
             String description,
@@ -315,9 +373,9 @@ public class BingoScoreManager {
         public String getFormattedType() {
             return switch (type) {
                 case "CHALLENGE" -> "Reto";
-                case "LINE" -> "Línea";
+                case "LINE"      -> "Línea";
                 case "FULL_BINGO" -> "Bingo Completo";
-                default -> type;
+                default          -> type;
             };
         }
     }

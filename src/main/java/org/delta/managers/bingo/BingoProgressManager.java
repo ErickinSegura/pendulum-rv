@@ -2,6 +2,7 @@ package org.delta.managers.bingo;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Team;
+import org.delta.database.BingoSyncManager;
 
 import java.util.*;
 
@@ -31,15 +32,21 @@ public class BingoProgressManager {
         return instance;
     }
 
+
     public void addProgress(String teamName, int challengeId, int amount) {
         teamProgress.computeIfAbsent(teamName, k -> new HashMap<>());
-        int currentProgress = teamProgress.get(teamName).getOrDefault(challengeId, 0);
-        teamProgress.get(teamName).put(challengeId, currentProgress + amount);
+        int current = teamProgress.get(teamName).getOrDefault(challengeId, 0);
+        int newValue = current + amount;
+        teamProgress.get(teamName).put(challengeId, newValue);
+
+        syncProgress(teamName, challengeId, newValue);
     }
 
     public void setProgress(String teamName, int challengeId, int amount) {
         teamProgress.computeIfAbsent(teamName, k -> new HashMap<>());
         teamProgress.get(teamName).put(challengeId, amount);
+
+        syncProgress(teamName, challengeId, amount);
     }
 
     public int getProgress(String teamName, int challengeId) {
@@ -50,9 +57,14 @@ public class BingoProgressManager {
         return new HashMap<>(teamProgress.getOrDefault(teamName, new HashMap<>()));
     }
 
+
     public void completeChallenge(String teamName, int challengeId) {
         completedChallenges.computeIfAbsent(teamName, k -> new HashSet<>());
         completedChallenges.get(teamName).add(challengeId);
+
+        BingoChallenge challenge = BingoDataManager.getInstance().getChallenge(String.valueOf(challengeId));
+        int finalProgress = challenge != null ? challenge.amount() : getProgress(teamName, challengeId);
+        syncProgress(teamName, challengeId, finalProgress, true);
     }
 
     public boolean isChallengeCompleted(String teamName, int challengeId) {
@@ -62,6 +74,7 @@ public class BingoProgressManager {
     public Set<Integer> getCompletedChallenges(String teamName) {
         return new HashSet<>(completedChallenges.getOrDefault(teamName, new HashSet<>()));
     }
+
 
     public void markRowCompleted(String teamName, int row) {
         completedRows.computeIfAbsent(teamName, k -> new HashSet<>());
@@ -105,6 +118,7 @@ public class BingoProgressManager {
         return new HashSet<>(completedColumns.getOrDefault(teamName, new HashSet<>()));
     }
 
+
     public void resetTeamProgress(String teamName) {
         teamProgress.remove(teamName);
         completedChallenges.remove(teamName);
@@ -123,6 +137,24 @@ public class BingoProgressManager {
         completedDiagonal2.clear();
     }
 
+
+
+    private void syncProgress(String teamName, int challengeId, int progress) {
+        boolean completed = isChallengeCompleted(teamName, challengeId);
+        syncProgress(teamName, challengeId, progress, completed);
+    }
+
+
+    private void syncProgress(String teamName, int challengeId, int progress, boolean completed) {
+        BingoSyncManager sync = BingoSyncManager.getInstance();
+        if (sync == null) return;
+
+        long teamId = sync.resolveTeamId(teamName);
+        if (teamId == -1L) return;
+
+        sync.syncProgress(teamId, challengeId, progress, completed);
+    }
+
     public void loadProgress(Map<String, Object> data) {
         if (data.containsKey("progress")) {
             Object progressObj = data.get("progress");
@@ -133,17 +165,14 @@ public class BingoProgressManager {
 
                     if (teamProgressObj instanceof Map<?, ?> teamProgressMap) {
                         Map<Integer, Integer> converted = new HashMap<>();
-
                         for (Map.Entry<?, ?> prog : teamProgressMap.entrySet()) {
                             try {
                                 Integer key = prog.getKey() instanceof Number ?
                                         ((Number) prog.getKey()).intValue() :
                                         Integer.parseInt(prog.getKey().toString());
-
                                 Integer value = prog.getValue() instanceof Number ?
                                         ((Number) prog.getValue()).intValue() :
                                         Integer.parseInt(prog.getValue().toString());
-
                                 converted.put(key, value);
                             } catch (NumberFormatException e) {
                                 Bukkit.getLogger().warning("Error parsing progress entry: " +
@@ -300,6 +329,7 @@ public class BingoProgressManager {
 
         return data;
     }
+
 
     public Team getPlayerTeam(String playerName) {
         for (Team team : Bukkit.getScoreboardManager().getMainScoreboard().getTeams()) {

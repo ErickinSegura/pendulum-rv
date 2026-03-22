@@ -3,6 +3,7 @@ package org.delta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
+import org.delta.database.BingoSyncManager;
 import org.delta.database.DatabaseManager;
 import org.delta.listeners.bingo.BingoCollectListener;
 import org.delta.listeners.bingo.BingoInventoryListener;
@@ -37,6 +38,7 @@ public final class pendulum extends JavaPlugin {
     private DeathEvents deathEvents;
     private BingoDataManager bingoDataManager;
     private BingoProgressManager bingoProgressManager;
+    private BingoSyncManager bingoSyncManager;
     private DatabaseManager databaseManager;
 
     @Override
@@ -59,6 +61,7 @@ public final class pendulum extends JavaPlugin {
         deathEvents = new DeathEvents();
         bingoDataManager = BingoDataManager.getInstance(this);
         bingoProgressManager = BingoProgressManager.getInstance();
+        bingoSyncManager = BingoSyncManager.getInstance(this, databaseManager);
         TeamChestManager.initialize(getDataFolder());
         PerkManager.initialize(getDataFolder());
         PerkManager.getInstance();
@@ -107,6 +110,7 @@ public final class pendulum extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BingoCollectListener(), this);
         getServer().getPluginManager().registerEvents(new BingoKillListener(), this);
         getServer().getPluginManager().registerEvents(new BingoMineListener(), this);
+        
 
         // Spawn Listeners
         getServer().getPluginManager().registerEvents(new ZombieSpawner(this), this);

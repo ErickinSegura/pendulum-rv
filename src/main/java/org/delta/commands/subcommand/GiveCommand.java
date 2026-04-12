@@ -84,9 +84,6 @@ public class GiveCommand implements SubCommand {
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&d/pdl give <item> &8[jugador]"));
         player.sendMessage("");
-        player.sendMessage(MessageUtils.color("&8└ &7Items disponibles:"));
-        player.sendMessage(MessageUtils.color("&8   ├ clawn"));
-        player.sendMessage("");
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
     }
 }

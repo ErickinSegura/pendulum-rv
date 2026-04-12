@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.delta.customs.items.ItemRegistry;
 import org.delta.libs.PendulumSettings;
 import org.delta.managers.perks.Perk;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public class CommandCompletion implements TabCompleter {
         subCommandCompletions.put("basic", basicCommands);
 
         List<String> adminCommands = Arrays.asList(
-                "dia"
+                "dia", "give"
         );
         subCommandCompletions.put("admin", adminCommands);
 
@@ -62,6 +63,8 @@ public class CommandCompletion implements TabCompleter {
         subCommandCompletions.put("perk_admin", Arrays.asList(
                 "assign", "remove", "reset", "resetall", "list"
         ));
+
+        subCommandCompletions.put("give_items", new ArrayList<>(ItemRegistry.getKeys()));
 
         subCommandCompletions.put("perk_perks", Arrays.asList(
                 Arrays.stream(Perk.values())
@@ -145,6 +148,10 @@ public class CommandCompletion implements TabCompleter {
                 }
                 return filterCompletions(perkCompletions, args[1]);
             }
+
+            if (args[0].equalsIgnoreCase("give") && checkPermission(player)) {
+                return filterCompletions(subCommandCompletions.get("give_items"), args[1]);
+            }
         }
 
         if (args.length == 3) {
@@ -212,6 +219,10 @@ public class CommandCompletion implements TabCompleter {
                             args[1].equalsIgnoreCase("reset") ||
                             args[1].equalsIgnoreCase("list"))) {
                 return getTeamNames(args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("give") && checkPermission(player)) {
+                return getOnlinePlayerNames(args[2]);
             }
         }
 

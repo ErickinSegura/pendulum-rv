@@ -5,6 +5,7 @@ import org.delta.customs.items.tools.Clawn;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class ItemRegistry {
 
@@ -20,5 +21,9 @@ public class ItemRegistry {
 
     public static Optional<CustomItem> get(String key) {
         return Optional.ofNullable(ITEMS.get(key.toLowerCase()));
+    }
+
+    public static Set<String> getKeys() {
+        return ITEMS.keySet();
     }
 }

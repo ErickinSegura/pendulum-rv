@@ -3,6 +3,7 @@ package org.delta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.delta.commands.CommandCompletion;
 import org.delta.commands.PendulumCommand;
+import org.delta.customs.craftings.CustomCraftingRegistry;
 import org.delta.database.BingoSyncManager;
 import org.delta.database.DatabaseManager;
 import org.delta.listeners.bingo.BingoCollectListener;
@@ -40,6 +41,7 @@ public final class pendulum extends JavaPlugin {
     private BingoProgressManager bingoProgressManager;
     private BingoSyncManager bingoSyncManager;
     private DatabaseManager databaseManager;
+    private CustomCraftingListener customCraftingListener;
 
     @Override
     public void onEnable() {
@@ -65,6 +67,8 @@ public final class pendulum extends JavaPlugin {
         TeamChestManager.initialize(getDataFolder());
         PerkManager.initialize(getDataFolder());
         PerkManager.getInstance();
+        customCraftingListener = new CustomCraftingListener(this);
+        CustomCraftingRegistry.register(customCraftingListener);
 
         registerEvents();
         registerCommands();

@@ -317,7 +317,7 @@ public class BingoDataManager {
             }
             progressConfig.save(progressFile);
 
-            BingoSyncManager.getInstance().resetAllProgress();
+            //BingoSyncManager.getInstance().resetAllProgress();
 
             plugin.getLogger().info("Progreso de bingo reseteado");
         } catch (IOException e) {

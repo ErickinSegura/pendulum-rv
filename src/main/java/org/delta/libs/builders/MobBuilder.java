@@ -16,7 +16,12 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.NamespacedKey;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +40,9 @@ public class MobBuilder {
     private int fireTicksDuration = 0;
     private ItemStack helmet, chestplate, leggings, boots, mainHand, offHand;
     private final List<PotionEffect> potionEffects = new ArrayList<>();
+    private final Map<Attribute, Double> baseAttributes = new HashMap<>();
+    private final List<AttributeModifierEntry> attributeModifiers = new ArrayList<>();
+    private record AttributeModifierEntry(Attribute attribute, String name, double amount, Operation operation) {}
 
     private boolean hasBossBar = false;
     private String bossBarTitle;
@@ -135,6 +143,28 @@ public class MobBuilder {
         return this;
     }
 
+    public MobBuilder setAttribute(Attribute attribute, double baseValue) {
+        this.baseAttributes.put(attribute, baseValue);
+        return this;
+    }
+
+    public MobBuilder addAttributeModifier(Attribute attribute, String name, double amount, Operation operation) {
+        this.attributeModifiers.add(new AttributeModifierEntry(attribute, name, amount, operation));
+        return this;
+    }
+
+    public MobBuilder addAttributeFlat(Attribute attribute, String name, double amount) {
+        return addAttributeModifier(attribute, name, amount, Operation.ADD_NUMBER);
+    }
+
+    public MobBuilder addAttributePercent(Attribute attribute, String name, double percent) {
+        return addAttributeModifier(attribute, name, percent, Operation.ADD_SCALAR);
+    }
+
+    public MobBuilder addAttributeMultiplier(Attribute attribute, String name, double multiplier) {
+        return addAttributeModifier(attribute, name, multiplier, Operation.MULTIPLY_SCALAR_1);
+    }
+
     public MobBuilder setBossBar(Plugin plugin, String title, BarColor color, BarStyle style) {
         this.hasBossBar = true;
         this.plugin = plugin;
@@ -169,6 +199,18 @@ public class MobBuilder {
         if (!removable && entity instanceof Mob mob) {
             mob.setRemoveWhenFarAway(false);
         }
+
+        baseAttributes.forEach((attr, value) -> {
+            var instance = entity.getAttribute(attr);
+            if (instance != null) instance.setBaseValue(value);
+        });
+
+        attributeModifiers.forEach(entry -> {
+            var instance = entity.getAttribute(entry.attribute());
+            if (instance == null) return;
+            NamespacedKey key = new NamespacedKey("mobbuilder", entry.name().toLowerCase().replace(" ", "_"));
+            instance.addModifier(new AttributeModifier(key, entry.amount(), entry.operation()));
+        });
 
         if (maxHealth > 0) {
             entity.getAttribute(Attribute.MAX_HEALTH).setBaseValue(maxHealth);

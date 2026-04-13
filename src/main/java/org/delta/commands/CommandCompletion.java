@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.delta.customs.items.ItemRegistry;
+import org.delta.customs.mobs.MobRegistry;
 import org.delta.libs.PendulumSettings;
 import org.delta.managers.perks.Perk;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ public class CommandCompletion implements TabCompleter {
         subCommandCompletions.put("basic", basicCommands);
 
         List<String> adminCommands = Arrays.asList(
-                "dia", "give"
+                "dia", "give", "summon"
         );
         subCommandCompletions.put("admin", adminCommands);
 
@@ -65,6 +66,8 @@ public class CommandCompletion implements TabCompleter {
         ));
 
         subCommandCompletions.put("give_items", new ArrayList<>(ItemRegistry.getKeys()));
+
+        subCommandCompletions.put("summon_mobs", new ArrayList<>(MobRegistry.getKeys()));
 
         subCommandCompletions.put("perk_perks", Arrays.asList(
                 Arrays.stream(Perk.values())
@@ -152,6 +155,10 @@ public class CommandCompletion implements TabCompleter {
             if (args[0].equalsIgnoreCase("give") && checkPermission(player)) {
                 return filterCompletions(subCommandCompletions.get("give_items"), args[1]);
             }
+
+            if (args[0].equalsIgnoreCase("summon") && checkPermission(player)) {
+                return filterCompletions(subCommandCompletions.get("summon_mobs"), args[1]);
+            }
         }
 
         if (args.length == 3) {
@@ -224,6 +231,10 @@ public class CommandCompletion implements TabCompleter {
             if (args[0].equalsIgnoreCase("give") && checkPermission(player)) {
                 return getOnlinePlayerNames(args[2]);
             }
+
+            if (args[0].equalsIgnoreCase("summon") && checkPermission(player)) {
+                return List.of(String.valueOf((int) player.getLocation().getX()), "~");
+            }
         }
 
         if (args.length == 4) {
@@ -250,6 +261,10 @@ public class CommandCompletion implements TabCompleter {
                     checkPermission(player)) {
                 return filterCompletions(subCommandCompletions.get("perk_perks"), args[3]);
             }
+
+            if (args[0].equalsIgnoreCase("summon") && checkPermission(player)) {
+                return List.of(String.valueOf((int) player.getLocation().getY()), "~");
+            }
         }
 
         if (args.length == 5) {
@@ -263,6 +278,10 @@ public class CommandCompletion implements TabCompleter {
                     args[1].equalsIgnoreCase("sacrifice") &&
                     checkPermission(player)) {
                 return getOnlinePlayerNames(args[4]);
+            }
+
+            if (args[0].equalsIgnoreCase("summon") && checkPermission(player)) {
+                return List.of(String.valueOf((int) player.getLocation().getY()), "~");
             }
         }
 

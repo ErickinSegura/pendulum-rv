@@ -2,12 +2,10 @@ package org.delta.customs.items.tools;
 
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.delta.customs.items.CustomItem;
 import org.delta.libs.builders.ItemBuilder;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class Clawn implements CustomItem {

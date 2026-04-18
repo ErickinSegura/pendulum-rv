@@ -2,6 +2,11 @@ package org.delta.customs.mobs;
 
 import org.bukkit.Location;
 import org.delta.customs.mobs.zombie_test.ZombieTest;
+import org.delta.customs.mobs.chargebase.defensor.DefensorBasico;
+import org.delta.customs.mobs.chargebase.healer.HealerBasico;
+import org.delta.customs.mobs.chargebase.atacante.AtacanteBasico;
+import org.delta.customs.mobs.chargebase.controlador.ControladorBasico;
+import org.delta.customs.mobs.chargebase.hibrido.HibridoBasico;
 import org.delta.pendulum;
 
 import java.util.*;
@@ -13,6 +18,12 @@ public class MobRegistry {
 
     static {
         register("zombie_vengador", ZombieTest::new);
+        // ChargeBase
+        register("atacante_basico", AtacanteBasico::new);
+        register("defensor_basico", DefensorBasico::new);
+        register("healer_basico", HealerBasico::new);
+        register("controlador_basico", ControladorBasico::new);
+        register("hibrido_basico", HibridoBasico::new);
     }
 
     private static void register(String key, BiFunction<pendulum, Location, CustomMob> factory) {

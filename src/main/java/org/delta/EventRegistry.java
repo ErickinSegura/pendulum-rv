@@ -2,6 +2,7 @@ package org.delta;
 
 import org.bukkit.plugin.PluginManager;
 import org.delta.listeners.bingo.*;
+import org.delta.listeners.chargebase.ChargeBaseDeathListener;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.listeners.death.DeathListener;
 import org.delta.listeners.perks.*;
@@ -34,6 +35,7 @@ public class EventRegistry {
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
         pm.registerEvents(new ChargeBaseZoneListener(plugin.getChargeBaseManager()), plugin);
+        pm.registerEvents(new ChargeBaseDeathListener(plugin.getChargeBaseManager()), plugin);
 
         // Perks
         pm.registerEvents(new PerkListener(), plugin);

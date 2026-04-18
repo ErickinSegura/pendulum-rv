@@ -22,6 +22,7 @@ public class ChargeBaseManager {
     private final pendulum plugin;
     private ChargeBaseZone activeZone = null;
     private boolean active = false;
+    private ChargeBaseSpawnManager spawnManager;
 
     public ChargeBaseManager(pendulum plugin) {
         this.plugin = plugin;
@@ -54,6 +55,9 @@ public class ChargeBaseManager {
         int y = world.getHighestBlockYAt(x, z);
 
         activeZone = new ChargeBaseZone(new Location(world, x, y, z), INITIAL_RADIUS);
+
+        spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);
+        spawnManager.start();
 
         Bukkit.broadcastMessage("§d§l[Pendulum] §rBase de Carga activa en §e" + x + ", " + z);
 
@@ -93,6 +97,10 @@ public class ChargeBaseManager {
     private void endEvent() {
         active = false;
         activeZone = null;
+        if (spawnManager != null) {
+            spawnManager.stop();
+            spawnManager = null;
+        }
         Bukkit.broadcastMessage("§d§l[Pendulum] §rLa Base de Carga ha finalizado.");
     }
 
@@ -110,6 +118,8 @@ public class ChargeBaseManager {
         active = true;
         startTimeTicks = plugin.getServer().getCurrentTick();
         activeZone = new ChargeBaseZone(loc, radius);
+        spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);
+        spawnManager.start();
         Bukkit.getServer().broadcast(MessageUtils.color("&d&l[Pendulum] &rBase de Carga activa en &e" + (int)loc.getX() + ", " + (int)loc.getZ()));        startShrinking();
         startParticles();
         new BukkitRunnable() {
@@ -142,6 +152,8 @@ public class ChargeBaseManager {
 
         return hours + "h " + minutes + "m " + seconds + "s";
     }
+
+    public ChargeBaseSpawnManager getSpawnManager() { return spawnManager; }
 
     public ChargeBaseZone getActiveZone() { return activeZone; }
 

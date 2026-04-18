@@ -1,5 +1,6 @@
 package org.delta.customs.items;
 
+import org.delta.customs.items.chargebase.*;
 import org.delta.customs.items.tools.Clawn;
 
 import java.util.HashMap;
@@ -13,6 +14,16 @@ public class ItemRegistry {
 
     static {
         register(new Clawn());
+        // ChargeBase drops
+        register(new NucleoImpulso());
+        register(new GarraEnergizada());
+        register(new NucleoProteccion());
+        register(new FragmentoEscudo());
+        register(new EsenciaVital());
+        register(new NucleoRestauracion());
+        register(new FragmentoTemporal());
+        register(new NucleoDistorsion());
+        register(new NucleoInestable());
     }
 
     private static void register(CustomItem item) {

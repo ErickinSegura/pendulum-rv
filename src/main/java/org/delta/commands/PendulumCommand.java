@@ -34,6 +34,7 @@ public class PendulumCommand implements CommandExecutor {
         addSubCommand(new PerkCommand());
         addSubCommand(new GiveCommand());
         addSubCommand(new SummonCommand(plugin));
+        addSubCommand(new ChargeBaseCommand());
     }
 
     private void addSubCommand(SubCommand command) {

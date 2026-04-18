@@ -20,6 +20,7 @@ import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
 import org.delta.managers.bingo.BingoDataManager;
 import org.delta.managers.bingo.BingoProgressManager;
+import org.delta.managers.chargebase.ChargeBaseManager;
 import org.delta.managers.death.ClockEvents;
 import org.delta.managers.death.DeathEvents;
 import org.delta.managers.death.LifeManager;
@@ -36,11 +37,8 @@ public final class pendulum extends JavaPlugin {
 
     public static String prefix = "&d&lPendulum&r";
     private LifeManager lifeManager;
-    private DeathEvents deathEvents;
-    private BingoDataManager bingoDataManager;
-    private BingoProgressManager bingoProgressManager;
-    private BingoSyncManager bingoSyncManager;
     private DatabaseManager databaseManager;
+    private ChargeBaseManager chargeBaseManager;
     private CustomCraftingListener customCraftingListener;
 
     @Override
@@ -60,17 +58,19 @@ public final class pendulum extends JavaPlugin {
 
         // Inicializar managers
         lifeManager = new LifeManager(this);
-        deathEvents = new DeathEvents();
-        bingoDataManager = BingoDataManager.getInstance(this);
-        bingoProgressManager = BingoProgressManager.getInstance();
-        bingoSyncManager = BingoSyncManager.getInstance(this, databaseManager);
+        DeathEvents deathEvents = new DeathEvents();
+        BingoDataManager bingoDataManager = BingoDataManager.getInstance(this);
+        BingoProgressManager bingoProgressManager = BingoProgressManager.getInstance();
+        BingoSyncManager bingoSyncManager = BingoSyncManager.getInstance(this, databaseManager);
+        chargeBaseManager = new ChargeBaseManager(this);
         TeamChestManager.initialize(getDataFolder());
         PerkManager.initialize(getDataFolder());
         PerkManager.getInstance();
         customCraftingListener = new CustomCraftingListener(this);
         CustomCraftingRegistry.register(customCraftingListener);
 
-        registerEvents();
+
+        new EventRegistry(this, lifeManager).registerAll();
         registerCommands();
 
         sendConsole("&d&m                                          ");
@@ -90,39 +90,6 @@ public final class pendulum extends JavaPlugin {
         sendConsole("&d&m                                          ");
     }
 
-    public void registerEvents() {
-        ClockEvents.setPlugin(this);
-        getServer().getPluginManager().registerEvents(new RetoListener(), this);
-        getServer().getPluginManager().registerEvents(new LifeListener(lifeManager), this);
-        getServer().getPluginManager().registerEvents(new DeathListener(lifeManager), this);
-        getServer().getPluginManager().registerEvents(new TotemListener(), this);
-        getServer().getPluginManager().registerEvents(new PotionListener(), this);
-        getServer().getPluginManager().registerEvents(new BedListener(), this);
-        getServer().getPluginManager().registerEvents(new PerkListener(), this);
-
-        // Listeners de perks
-        getServer().getPluginManager().registerEvents(new LastStandListener(), this);
-        getServer().getPluginManager().registerEvents(new FumbleListener(), this);
-        getServer().getPluginManager().registerEvents(new SharedSpaceListener(), this);
-        getServer().getPluginManager().registerEvents(new LifestealListener(), this);
-
-        // Listeners de TeamChest
-        getServer().getPluginManager().registerEvents(new TeamChestListener(), this);
-
-        // Listeners del bingo
-        getServer().getPluginManager().registerEvents(new BingoInventoryListener(), this);
-        getServer().getPluginManager().registerEvents(new BingoCollectListener(), this);
-        getServer().getPluginManager().registerEvents(new BingoKillListener(), this);
-        getServer().getPluginManager().registerEvents(new BingoMineListener(), this);
-        
-
-        // Spawn Listeners
-        getServer().getPluginManager().registerEvents(new ZombieSpawner(this), this);
-
-        // Database Listeners
-        getServer().getPluginManager().registerEvents(new JoinLeaveListener(lifeManager), this);
-    }
-
     private void registerCommands() {
         Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setExecutor(new PendulumCommand(this));
         Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setTabCompleter(new CommandCompletion());
@@ -139,4 +106,6 @@ public final class pendulum extends JavaPlugin {
     public DatabaseManager getDatabaseManager() {
         return databaseManager;
     }
+
+    public ChargeBaseManager getChargeBaseManager() { return chargeBaseManager; }
 }

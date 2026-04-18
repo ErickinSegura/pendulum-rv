@@ -1,0 +1,58 @@
+package org.delta;
+
+import org.bukkit.plugin.PluginManager;
+import org.delta.listeners.bingo.*;
+import org.delta.listeners.chargebase.ChargeBaseZoneListener;
+import org.delta.listeners.death.DeathListener;
+import org.delta.listeners.perks.*;
+import org.delta.listeners.perks.impl.*;
+import org.delta.listeners.player.*;
+import org.delta.listeners.spawns.PolarBear;
+import org.delta.listeners.spawns.ZombieSpawner;
+import org.delta.listeners.teamChest.TeamChestListener;
+import org.delta.managers.death.LifeManager;
+
+public class EventRegistry {
+
+    private final pendulum plugin;
+    private final LifeManager lifeManager;
+
+    public EventRegistry(pendulum plugin, LifeManager lifeManager) {
+        this.plugin = plugin;
+        this.lifeManager = lifeManager;
+    }
+
+    public void registerAll() {
+        PluginManager pm = plugin.getServer().getPluginManager();
+
+        // Player
+        pm.registerEvents(new RetoListener(), plugin);
+        pm.registerEvents(new LifeListener(lifeManager), plugin);
+        pm.registerEvents(new DeathListener(lifeManager), plugin);
+        pm.registerEvents(new TotemListener(), plugin);
+        pm.registerEvents(new PotionListener(), plugin);
+        pm.registerEvents(new BedListener(), plugin);
+        pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
+        pm.registerEvents(new ChargeBaseZoneListener(plugin.getChargeBaseManager()), plugin);
+
+        // Perks
+        pm.registerEvents(new PerkListener(), plugin);
+        pm.registerEvents(new LastStandListener(), plugin);
+        pm.registerEvents(new FumbleListener(), plugin);
+        pm.registerEvents(new SharedSpaceListener(), plugin);
+        pm.registerEvents(new LifestealListener(), plugin);
+
+        // TeamChest
+        pm.registerEvents(new TeamChestListener(), plugin);
+
+        // Bingo
+        pm.registerEvents(new BingoInventoryListener(), plugin);
+        pm.registerEvents(new BingoCollectListener(), plugin);
+        pm.registerEvents(new BingoKillListener(), plugin);
+        pm.registerEvents(new BingoMineListener(), plugin);
+
+        // Spawns
+        pm.registerEvents(new ZombieSpawner(plugin), plugin);
+        pm.registerEvents(new PolarBear(plugin), plugin);
+    }
+}

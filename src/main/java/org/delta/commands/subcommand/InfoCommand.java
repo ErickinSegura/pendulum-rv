@@ -2,14 +2,19 @@ package org.delta.commands.subcommand;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Team;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
+import org.delta.managers.chargebase.ChargeBaseManager;
+import org.delta.pendulum;
 
 public class InfoCommand implements SubCommand {
+
+    private final PendulumSettings settings = PendulumSettings.getInstance();
 
     @Override
     public String getName() {
@@ -18,7 +23,9 @@ public class InfoCommand implements SubCommand {
 
     @Override
     public void execute(Player player, String[] args) {
+
         Team team = player.getScoreboard().getEntryTeam(player.getName());
+        ChargeBaseManager charge = pendulum.getInstance().getChargeBaseManager();
         String equipo = (team != null) ? team.getPrefix() : "&cSin equipo";
         int dia = PendulumSettings.getInstance().getDia();
 
@@ -43,6 +50,21 @@ public class InfoCommand implements SubCommand {
         sendStatistic(player, "Tu Equipo", equipo);
         sendStatistic(player, "Estado del Reto", getRetoStatus(retoCumplido));
         sendStatistic(player, "Día del servidor", "&e" + dia);
+
+        // Información Zona de Carga
+        if (settings.getDia() >= 5) {
+            if (charge.isActive()) {
+                var zone = charge.getActiveZone();
+                var center = zone.getCenter();
+                sendStatistic(player, "Base de Carga", "&aActiva en &e" + (int)center.getX() + ", " + (int)center.getZ());
+                sendStatistic(player, "Radio actual", "&e" + String.format("%.1f", zone.getCurrentRadius()));
+                sendStatistic(player, "Tiempo restante", "&e" + (charge.getRemainingTicks() / 20) / 60 + "m " + (charge.getRemainingTicks() / 20) % 60 + "s");
+            } else {
+                sendStatistic(player, "Base de Carga", "&cNo hay ninguna activa");
+                sendStatistic(player, "Proxima", "&c" + charge.getTimeUntilNext());
+            }
+        }
+
 
         // Sonido de finalización
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, 1.0f);

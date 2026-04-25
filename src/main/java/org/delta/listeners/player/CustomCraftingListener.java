@@ -84,6 +84,7 @@ public class CustomCraftingListener implements Listener {
 
     @EventHandler
     public void onPrepare(PrepareItemCraftEvent event) {
+        if (event.getInventory().getMatrix().length < 9) return;
         CustomRecipeBuilder.CustomRecipe match = matchRecipe(event.getInventory().getMatrix());
         if (match != null) {
             event.getInventory().setResult(match.getResult());
@@ -92,12 +93,12 @@ public class CustomCraftingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        // Solo nos interesa el slot de resultado (slot 0) de una crafting table o inventario 2x2
         if (event.getSlotType() != InventoryType.SlotType.RESULT) return;
         if (!(event.getInventory() instanceof CraftingInventory craftingInv)) return;
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
         ItemStack[] matrix = craftingInv.getMatrix();
+        if (matrix.length < 9) return;
         CustomRecipeBuilder.CustomRecipe match = matchRecipe(matrix);
         if (match == null) return;
 
@@ -107,10 +108,8 @@ public class CustomCraftingListener implements Listener {
         int times = isShiftClick ? calculateMaxCrafts(matrix, match) : 1;
         if (times <= 0) return;
 
-        // Consumir ingredientes
         consumeIngredients(craftingInv, match, times);
 
-        // Dar resultado
         ItemStack result = match.getResult();
         result.setAmount(result.getAmount() * times);
         HashMap<Integer, ItemStack> overflow = player.getInventory().addItem(result);

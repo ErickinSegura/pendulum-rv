@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.delta.customs.mobs.CustomMob;
+import org.delta.customs.mobs.chargebase.MobClass;
 import org.delta.libs.builders.ItemBuilder;
 import org.delta.libs.builders.MobBuilder;
 import org.delta.pendulum;
@@ -21,6 +22,11 @@ public class ZombieTest implements CustomMob {
     public ZombieTest(pendulum plugin, Location location) {
         this.plugin = plugin;
         this.location = location;
+    }
+
+    @Override
+    public MobClass getMobClass() {
+        return null;
     }
 
     @Override

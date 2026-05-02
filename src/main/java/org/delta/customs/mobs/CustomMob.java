@@ -8,4 +8,7 @@ public interface CustomMob {
 
     String getKey();
     LivingEntity build();
+
+    default double getKnockbackStrength() { return 0; }
+    default double getKnockbackVertical() { return 0; }
 }

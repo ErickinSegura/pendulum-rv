@@ -36,11 +36,8 @@ public class ChargeBaseSpawnManager {
     private final pendulum plugin;
     private final ChargeBaseZone zone;
 
-    // UUID -> clase del mob
     private final Map<UUID, MobClass> activeMobs = new HashMap<>();
-    // Kills por clase (reduce spawns)
     private final Map<MobClass, Integer> killCount = new EnumMap<>(MobClass.class);
-    // Dificultad actual (0.0 - 1.0, sube con el tiempo)
     private double difficulty = 0.0;
 
     private final List<BukkitRunnable> tasks = new ArrayList<>();
@@ -61,7 +58,6 @@ public class ChargeBaseSpawnManager {
     public void stop() {
         tasks.forEach(BukkitRunnable::cancel);
         tasks.clear();
-        // Elimina mobs vivos de la zona
         activeMobs.keySet().forEach(uid -> {
             plugin.getServer().getWorlds().stream()
                     .flatMap(w -> w.getEntities().stream())
@@ -78,6 +74,12 @@ public class ChargeBaseSpawnManager {
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public void run() {
+                activeMobs.entrySet().removeIf(entry -> {
+                    return plugin.getServer().getWorlds().stream()
+                            .flatMap(w -> w.getEntities().stream())
+                            .noneMatch(e -> e.getUniqueId().equals(entry.getKey()));
+                });
+
                 int activeCount = (int) activeMobs.values().stream()
                         .filter(c -> c == mobClass).count();
 
@@ -99,11 +101,10 @@ public class ChargeBaseSpawnManager {
     }
 
     private void startDifficultyRamp() {
-        // Sube dificultad cada 5 minutos (6000 ticks)
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public void run() {
-                difficulty = Math.min(1.0, difficulty + (1.0 / 12)); // 12 pasos en 1 hora
+                difficulty = Math.min(1.0, difficulty + (1.0 / 12));
                 plugin.getLogger().info("[ChargeBase] Dificultad: " + String.format("%.0f%%", difficulty * 100));
             }
         };
@@ -111,12 +112,10 @@ public class ChargeBaseSpawnManager {
         tasks.add(task);
     }
 
-    // Mientras más kills de una clase, menos spawnean (mínimo 1)
     private int getMaxAllowed(MobClass mobClass) {
         int kills = killCount.get(mobClass);
         int base = MAX_PER_CLASS.get(mobClass);
         int reduced = Math.max(1, base - (kills / 5));
-        // Dificultad sube el máximo ligeramente
         return (int)(reduced * (1 + difficulty * 0.5));
     }
 
@@ -128,6 +127,24 @@ public class ChargeBaseSpawnManager {
             case CONTROLADOR -> new ControladorBasico(plugin, loc).build();
             case HIBRIDO     -> new HibridoBasico(plugin, loc).build();
         };
+    }
+
+    public void despawnOutsideMobs() {
+        activeMobs.entrySet().removeIf(entry -> {
+            UUID uid = entry.getKey();
+            return plugin.getServer().getWorlds().stream()
+                    .flatMap(w -> w.getEntities().stream())
+                    .filter(e -> e.getUniqueId().equals(uid))
+                    .findFirst()
+                    .map(e -> {
+                        if (!zone.isInside(e.getLocation())) {
+                            e.remove();
+                            return true;
+                        }
+                        return false;
+                    })
+                    .orElse(true);
+        });
     }
 
     private Location randomLocationInZone() {
@@ -162,6 +179,4 @@ public class ChargeBaseSpawnManager {
         return activeMobs.get(uid);
     }
 
-    public double getDifficulty() { return difficulty; }
-    public Map<MobClass, Integer> getKillCount() { return killCount; }
 }

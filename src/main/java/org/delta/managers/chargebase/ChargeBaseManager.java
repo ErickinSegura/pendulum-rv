@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.libs.MessageUtils;
+import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.pendulum;
 
 import java.time.LocalTime;
@@ -23,6 +24,7 @@ public class ChargeBaseManager {
     private ChargeBaseZone activeZone = null;
     private boolean active = false;
     private ChargeBaseSpawnManager spawnManager;
+    private ChargeBaseZoneListener zoneListener;
 
     public ChargeBaseManager(pendulum plugin) {
         this.plugin = plugin;
@@ -41,7 +43,7 @@ public class ChargeBaseManager {
                     startEvent();
                 }
             }
-        }.runTaskTimer(plugin, 0L, 20L); // checa cada segundo
+        }.runTaskTimer(plugin, 0L, 20L);
     }
 
     private void startEvent() {
@@ -72,7 +74,7 @@ public class ChargeBaseManager {
     }
 
     private void startShrinking() {
-        long steps = DURATION_TICKS / SHRINK_INTERVAL; // 60 pasos
+        long steps = DURATION_TICKS / SHRINK_INTERVAL;
         double shrinkPerStep = INITIAL_RADIUS / steps;
 
         new BukkitRunnable() {
@@ -80,7 +82,15 @@ public class ChargeBaseManager {
             public void run() {
                 if (!active) { cancel(); return; }
                 activeZone.shrink(shrinkPerStep);
-                plugin.getLogger().info("Base de Carga reducida — Radio actual: " + String.format("%.1f", activeZone.getCurrentRadius()) + " bloques");
+
+                // Despawnear mobs que quedaron fuera de la zona reducida
+                if (spawnManager != null) {
+                    spawnManager.despawnOutsideMobs();
+                }
+
+                plugin.getLogger().info("Base de Carga reducida — Radio actual: "
+                        + String.format("%.1f", activeZone.getCurrentRadius()) + " bloques");
+
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (activeZone.isInside(p.getLocation())) {
                         p.sendMessage(MessageUtils.color(
@@ -89,12 +99,14 @@ public class ChargeBaseManager {
                         ));
                     }
                 }
-
             }
         }.runTaskTimer(plugin, SHRINK_INTERVAL, SHRINK_INTERVAL);
     }
 
     private void endEvent() {
+        if (zoneListener != null) {
+            zoneListener.cleanupAll();
+        }
         active = false;
         activeZone = null;
         if (spawnManager != null) {
@@ -156,6 +168,10 @@ public class ChargeBaseManager {
     public ChargeBaseSpawnManager getSpawnManager() { return spawnManager; }
 
     public ChargeBaseZone getActiveZone() { return activeZone; }
+
+    public void setZoneListener(ChargeBaseZoneListener listener) {
+        this.zoneListener = listener;
+    }
 
     public boolean isActive() { return active; }
 }

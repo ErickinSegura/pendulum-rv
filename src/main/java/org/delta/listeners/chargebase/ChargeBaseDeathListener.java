@@ -15,7 +15,6 @@ import java.util.Random;
 
 public class ChargeBaseDeathListener implements Listener {
 
-    // Drops por clase: lista de item keys con su probabilidad
     private static final Map<MobClass, List<DropEntry>> DROPS = Map.of(
             MobClass.ATACANTE,    List.of(new DropEntry("nucleo_impulso", 0.4), new DropEntry("garra_energizada", 0.3)),
             MobClass.DEFENSOR,    List.of(new DropEntry("nucleo_proteccion", 0.4), new DropEntry("fragmento_escudo", 0.3)),

@@ -14,8 +14,4 @@ public class ZombieSpawner implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        new ZombieTest(plugin, event.getEntity().getLocation()).build();
-    }
 }

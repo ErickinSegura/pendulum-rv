@@ -8,6 +8,7 @@ import org.delta.listeners.death.DeathListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
 import org.delta.listeners.player.*;
+import org.delta.listeners.spawns.CustomMobListener;
 import org.delta.listeners.spawns.PolarBear;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
@@ -25,6 +26,8 @@ public class EventRegistry {
 
     public void registerAll() {
         PluginManager pm = plugin.getServer().getPluginManager();
+        ChargeBaseZoneListener zoneListener = new ChargeBaseZoneListener(plugin.getChargeBaseManager());
+        plugin.getChargeBaseManager().setZoneListener(zoneListener);
 
         // Player
         pm.registerEvents(new RetoListener(), plugin);
@@ -34,7 +37,7 @@ public class EventRegistry {
         pm.registerEvents(new PotionListener(), plugin);
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
-        pm.registerEvents(new ChargeBaseZoneListener(plugin.getChargeBaseManager()), plugin);
+        pm.registerEvents(zoneListener, plugin);
         pm.registerEvents(new ChargeBaseDeathListener(plugin.getChargeBaseManager()), plugin);
 
         // Perks
@@ -56,5 +59,6 @@ public class EventRegistry {
         // Spawns
         pm.registerEvents(new ZombieSpawner(plugin), plugin);
         pm.registerEvents(new PolarBear(plugin), plugin);
+        pm.registerEvents(new CustomMobListener(plugin), plugin);
     }
 }

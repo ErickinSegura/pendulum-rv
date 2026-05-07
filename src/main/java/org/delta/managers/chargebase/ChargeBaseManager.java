@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.delta.libs.MessageUtils;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.pendulum;
@@ -25,6 +26,9 @@ public class ChargeBaseManager {
     private boolean active = false;
     private ChargeBaseSpawnManager spawnManager;
     private ChargeBaseZoneListener zoneListener;
+
+    private BukkitRunnable shrinkTask;
+    private BukkitTask endTask;
 
     public ChargeBaseManager(pendulum plugin) {
         this.plugin = plugin;
@@ -49,48 +53,48 @@ public class ChargeBaseManager {
     private void startEvent() {
         active = true;
         startTimeTicks = plugin.getServer().getCurrentTick();
-
         World world = Bukkit.getWorlds().get(0);
         Random rng = new Random();
         int x = rng.nextInt(MAP_BOUND * 2) - MAP_BOUND;
         int z = rng.nextInt(MAP_BOUND * 2) - MAP_BOUND;
         int y = world.getHighestBlockYAt(x, z);
-
         activeZone = new ChargeBaseZone(new Location(world, x, y, z), INITIAL_RADIUS);
-
         spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);
         spawnManager.start();
-
         Bukkit.broadcastMessage("§d§l[Pendulum] §rBase de Carga activa en §e" + x + ", " + z);
-
         startShrinking();
         startParticles();
-
-        new BukkitRunnable() {
-            @Override
-            public void run() { endEvent(); }
+        endTask = new BukkitRunnable() {
+            @Override public void run() { endEvent(); }
         }.runTaskLater(plugin, DURATION_TICKS);
+    }
 
+    public void startEventAt(Location loc, double radius) {
+        active = true;
+        startTimeTicks = plugin.getServer().getCurrentTick();
+        activeZone = new ChargeBaseZone(loc, radius);
+        spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);
+        spawnManager.start();
+        Bukkit.getServer().broadcast(MessageUtils.color("&d&l[Pendulum] &rBase de Carga activa en &e" + (int)loc.getX() + ", " + (int)loc.getZ()));
+        startShrinking();
+        startParticles();
+        endTask = new BukkitRunnable() {
+            @Override public void run() { endEvent(); }
+        }.runTaskLater(plugin, DURATION_TICKS);
     }
 
     private void startShrinking() {
         long steps = DURATION_TICKS / SHRINK_INTERVAL;
-        double shrinkPerStep = INITIAL_RADIUS / steps;
+        double shrinkPerStep = activeZone.getCurrentRadius() / steps;
 
-        new BukkitRunnable() {
+        shrinkTask = new BukkitRunnable() {
             @Override
             public void run() {
                 if (!active) { cancel(); return; }
                 activeZone.shrink(shrinkPerStep);
-
-                // Despawnear mobs que quedaron fuera de la zona reducida
-                if (spawnManager != null) {
-                    spawnManager.despawnOutsideMobs();
-                }
-
+                if (spawnManager != null) spawnManager.despawnOutsideMobs();
                 plugin.getLogger().info("Base de Carga reducida — Radio actual: "
                         + String.format("%.1f", activeZone.getCurrentRadius()) + " bloques");
-
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (activeZone.isInside(p.getLocation())) {
                         p.sendMessage(MessageUtils.color(
@@ -100,13 +104,14 @@ public class ChargeBaseManager {
                     }
                 }
             }
-        }.runTaskTimer(plugin, SHRINK_INTERVAL, SHRINK_INTERVAL);
+        };
+        shrinkTask.runTaskTimer(plugin, SHRINK_INTERVAL, SHRINK_INTERVAL);
     }
 
     private void endEvent() {
-        if (zoneListener != null) {
-            zoneListener.cleanupAll();
-        }
+        if (shrinkTask != null) { shrinkTask.cancel(); shrinkTask = null; }
+        if (endTask != null) { endTask.cancel(); endTask = null; }
+        if (zoneListener != null) zoneListener.cleanupAll();
         active = false;
         activeZone = null;
         if (spawnManager != null) {
@@ -124,19 +129,6 @@ public class ChargeBaseManager {
                 activeZone.spawnParticles();
             }
         }.runTaskTimer(plugin, 0L, 20L);
-    }
-
-    public void startEventAt(Location loc, double radius) {
-        active = true;
-        startTimeTicks = plugin.getServer().getCurrentTick();
-        activeZone = new ChargeBaseZone(loc, radius);
-        spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);
-        spawnManager.start();
-        Bukkit.getServer().broadcast(MessageUtils.color("&d&l[Pendulum] &rBase de Carga activa en &e" + (int)loc.getX() + ", " + (int)loc.getZ()));        startShrinking();
-        startParticles();
-        new BukkitRunnable() {
-            @Override public void run() { endEvent(); }
-        }.runTaskLater(plugin, DURATION_TICKS);
     }
 
     public void forceEnd() { endEvent(); }

@@ -1,21 +1,32 @@
 package org.delta.managers.chargebase;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.delta.pendulum;
 
 public class ChargeBaseZone {
     private final Location center;
     private final double initialRadius;
     private double currentRadius;
-    private final int baseY;
+    private int[] groundCache;
+    private int cachedSteps;
 
     public ChargeBaseZone(Location center, double initialRadius) {
-        this.center  = center;
+        this.center = center;
         this.initialRadius = initialRadius;
         this.currentRadius = initialRadius;
-        this.baseY = center.getWorld().getHighestBlockYAt(center.getBlockX(), center.getBlockZ());
+        Bukkit.getScheduler().runTaskLater(pendulum.getInstance(), this::rebuildGroundCache, 1L);
+    }
+
+    private void rebuildGroundCache() {
+        cachedSteps = (int) Math.min(720, Math.max(48, (2 * Math.PI * currentRadius) / 1.0));
+        groundCache = new int[cachedSteps];
+        World world = center.getWorld();
+        for (int i = 0; i < cachedSteps; i++) {
+            double angle = (2 * Math.PI / cachedSteps) * i;
+            double x = center.getX() + currentRadius * Math.cos(angle);
+            double z = center.getZ() + currentRadius * Math.sin(angle);
+            groundCache[i] = world.getHighestBlockYAt((int) x, (int) z);
+        }
     }
 
     public boolean isInside(Location loc) {
@@ -27,26 +38,26 @@ public class ChargeBaseZone {
 
     public void spawnParticles() {
         World world = center.getWorld();
-        Particle.DustOptions wall = new Particle.DustOptions(Color.fromRGB(180, 0, 255), 1.5f);
+        if (world == null || groundCache == null || cachedSteps == 0) return;
 
-        int wallSteps = (int) Math.min(360, Math.max(24, (2 * Math.PI * currentRadius) / 1.5));
+        Particle.DustOptions wall = new Particle.DustOptions(Color.fromRGB(220, 50, 255), 2.5f);
+        double heightSpacing = 1.5;
 
-        int yBottom = baseY - 8;
-        int yTop    = baseY + 64;
-        double heightSpacing = 2.0;
+        for (int i = 0; i < cachedSteps; i++) {
+            double angle = (2 * Math.PI / cachedSteps) * i;
+            double x = center.getX() + currentRadius * Math.cos(angle);
+            double z = center.getZ() + currentRadius * Math.sin(angle);
+            int groundY = groundCache[i];
 
-        for (double y = yBottom; y <= yTop; y += heightSpacing) {
-            for (int i = 0; i < wallSteps; i++) {
-                double angle = (2 * Math.PI / wallSteps) * i;
-                double x = center.getX() + currentRadius * Math.cos(angle);
-                double z = center.getZ() + currentRadius * Math.sin(angle);
-                world.spawnParticle(Particle.DUST, x, y, z, 1, wall);
+            for (double y = groundY - 2; y <= groundY + 82; y += heightSpacing) {
+                world.spawnParticle(Particle.DUST, new Location(world, x, y, z), 1, 0, 0, 0, 0, wall, true);
             }
         }
     }
 
     public void shrink(double amount) {
         currentRadius = Math.max(0, currentRadius - amount);
+        rebuildGroundCache();
     }
 
     public Location getCenter()       { return center; }

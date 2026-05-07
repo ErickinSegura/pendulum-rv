@@ -1,6 +1,7 @@
 package org.delta.managers.chargebase;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.customs.mobs.chargebase.MobClass;
@@ -15,7 +16,6 @@ import java.util.*;
 
 public class ChargeBaseSpawnManager {
 
-    // Cuántos mobs máx activos por clase
     private static final Map<MobClass, Integer> MAX_PER_CLASS = Map.of(
             MobClass.ATACANTE,    6,
             MobClass.DEFENSOR,    4,
@@ -24,7 +24,6 @@ public class ChargeBaseSpawnManager {
             MobClass.HIBRIDO,     1
     );
 
-    // Cada cuántos ticks spawnea cada clase (20t = 1s)
     private static final Map<MobClass, Long> SPAWN_INTERVAL = Map.of(
             MobClass.ATACANTE,    200L,  // 10s
             MobClass.DEFENSOR,    300L,  // 15s
@@ -37,6 +36,7 @@ public class ChargeBaseSpawnManager {
     private final ChargeBaseZone zone;
 
     private final Map<UUID, MobClass> activeMobs = new HashMap<>();
+    private final Set<UUID> allSpawned = new HashSet<>();
     private final Map<MobClass, Integer> killCount = new EnumMap<>(MobClass.class);
     private double difficulty = 0.0;
 
@@ -58,14 +58,15 @@ public class ChargeBaseSpawnManager {
     public void stop() {
         tasks.forEach(BukkitRunnable::cancel);
         tasks.clear();
-        activeMobs.keySet().forEach(uid -> {
+        allSpawned.forEach(uid -> {
             plugin.getServer().getWorlds().stream()
                     .flatMap(w -> w.getEntities().stream())
                     .filter(e -> e.getUniqueId().equals(uid))
                     .findFirst()
-                    .ifPresent(e -> e.remove());
+                    .ifPresent(Entity::remove);
         });
         activeMobs.clear();
+        allSpawned.clear();
     }
 
     private void startSpawnLoop(MobClass mobClass) {
@@ -92,6 +93,7 @@ public class ChargeBaseSpawnManager {
                 LivingEntity entity = spawnMob(mobClass, spawnLoc);
                 if (entity != null) {
                     activeMobs.put(entity.getUniqueId(), mobClass);
+                    allSpawned.add(entity.getUniqueId());
                 }
             }
         };

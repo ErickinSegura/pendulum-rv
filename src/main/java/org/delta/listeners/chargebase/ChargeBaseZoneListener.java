@@ -34,13 +34,11 @@ public class ChargeBaseZoneListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         if (!manager.isActive()) return;
 
-        // Optimización: solo procesar si cambió posición XZ
         if (event.getFrom().getBlockX() == event.getTo().getBlockX() &&
                 event.getFrom().getBlockZ() == event.getTo().getBlockZ()) return;
 
         Player player  = event.getPlayer();
         UUID   uid     = player.getUniqueId();
-        // isInside ahora solo evalúa XZ → detección consistente sin importar Y
         boolean inside    = manager.getActiveZone().isInside(event.getTo());
         boolean wasInside = insideZone.contains(uid);
 

@@ -16,11 +16,11 @@ import java.util.Random;
 public class ChargeBaseDeathListener implements Listener {
 
     private static final Map<MobClass, List<DropEntry>> DROPS = Map.of(
-            MobClass.ATACANTE,    List.of(new DropEntry("nucleo_impulso", 0.4), new DropEntry("garra_energizada", 0.3)),
-            MobClass.DEFENSOR,    List.of(new DropEntry("nucleo_proteccion", 0.4), new DropEntry("fragmento_escudo", 0.3)),
-            MobClass.HEALER,      List.of(new DropEntry("esencia_vital", 0.4), new DropEntry("nucleo_restauracion", 0.3)),
-            MobClass.CONTROLADOR, List.of(new DropEntry("fragmento_temporal", 0.4), new DropEntry("nucleo_distorsion", 0.3)),
-            MobClass.HIBRIDO,     List.of(new DropEntry("nucleo_inestable", 0.7))
+            MobClass.ATACANTE,    List.of(new DropEntry("nucleo_impulso", 1), new DropEntry("garra_energizada", 0.3)),
+            MobClass.DEFENSOR,    List.of(new DropEntry("nucleo_proteccion", 1), new DropEntry("fragmento_escudo", 0.3)),
+            MobClass.HEALER,      List.of(new DropEntry("esencia_vital", 1), new DropEntry("nucleo_restauracion", 0.3)),
+            MobClass.CONTROLADOR, List.of(new DropEntry("fragmento_temporal", 1), new DropEntry("nucleo_distorsion", 0.3)),
+            MobClass.HIBRIDO,     List.of(new DropEntry("nucleo_inestable", 1))
     );
 
     private final ChargeBaseManager manager;
@@ -33,20 +33,18 @@ public class ChargeBaseDeathListener implements Listener {
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
         if (!manager.isActive()) return;
-
         ChargeBaseSpawnManager spawnManager = manager.getSpawnManager();
         if (spawnManager == null) return;
-
         if (!spawnManager.isManagedMob(event.getEntity().getUniqueId())) return;
+
+        event.getDrops().clear();
+        event.setDroppedExp(0);
 
         MobClass mobClass = spawnManager.getMobClass(event.getEntity().getUniqueId());
         spawnManager.registerKill(event.getEntity().getUniqueId());
 
         Player killer = event.getEntity().getKiller();
-        if (killer == null) return;
-        if (mobClass == null) return;
-
-        event.getDrops().clear();
+        if (killer == null || mobClass == null) return;
 
         List<DropEntry> drops = DROPS.get(mobClass);
         for (DropEntry drop : drops) {

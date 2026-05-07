@@ -93,7 +93,7 @@ public class ChargeBaseZoneListener implements Listener {
                 cancelGlowTask(uid);
                 return;
             }
-            player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20, 0, false, true));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 45, 0, false, true));
             player.playSound(
                     player.getLocation(),
                     "minecraft:entity.warden.heartbeat",

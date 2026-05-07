@@ -24,12 +24,12 @@ public class CommandCompletion implements TabCompleter {
 
     private void initializeCompletions() {
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "relojs", "bingo", "health", "chest", "perk"
+                "reto", "info", "relojes", "bingo", "health", "chest", "perk"
         );
         subCommandCompletions.put("basic", basicCommands);
 
         List<String> adminCommands = Arrays.asList(
-                "dia", "give", "summon"
+                "dia", "give", "summon", "chargebase"
         );
         subCommandCompletions.put("admin", adminCommands);
 
@@ -41,7 +41,7 @@ public class CommandCompletion implements TabCompleter {
                 "reset", "ruleta", "lista"
         ));
 
-        subCommandCompletions.put("relojs", Arrays.asList(
+        subCommandCompletions.put("relojes", Arrays.asList(
                 "set", "reset", "sacrifice"
         ));
 
@@ -49,7 +49,7 @@ public class CommandCompletion implements TabCompleter {
                 "stats", "lb"
         ));
 
-        subCommandCompletions.put("bingo_admin", Arrays.asList(
+        subCommandCompletions.put("bingo_admin", List.of(
                 "reset"
         ));
 
@@ -62,7 +62,7 @@ public class CommandCompletion implements TabCompleter {
         ));
 
         subCommandCompletions.put("perk_admin", Arrays.asList(
-                "assign", "remove", "reset", "resetall", "list"
+                "assign", "remove", "reset", "resetall"
         ));
 
         subCommandCompletions.put("give_items", new ArrayList<>(ItemRegistry.getKeys()));
@@ -73,6 +73,14 @@ public class CommandCompletion implements TabCompleter {
                 Arrays.stream(Perk.values())
                         .map(p -> p.name().toLowerCase())
                         .toArray(String[]::new)
+        ));
+
+        subCommandCompletions.put("chargebase", List.of(
+                "info"
+        ));
+
+        subCommandCompletions.put("chargebase_admin", Arrays.asList(
+                "start", "stop"
         ));
     }
 
@@ -159,6 +167,19 @@ public class CommandCompletion implements TabCompleter {
             if (args[0].equalsIgnoreCase("summon") && checkPermission(player)) {
                 return filterCompletions(subCommandCompletions.get("summon_mobs"), args[1]);
             }
+
+            if (args[0].equalsIgnoreCase("chargebase")) {
+                List<String> chargebaseCompletions = new ArrayList<>(subCommandCompletions.get("chargebase"));
+                if (checkPermission(player)) {
+                    List<String> chargebaseAdminCompletions = subCommandCompletions.get("chargebase_admin");
+                    if (chargebaseAdminCompletions != null) {
+                        chargebaseCompletions.addAll(chargebaseAdminCompletions);
+                    }
+                }
+                return filterCompletions(chargebaseCompletions, args[1]);
+            }
+
+
         }
 
         if (args.length == 3) {

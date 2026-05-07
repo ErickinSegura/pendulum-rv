@@ -120,6 +120,17 @@ public class NMSEntityUtils {
         nms.goalSelector.addGoal(4, new LookAtPlayerGoal(nms, Player.class, 8.0F));
     }
 
+    public static void applyRangedGoals(PathfinderMob nms) {
+        clearGoals(nms);
+        nms.goalSelector.addGoal(1, new FloatGoal(nms));
+        nms.goalSelector.addGoal(2, new RangedAttackGoal((net.minecraft.world.entity.monster.RangedAttackMob) nms, 1.0D, 20, 15.0F));
+        nms.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(nms, 0.8D));
+        nms.goalSelector.addGoal(4, new LookAtPlayerGoal(nms, Player.class, 12.0F));
+        nms.goalSelector.addGoal(5, new RandomLookAroundGoal(nms));
+        nms.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(nms, Player.class, true));
+        nms.targetSelector.addGoal(2, new HurtByTargetGoal(nms));
+    }
+
 
     public static void forceTarget(PathfinderMob nms, LivingEntity target) {
         net.minecraft.world.entity.LivingEntity nmsTarget =

@@ -1,7 +1,7 @@
 package org.delta.customs.mobs.chargebase.controlador;
 
-
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.delta.customs.mobs.CustomMob;
@@ -9,11 +9,11 @@ import org.delta.customs.mobs.chargebase.MobClass;
 import org.delta.libs.builders.MobBuilder;
 import org.delta.pendulum;
 
-public class ControladorBasico implements CustomMob {
+public class ControladorAvanzado implements CustomMob {
     private final pendulum plugin;
     private final Location location;
 
-    public ControladorBasico(pendulum plugin, Location location) {
+    public ControladorAvanzado(pendulum plugin, Location location) {
         this.plugin = plugin;
         this.location = location;
     }
@@ -22,19 +22,23 @@ public class ControladorBasico implements CustomMob {
     public MobClass getMobClass() { return MobClass.CONTROLADOR; }
 
     @Override
-    public String getKey() { return "controlador_basico"; }
+    public String getKey() { return "controlador_avanzado"; }
 
     @Override
     public LivingEntity build() {
-        LivingEntity entity = new MobBuilder(EntityType.ILLUSIONER)
-                .setCustomName("&5&lTelevisión Azteca")
+        LivingEntity entity = new MobBuilder(EntityType.BREEZE)
+                .setCustomName("&5&l¡Que el viento te atrape!")
                 .setCustomNameVisible(true)
-                .setMaxHealth(60)
+                .setMaxHealth(80)
+                .setAttribute(Attribute.MOVEMENT_SPEED, 0.35)
                 .setRemovable(false)
                 .build(location);
 
         entity.addScoreboardTag(getKey());
         return entity;
     }
+
+    @Override
+    public double getKnockbackStrength() { return 5.0; }
 
 }

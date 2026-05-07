@@ -4,6 +4,9 @@ import org.bukkit.plugin.PluginManager;
 import org.delta.listeners.bingo.*;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
+import org.delta.listeners.chargebase.mobs.ControladorArrowListener;
+import org.delta.listeners.chargebase.mobs.ControladorAvanzadoListener;
+import org.delta.listeners.chargebase.mobs.DefensorBehaviorListener;
 import org.delta.listeners.death.DeathListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
@@ -37,8 +40,13 @@ public class EventRegistry {
         pm.registerEvents(new PotionListener(), plugin);
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
-        pm.registerEvents(zoneListener, plugin);
+
+        // ChargeBase
         pm.registerEvents(new ChargeBaseDeathListener(plugin.getChargeBaseManager()), plugin);
+        pm.registerEvents(zoneListener, plugin);
+        pm.registerEvents(new DefensorBehaviorListener(), plugin);
+        pm.registerEvents(new ControladorArrowListener(), plugin);
+        pm.registerEvents(new ControladorAvanzadoListener(plugin), plugin);
 
         // Perks
         pm.registerEvents(new PerkListener(), plugin);

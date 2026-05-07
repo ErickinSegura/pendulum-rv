@@ -6,6 +6,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.customs.mobs.chargebase.MobClass;
 import org.delta.customs.mobs.chargebase.atacante.AtacanteBasico;
+import org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado;
 import org.delta.customs.mobs.chargebase.controlador.ControladorBasico;
 import org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado;
 import org.delta.customs.mobs.chargebase.defensor.DefensorBasico;
@@ -141,7 +142,9 @@ public class ChargeBaseSpawnManager {
                     ? new DefensorAvanzado(plugin, loc).build()
                     : new DefensorBasico(plugin, loc).build();
             case HEALER      -> new HealerBasico(plugin, loc).build();
-            case CONTROLADOR -> new ControladorBasico(plugin, loc).build();
+            case CONTROLADOR -> rng.nextDouble() < 0.10
+                    ? new ControladorBasico(plugin, loc).build()
+                    : new ControladorAvanzado(plugin, loc).build();
             case HIBRIDO     -> new HibridoBasico(plugin, loc).build();
         };
 

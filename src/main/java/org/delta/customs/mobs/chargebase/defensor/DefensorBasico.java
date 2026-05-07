@@ -39,7 +39,7 @@ public class DefensorBasico implements CustomMob {
         LivingEntity entity = new MobBuilder(EntityType.SNIFFER)
                 .setCustomName("&b&lEstudios San Ángel")
                 .setCustomNameVisible(true)
-                .setMaxHealth(80)
+                .setMaxHealth(120)
                 .setAttribute(org.bukkit.attribute.Attribute.MOVEMENT_SPEED, 0.25)
                 .setAttribute(org.bukkit.attribute.Attribute.KNOCKBACK_RESISTANCE, 0.8)
                 .setAttribute(Attribute.SCALE, 1.3)

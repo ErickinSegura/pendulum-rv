@@ -1,6 +1,7 @@
 package org.delta.customs.mobs;
 
 import org.bukkit.Location;
+import org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado;
 import org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado;
 import org.delta.customs.mobs.zombie_test.ZombieTest;
 import org.delta.customs.mobs.chargebase.defensor.DefensorBasico;
@@ -25,6 +26,7 @@ public class MobRegistry {
         register("defensor_avanzado", DefensorAvanzado::new);
         register("healer_basico", HealerBasico::new);
         register("controlador_basico", ControladorBasico::new);
+        register("controlador_avanzado", ControladorAvanzado::new);
         register("hibrido_basico", HibridoBasico::new);
     }
 

@@ -50,8 +50,18 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.4.2</version>
         <configuration>
-          <outputDirectory>C:\Users\PC\Proyectos\pendulum_server\plugins</outputDirectory>
+          <archive>
+            <manifestEntries>
+              <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
+            </manifestEntries>
+          </archive>
+          <outputDirectory>/home/erick/Proyectos/pendulum_server/plugins</outputDirectory>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>ca.bkaw</groupId>
+        <artifactId>paper-nms-maven-plugin</artifactId>
+        <version>1.4.10</version>
       </plugin>
     </plugins>
   </build>
@@ -61,6 +71,12 @@
       <url>https://repo.papermc.io/repository/maven-public/</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>bytecode.space</id>
+      <url>https://repo.bytecode.space/repository/maven-public/</url>
+    </pluginRepository>
+  </pluginRepositories>
   <dependencies>
     <dependency>
       <groupId>io.papermc.paper</groupId>
@@ -69,20 +85,16 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>io.papermc.paper</groupId>
+      <groupId>ca.bkaw</groupId>
       <artifactId>paper-nms</artifactId>
-      <version>1.21.11</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.papermc.paper</groupId>
-      <artifactId>paper-server</artifactId>
-      <version>1.21.11</version>
+      <version>1.21.11-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
   <properties>
-    <java.version>21</java.version>
+    <paper.nms.version>1.21.11-SNAPSHOT</paper.nms.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>21</java.version>
+    <paper.api.version>1.21.11-R0.1-SNAPSHOT</paper.api.version>
   </properties>
 </project>

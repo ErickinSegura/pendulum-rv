@@ -5,10 +5,7 @@ import org.delta.listeners.bingo.*;
 import org.delta.listeners.chargebase.AtacanteBehaviorListener;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
-import org.delta.listeners.chargebase.mobs.ControladorArrowListener;
-import org.delta.listeners.chargebase.mobs.ControladorAvanzadoListener;
-import org.delta.listeners.chargebase.mobs.DefensorBehaviorListener;
-import org.delta.listeners.chargebase.mobs.HealerBehaviorListener;
+import org.delta.listeners.chargebase.mobs.*;
 import org.delta.listeners.death.DeathListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
@@ -51,6 +48,8 @@ public class EventRegistry {
         pm.registerEvents(new ControladorAvanzadoListener(plugin), plugin);
         pm.registerEvents(new HealerBehaviorListener(plugin, plugin.getChargeBaseManager()), plugin);
         pm.registerEvents(new AtacanteBehaviorListener(plugin), plugin);
+        pm.registerEvents(new HibridoBasicoListener(plugin, plugin.getChargeBaseManager()), plugin);
+        pm.registerEvents(new HibridoAvanzadoListener(plugin, plugin.getChargeBaseManager()), plugin);
 
         // Perks
         pm.registerEvents(new PerkListener(), plugin);

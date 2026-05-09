@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.customs.mobs.chargebase.MobClass;
+import org.delta.customs.mobs.chargebase.atacante.AtacanteAvanzado;
 import org.delta.customs.mobs.chargebase.atacante.AtacanteBasico;
 import org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado;
 import org.delta.customs.mobs.chargebase.controlador.ControladorBasico;
@@ -12,6 +13,7 @@ import org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado;
 import org.delta.customs.mobs.chargebase.defensor.DefensorBasico;
 import org.delta.customs.mobs.chargebase.healer.HealerAvanzado;
 import org.delta.customs.mobs.chargebase.healer.HealerBasico;
+import org.delta.customs.mobs.chargebase.hibrido.HibridoAvanzado;
 import org.delta.customs.mobs.chargebase.hibrido.HibridoBasico;
 import org.delta.pendulum;
 
@@ -146,7 +148,7 @@ public class ChargeBaseSpawnManager {
         return switch (mobClass) {
             case ATACANTE    -> rng.nextDouble() < advancedChance
                     ? new AtacanteBasico(plugin, loc).build()
-                    : new AtacanteBasico(plugin, loc).build();
+                    : new AtacanteAvanzado(plugin, loc).build();
             case DEFENSOR    -> rng.nextDouble() < advancedChance
                     ? new DefensorAvanzado(plugin, loc).build()
                     : new DefensorBasico(plugin, loc).build();
@@ -156,7 +158,9 @@ public class ChargeBaseSpawnManager {
             case CONTROLADOR -> rng.nextDouble() < advancedChance
                     ? new ControladorAvanzado(plugin, loc).build()
                     : new ControladorBasico(plugin, loc).build();
-            case HIBRIDO     -> new HibridoBasico(plugin, loc).build();
+            case HIBRIDO     -> rng.nextDouble() < advancedChance
+                    ? new HibridoBasico(plugin, loc).build()
+                    : new HibridoAvanzado(plugin, loc).build();
         };
     }
 

@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.delta.customs.mobs.chargebase.atacante.AtacanteAvanzado;
 import org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado;
 import org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado;
+import org.delta.customs.mobs.chargebase.hibrido.HibridoAvanzado;
 import org.delta.customs.mobs.zombie_test.ZombieTest;
 import org.delta.customs.mobs.chargebase.defensor.DefensorBasico;
 import org.delta.customs.mobs.chargebase.healer.HealerBasico;
@@ -30,6 +31,7 @@ public class MobRegistry {
         register("controlador_basico", ControladorBasico::new);
         register("controlador_avanzado", ControladorAvanzado::new);
         register("hibrido_basico", HibridoBasico::new);
+        register("hibrido_avanzado", HibridoAvanzado::new);
     }
 
     private static void register(String key, BiFunction<pendulum, Location, CustomMob> factory) {

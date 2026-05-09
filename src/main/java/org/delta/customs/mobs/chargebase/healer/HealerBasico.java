@@ -28,7 +28,7 @@ public class HealerBasico implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.WITCH)
-                .setCustomName("&a&lSanadore")
+                .setCustomName("&a&lHealer Básico")
                 .setCustomNameVisible(true)
                 .setMaxHealth(40)
                 .setRemovable(false)

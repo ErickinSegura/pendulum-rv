@@ -27,7 +27,7 @@ public class ControladorAvanzado implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.BREEZE)
-                .setCustomName("&5&l¡Que el viento te atrape!")
+                .setCustomName("&5&lControl Avanzado")
                 .setCustomNameVisible(true)
                 .setMaxHealth(80)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.35)

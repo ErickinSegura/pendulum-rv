@@ -16,11 +16,11 @@ import java.util.Random;
 public class ChargeBaseDeathListener implements Listener {
 
     private static final Map<MobClass, List<DropEntry>> DROPS = Map.of(
-            MobClass.ATACANTE,    List.of(new DropEntry("nucleo_impulso", 1), new DropEntry("garra_energizada", 0.3)),
-            MobClass.DEFENSOR,    List.of(new DropEntry("nucleo_proteccion", 1), new DropEntry("fragmento_escudo", 0.3)),
-            MobClass.HEALER,      List.of(new DropEntry("esencia_vital", 1), new DropEntry("nucleo_restauracion", 0.3)),
-            MobClass.CONTROLADOR, List.of(new DropEntry("fragmento_temporal", 1), new DropEntry("nucleo_distorsion", 0.3)),
-            MobClass.HIBRIDO,     List.of(new DropEntry("nucleo_inestable", 1))
+            MobClass.ATACANTE,    List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
+            MobClass.DEFENSOR,    List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
+            MobClass.HEALER,      List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
+            MobClass.CONTROLADOR, List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
+            MobClass.HIBRIDO,     List.of(new DropEntry("placeholder", 1))
     );
 
     private final ChargeBaseManager manager;

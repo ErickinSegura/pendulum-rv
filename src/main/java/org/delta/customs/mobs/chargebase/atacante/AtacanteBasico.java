@@ -37,7 +37,7 @@ public class AtacanteBasico implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.ZOMBIE)
-                .setCustomName("&c&lAsaltante")
+                .setCustomName("&c&lAtacante Básico")
                 .setCustomNameVisible(true)
                 .setMaxHealth(60)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.32)

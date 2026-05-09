@@ -1,12 +1,11 @@
-// Híbrido
 package org.delta.customs.mobs.chargebase.hibrido;
 
+import net.minecraft.world.entity.PathfinderMob;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.delta.customs.mobs.CustomMob;
 import org.delta.customs.mobs.chargebase.MobClass;
 import org.delta.libs.builders.MobBuilder;
@@ -21,21 +20,30 @@ public class HibridoBasico implements CustomMob {
         this.location = location;
     }
 
+    @Override
     public MobClass getMobClass() { return MobClass.HIBRIDO; }
 
-    @Override public String getKey() { return "hibrido_basico"; }
+    @Override
+    public String getKey() { return "hibrido_basico"; }
 
     @Override
     public LivingEntity build() {
-        return new MobBuilder(EntityType.WARDEN)
-                .setCustomName("&d&lHíbrido")
+        LivingEntity entity = new MobBuilder(EntityType.CREEPER)
+                .setCustomName("&d&lHibrido Básico")
                 .setCustomNameVisible(true)
-                .setMaxHealth(120)
-                .setAttribute(Attribute.MOVEMENT_SPEED, 0.3)
-                .setAttribute(Attribute.ATTACK_DAMAGE, 12.0)
+                .setMaxHealth(80)
+                .setAttribute(Attribute.MOVEMENT_SPEED, 0.42)
+                .setAttribute(Attribute.SCALE, 0.7)
                 .setRemovable(false)
-                .addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, Integer.MAX_VALUE, 1, false, false))
-                .addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 0, false, false))
                 .build(location);
+
+        Creeper creeper = (Creeper) entity;
+        creeper.setPowered(true);
+        creeper.setMaxFuseTicks(60);
+        creeper.setExplosionRadius(3);
+
+        entity.addScoreboardTag(getKey());
+        return entity;
     }
+
 }

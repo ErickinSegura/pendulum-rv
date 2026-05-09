@@ -7,9 +7,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ArmorMeta;
-import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
 import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.delta.customs.mobs.CustomMob;
@@ -37,7 +34,7 @@ public class AtacanteAvanzado implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.WITHER_SKELETON)
-                .setCustomName("&c&l⚔ Berserker ⚔")
+                .setCustomName("&c&lAtacante Avanzado")
                 .setCustomNameVisible(true)
                 .setMaxHealth(80)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.35)

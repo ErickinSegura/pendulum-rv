@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.delta.customs.mobs.chargebase.atacante.AtacanteAvanzado;
 import org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado;
 import org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado;
+import org.delta.customs.mobs.chargebase.healer.HealerAvanzado;
 import org.delta.customs.mobs.chargebase.hibrido.HibridoAvanzado;
 import org.delta.customs.mobs.zombie_test.ZombieTest;
 import org.delta.customs.mobs.chargebase.defensor.DefensorBasico;
@@ -21,13 +22,13 @@ public class MobRegistry {
     private static final Map<String, BiFunction<pendulum, Location, CustomMob>> FACTORIES = new HashMap<>();
 
     static {
-        register("zombie_vengador", ZombieTest::new);
         // ChargeBase
         register("atacante_basico", AtacanteBasico::new);
         register("atacante_avanzado", AtacanteAvanzado::new);
         register("defensor_basico", DefensorBasico::new);
         register("defensor_avanzado", DefensorAvanzado::new);
         register("healer_basico", HealerBasico::new);
+        register("healer_avanzado", HealerAvanzado::new);
         register("controlador_basico", ControladorBasico::new);
         register("controlador_avanzado", ControladorAvanzado::new);
         register("hibrido_basico", HibridoBasico::new);

@@ -24,6 +24,7 @@ public class ItemRegistry {
         register(new FragmentoTemporal());
         register(new NucleoDistorsion());
         register(new NucleoInestable());
+        register(new Placeholder());
     }
 
     private static void register(CustomItem item) {

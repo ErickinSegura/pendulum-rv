@@ -27,7 +27,7 @@ public class ControladorAvanzado implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.BREEZE)
-                .setCustomName("&5&lControl Avanzado")
+                .setCustomName("&5&lMalboro")
                 .setCustomNameVisible(true)
                 .setMaxHealth(80)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.35)
@@ -38,7 +38,5 @@ public class ControladorAvanzado implements CustomMob {
         return entity;
     }
 
-    @Override
-    public double getKnockbackStrength() { return 5.0; }
 
 }

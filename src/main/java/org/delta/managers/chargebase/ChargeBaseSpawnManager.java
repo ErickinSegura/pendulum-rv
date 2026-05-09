@@ -164,25 +164,6 @@ public class ChargeBaseSpawnManager {
         };
     }
 
-    private void applyDifficultyScaling(LivingEntity entity) {
-        if (difficulty <= 0) return;
-
-        double maxHp = entity.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue();
-        double newHp = maxHp * (1 + difficulty * 0.5);
-        entity.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).setBaseValue(newHp);
-        entity.setHealth(newHp);
-
-        var speedAttr = entity.getAttribute(org.bukkit.attribute.Attribute.MOVEMENT_SPEED);
-        if (speedAttr != null) {
-            speedAttr.setBaseValue(speedAttr.getValue() * (1 + difficulty * 0.3));
-        }
-
-        var damageAttr = entity.getAttribute(org.bukkit.attribute.Attribute.ATTACK_DAMAGE);
-        if (damageAttr != null) {
-            damageAttr.setBaseValue(damageAttr.getValue() * (1 + difficulty * 0.4));
-        }
-    }
-
     public void despawnOutsideMobs() {
         activeMobs.entrySet().removeIf(entry -> {
             UUID uid = entry.getKey();

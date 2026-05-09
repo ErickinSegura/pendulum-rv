@@ -41,9 +41,6 @@ public class HealerAvanzado implements CustomMob {
         return entity;
     }
 
-    @Override
-    public double getKnockbackStrength() { return 1.0; }
-
     private void applyNMSBehavior(LivingEntity bukkit) {
         PathfinderMob nms = NMSEntityUtils.toNMS(bukkit);
         NMSEntityUtils.clearBrain(nms);

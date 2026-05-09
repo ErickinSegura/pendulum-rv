@@ -27,7 +27,7 @@ public class ControladorBasico implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.ILLUSIONER)
-                .setCustomName("&5&lControlador Básico")
+                .setCustomName("&5&lEl Trigonometrico")
                 .setCustomNameVisible(true)
                 .setMaxHealth(60)
                 .setRemovable(false)

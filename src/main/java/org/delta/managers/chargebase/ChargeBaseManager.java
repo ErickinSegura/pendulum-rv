@@ -66,7 +66,7 @@ public class ChargeBaseManager {
         spawnManager.start();
         Bukkit.broadcastMessage("§d§l[Pendulum] §rBase de Carga activa en §e" + x + ", " + z);
         startShrinking();
-        startParticles();
+        //startParticles();
         endTask = new BukkitRunnable() {
             @Override public void run() { endEvent(); }
         }.runTaskLater(plugin, DURATION_TICKS);
@@ -80,7 +80,7 @@ public class ChargeBaseManager {
         spawnManager.start();
         Bukkit.getServer().broadcast(MessageUtils.color("&d&l[Pendulum] &rBase de Carga activa en &e" + (int)loc.getX() + ", " + (int)loc.getZ()));
         startShrinking();
-        startParticles();
+        //startParticles();
         endTask = new BukkitRunnable() {
             @Override public void run() { endEvent(); }
         }.runTaskLater(plugin, DURATION_TICKS);

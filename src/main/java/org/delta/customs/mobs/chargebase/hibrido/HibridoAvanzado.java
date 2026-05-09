@@ -29,7 +29,7 @@ public class HibridoAvanzado implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.WARDEN)
-                .setCustomName("&d&lHibrido Avanzado")
+                .setCustomName("&d&lC Ñank F1")
                 .setCustomNameVisible(true)
                 .setMaxHealth(120)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.32)
@@ -42,9 +42,6 @@ public class HibridoAvanzado implements CustomMob {
         applyNMSBehavior(entity);
         return entity;
     }
-
-    @Override
-    public double getKnockbackStrength() { return 8.0; }
 
     private void applyNMSBehavior(LivingEntity bukkit) {
         PathfinderMob nms = NMSEntityUtils.toNMS(bukkit);

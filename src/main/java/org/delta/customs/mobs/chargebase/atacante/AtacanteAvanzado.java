@@ -19,11 +19,11 @@ import org.delta.libs.builders.MobBuilder;
 import org.delta.libs.nms.NMSEntityUtils;
 import org.delta.pendulum;
 
-public class AtacanteBasico implements CustomMob {
+public class AtacanteAvanzado implements CustomMob {
     private final pendulum plugin;
     private final Location location;
 
-    public AtacanteBasico(pendulum plugin, Location location) {
+    public AtacanteAvanzado(pendulum plugin, Location location) {
         this.plugin = plugin;
         this.location = location;
     }
@@ -32,17 +32,17 @@ public class AtacanteBasico implements CustomMob {
     public MobClass getMobClass() { return MobClass.ATACANTE; }
 
     @Override
-    public String getKey() { return "atacante_basico"; }
+    public String getKey() { return "atacante_avanzado"; }
 
     @Override
     public LivingEntity build() {
-        LivingEntity entity = new MobBuilder(EntityType.ZOMBIE)
-                .setCustomName("&c&lAsaltante")
+        LivingEntity entity = new MobBuilder(EntityType.WITHER_SKELETON)
+                .setCustomName("&c&l⚔ Berserker ⚔")
                 .setCustomNameVisible(true)
-                .setMaxHealth(60)
-                .setAttribute(Attribute.MOVEMENT_SPEED, 0.32)
-                .setAttribute(Attribute.ATTACK_DAMAGE, 8.0)
-                .setAttribute(Attribute.SCALE, 1.1)
+                .setMaxHealth(80)
+                .setAttribute(Attribute.MOVEMENT_SPEED, 0.35)
+                .setAttribute(Attribute.ATTACK_DAMAGE, 14.0)
+                .setAttribute(Attribute.SCALE, 1.4)
                 .setRemovable(false)
                 .build(location);
 
@@ -55,14 +55,7 @@ public class AtacanteBasico implements CustomMob {
     private void applyEquipment(LivingEntity entity) {
         EntityEquipment eq = entity.getEquipment();
 
-        eq.setHelmet(new ItemStack(Material.DRAGON_HEAD));
-        eq.setHelmetDropChance(0f);
-
         eq.setChestplate(new ItemBuilder(Material.IRON_CHESTPLATE)
-                .setArmorTrim(TrimMaterial.COPPER, TrimPattern.WILD).build());
-        eq.setLeggings(new ItemBuilder(Material.IRON_LEGGINGS)
-                .setArmorTrim(TrimMaterial.COPPER, TrimPattern.WILD).build());
-        eq.setBoots(new ItemBuilder(Material.IRON_BOOTS)
                 .setArmorTrim(TrimMaterial.COPPER, TrimPattern.WILD).build());
 
         eq.setChestplateDropChance(0f);
@@ -71,13 +64,13 @@ public class AtacanteBasico implements CustomMob {
     }
 
     @Override
-    public double getKnockbackStrength() { return 6.0; }
+    public double getKnockbackStrength() { return 10.0; }
 
     private void applyNMSBehavior(LivingEntity bukkit) {
         PathfinderMob nms = NMSEntityUtils.toNMS(bukkit);
         NMSEntityUtils.clearBrain(nms);
-        NMSEntityUtils.setFollowRange(nms, 24.0);
-        NMSEntityUtils.setAttackDamage(nms, 8.0);
+        NMSEntityUtils.setFollowRange(nms, 28.0);
+        NMSEntityUtils.setAttackDamage(nms, 14.0);
         NMSEntityUtils.applyMeleeGoals(nms);
     }
 }

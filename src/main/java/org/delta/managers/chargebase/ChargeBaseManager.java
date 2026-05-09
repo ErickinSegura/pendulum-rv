@@ -57,6 +57,9 @@ public class ChargeBaseManager {
         Random rng = new Random();
         int x = rng.nextInt(MAP_BOUND * 2) - MAP_BOUND;
         int z = rng.nextInt(MAP_BOUND * 2) - MAP_BOUND;
+
+        world.getChunkAt(x >> 4, z >> 4).load(true);
+
         int y = world.getHighestBlockYAt(x, z);
         activeZone = new ChargeBaseZone(new Location(world, x, y, z), INITIAL_RADIUS);
         spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);

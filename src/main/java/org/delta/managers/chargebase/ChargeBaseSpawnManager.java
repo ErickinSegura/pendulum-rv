@@ -10,6 +10,7 @@ import org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado;
 import org.delta.customs.mobs.chargebase.controlador.ControladorBasico;
 import org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado;
 import org.delta.customs.mobs.chargebase.defensor.DefensorBasico;
+import org.delta.customs.mobs.chargebase.healer.HealerAvanzado;
 import org.delta.customs.mobs.chargebase.healer.HealerBasico;
 import org.delta.customs.mobs.chargebase.hibrido.HibridoBasico;
 import org.delta.pendulum;
@@ -99,16 +100,20 @@ public class ChargeBaseSpawnManager {
 
     private void startSpawnLoop(MobClass mobClass) {
         long base = SPAWN_INTERVAL.get(mobClass);
-        long scaled = (long)(base * Math.max(0.6, 1 - difficulty * 0.4)); // mínimo 60% del intervalo original
+        long scaled = (long)(base * Math.max(0.6, 1 - difficulty * 0.4));
 
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public void run() {
-                activeMobs.entrySet().removeIf(entry ->
-                        plugin.getServer().getWorlds().stream()
-                                .flatMap(w -> w.getEntities().stream())
-                                .noneMatch(e -> e.getUniqueId().equals(entry.getKey()))
-                );
+                activeMobs.entrySet().removeIf(entry -> plugin.getServer().getWorlds().stream()
+                        .flatMap(w -> w.getEntities().stream())
+                        .noneMatch(e -> {
+                            Location loc = e.getLocation();
+                            if (!loc.getWorld().isChunkLoaded(loc.getBlockX() >> 4, loc.getBlockZ() >> 4)) {
+                                return false;
+                            }
+                            return e.getUniqueId().equals(entry.getKey());
+                        }));
 
                 int activeCount = (int) activeMobs.values().stream()
                         .filter(c -> c == mobClass).count();
@@ -136,20 +141,23 @@ public class ChargeBaseSpawnManager {
     }
 
     private LivingEntity spawnMob(MobClass mobClass, Location loc) {
-        LivingEntity entity = switch (mobClass) {
-            case ATACANTE    -> new AtacanteBasico(plugin, loc).build();
-            case DEFENSOR    -> rng.nextDouble() < 0.10
+        double advancedChance = 0.05 + (difficulty * 0.45);
+
+        return switch (mobClass) {
+            case ATACANTE    -> rng.nextDouble() < advancedChance
+                    ? new AtacanteBasico(plugin, loc).build()
+                    : new AtacanteBasico(plugin, loc).build();
+            case DEFENSOR    -> rng.nextDouble() < advancedChance
                     ? new DefensorAvanzado(plugin, loc).build()
                     : new DefensorBasico(plugin, loc).build();
-            case HEALER      -> new HealerBasico(plugin, loc).build();
-            case CONTROLADOR -> rng.nextDouble() < 0.10
-                    ? new ControladorBasico(plugin, loc).build()
-                    : new ControladorAvanzado(plugin, loc).build();
+            case HEALER      -> rng.nextDouble() < advancedChance
+                    ? new HealerAvanzado(plugin, loc).build()
+                    : new HealerBasico(plugin, loc).build();
+            case CONTROLADOR -> rng.nextDouble() < advancedChance
+                    ? new ControladorAvanzado(plugin, loc).build()
+                    : new ControladorBasico(plugin, loc).build();
             case HIBRIDO     -> new HibridoBasico(plugin, loc).build();
         };
-
-        applyDifficultyScaling(entity);
-        return entity;
     }
 
     private void applyDifficultyScaling(LivingEntity entity) {

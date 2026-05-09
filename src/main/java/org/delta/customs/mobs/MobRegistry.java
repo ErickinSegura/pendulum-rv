@@ -1,6 +1,7 @@
 package org.delta.customs.mobs;
 
 import org.bukkit.Location;
+import org.delta.customs.mobs.chargebase.atacante.AtacanteAvanzado;
 import org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado;
 import org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado;
 import org.delta.customs.mobs.zombie_test.ZombieTest;
@@ -22,6 +23,7 @@ public class MobRegistry {
         register("zombie_vengador", ZombieTest::new);
         // ChargeBase
         register("atacante_basico", AtacanteBasico::new);
+        register("atacante_avanzado", AtacanteAvanzado::new);
         register("defensor_basico", DefensorBasico::new);
         register("defensor_avanzado", DefensorAvanzado::new);
         register("healer_basico", HealerBasico::new);

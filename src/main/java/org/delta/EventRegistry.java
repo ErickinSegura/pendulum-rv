@@ -2,6 +2,7 @@ package org.delta;
 
 import org.bukkit.plugin.PluginManager;
 import org.delta.listeners.bingo.*;
+import org.delta.listeners.chargebase.AtacanteBehaviorListener;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.listeners.chargebase.mobs.ControladorArrowListener;
@@ -49,6 +50,7 @@ public class EventRegistry {
         pm.registerEvents(new ControladorArrowListener(), plugin);
         pm.registerEvents(new ControladorAvanzadoListener(plugin), plugin);
         pm.registerEvents(new HealerBehaviorListener(plugin, plugin.getChargeBaseManager()), plugin);
+        pm.registerEvents(new AtacanteBehaviorListener(plugin), plugin);
 
         // Perks
         pm.registerEvents(new PerkListener(), plugin);

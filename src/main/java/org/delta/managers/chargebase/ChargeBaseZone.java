@@ -1,6 +1,7 @@
 package org.delta.managers.chargebase;
 
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.delta.pendulum;
 
 public class ChargeBaseZone {
@@ -41,16 +42,35 @@ public class ChargeBaseZone {
         if (world == null || groundCache == null || cachedSteps == 0) return;
 
         Particle.DustOptions wall = new Particle.DustOptions(Color.fromRGB(220, 50, 255), 2.5f);
-        double heightSpacing = 1.5;
+        double heightSpacing = 2.0;
+        double arcRadians = Math.PI / 3; // arco de 60° visible por jugador
 
-        for (int i = 0; i < cachedSteps; i++) {
-            double angle = (2 * Math.PI / cachedSteps) * i;
-            double x = center.getX() + currentRadius * Math.cos(angle);
-            double z = center.getZ() + currentRadius * Math.sin(angle);
-            int groundY = groundCache[i];
+        for (Player player : world.getPlayers()) {
+            Location pLoc = player.getLocation();
 
-            for (double y = groundY - 2; y <= groundY + 82; y += heightSpacing) {
-                world.spawnParticle(Particle.DUST, new Location(world, x, y, z), 1, 0, 0, 0, 0, wall, true);
+            // ángulo del jugador relativo al centro
+            double playerAngle = Math.atan2(
+                    pLoc.getZ() - center.getZ(),
+                    pLoc.getX() - center.getX()
+            );
+
+            // solo renderiza los steps dentro del arco
+            for (int i = 0; i < cachedSteps; i++) {
+                double angle = (2 * Math.PI / cachedSteps) * i;
+
+                // diferencia angular normalizada
+                double diff = Math.abs(angle - playerAngle);
+                if (diff > Math.PI) diff = 2 * Math.PI - diff;
+                if (diff > arcRadians) continue; // fuera del arco, skip
+
+                double x = center.getX() + currentRadius * Math.cos(angle);
+                double z = center.getZ() + currentRadius * Math.sin(angle);
+                int groundY = groundCache[i];
+
+                for (double y = groundY - 2; y <= groundY + 64; y += heightSpacing) {
+                    world.spawnParticle(Particle.DUST,
+                            new Location(world, x, y, z), 1, 0, 0, 0, 0, wall, true);
+                }
             }
         }
     }

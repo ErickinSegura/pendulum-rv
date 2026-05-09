@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -72,6 +73,17 @@ public class ChargeBaseZoneListener implements Listener {
         cancelGlowTask(player.getUniqueId());
     }
 
+    @EventHandler
+    public void onPotionRemoved(EntityPotionEffectEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (!insideZone.contains(player.getUniqueId())) return;
+        if (event.getModifiedType() != PotionEffectType.DARKNESS) return;
+        if (event.getCause() == EntityPotionEffectEvent.Cause.EXPIRATION) return;
+        if (event.getCause() == EntityPotionEffectEvent.Cause.PLUGIN) return;
+
+        event.setCancelled(true);
+    }
+
     public void cleanupAll() {
         for (UUID uid : new HashSet<>(insideZone)) {
             Player player = Bukkit.getPlayer(uid);
@@ -86,7 +98,7 @@ public class ChargeBaseZoneListener implements Listener {
     private void applyZoneEffects(Player player) {
         UUID uid = player.getUniqueId();
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, Integer.MAX_VALUE, 0, false, false));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, PotionEffect.INFINITE_DURATION, 0, false, false));
 
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(pendulum.getInstance(), () -> {
             if (!player.isOnline()) {

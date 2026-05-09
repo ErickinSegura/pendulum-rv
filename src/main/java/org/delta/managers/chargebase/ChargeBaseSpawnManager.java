@@ -147,8 +147,8 @@ public class ChargeBaseSpawnManager {
 
         return switch (mobClass) {
             case ATACANTE    -> rng.nextDouble() < advancedChance
-                    ? new AtacanteBasico(plugin, loc).build()
-                    : new AtacanteAvanzado(plugin, loc).build();
+                    ? new AtacanteAvanzado(plugin, loc).build()
+                    : new AtacanteBasico(plugin, loc).build();
             case DEFENSOR    -> rng.nextDouble() < advancedChance
                     ? new DefensorAvanzado(plugin, loc).build()
                     : new DefensorBasico(plugin, loc).build();
@@ -159,8 +159,8 @@ public class ChargeBaseSpawnManager {
                     ? new ControladorAvanzado(plugin, loc).build()
                     : new ControladorBasico(plugin, loc).build();
             case HIBRIDO     -> rng.nextDouble() < advancedChance
-                    ? new HibridoBasico(plugin, loc).build()
-                    : new HibridoAvanzado(plugin, loc).build();
+                    ? new HibridoAvanzado(plugin, loc).build()
+                    : new HibridoBasico(plugin, loc).build();
         };
     }
 

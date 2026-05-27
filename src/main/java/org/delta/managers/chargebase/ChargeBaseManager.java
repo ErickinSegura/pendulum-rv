@@ -66,7 +66,6 @@ public class ChargeBaseManager {
         spawnManager.start();
         Bukkit.broadcastMessage("§d§l[Pendulum] §rBase de Carga activa en §e" + x + ", " + z);
         startShrinking();
-        //startParticles();
         endTask = new BukkitRunnable() {
             @Override public void run() { endEvent(); }
         }.runTaskLater(plugin, DURATION_TICKS);
@@ -80,7 +79,6 @@ public class ChargeBaseManager {
         spawnManager.start();
         Bukkit.getServer().broadcast(MessageUtils.color("&d&l[Pendulum] &rBase de Carga activa en &e" + (int)loc.getX() + ", " + (int)loc.getZ()));
         startShrinking();
-        //startParticles();
         endTask = new BukkitRunnable() {
             @Override public void run() { endEvent(); }
         }.runTaskLater(plugin, DURATION_TICKS);
@@ -113,26 +111,16 @@ public class ChargeBaseManager {
 
     private void endEvent() {
         if (shrinkTask != null) { shrinkTask.cancel(); shrinkTask = null; }
-        if (endTask != null) { endTask.cancel(); endTask = null; }
+        if (endTask   != null) { endTask.cancel();    endTask   = null; }
         if (zoneListener != null) zoneListener.cleanupAll();
+
+        if (activeZone != null) { activeZone.removeDisplays(); activeZone = null; }
+
         active = false;
-        activeZone = null;
-        if (spawnManager != null) {
-            spawnManager.stop();
-            spawnManager = null;
-        }
+        if (spawnManager != null) { spawnManager.stop(); spawnManager = null; }
         Bukkit.broadcastMessage("§d§l[Pendulum] §rLa Base de Carga ha finalizado.");
     }
 
-    private void startParticles() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!active) { cancel(); return; }
-                activeZone.spawnParticles();
-            }
-        }.runTaskTimer(plugin, 0L, 20L);
-    }
 
     public void forceEnd() { endEvent(); }
 

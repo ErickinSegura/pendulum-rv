@@ -42,12 +42,13 @@ public class HealerBehaviorListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (!manager.isActive()) { cancel(); return; }
+
                 for (World world : Bukkit.getWorlds()) {
                     for (Entity e : world.getEntities()) {
                         if (!(e instanceof LivingEntity healer)) continue;
                         if (!healer.getScoreboardTags().contains("healer_basico") &&
                                 !healer.getScoreboardTags().contains("healer_avanzado")) continue;
-
                         healNearbyAllies(healer);
                     }
                 }
@@ -56,15 +57,15 @@ public class HealerBehaviorListener implements Listener {
     }
 
     private void healNearbyAllies(LivingEntity healer) {
+        if (!manager.isActive() || manager.getSpawnManager() == null) return;
+
         healer.getNearbyEntities(HEAL_RADIUS, HEAL_RADIUS, HEAL_RADIUS).forEach(nearby -> {
             if (!(nearby instanceof LivingEntity ally)) return;
             if (ally instanceof Player) return;
             if (!manager.getSpawnManager().isManagedMob(ally.getUniqueId())) return;
 
             double maxHp = ally.getAttribute(Attribute.MAX_HEALTH).getValue();
-            double newHp = Math.min(maxHp, ally.getHealth() + HEAL_AMOUNT);
-            ally.setHealth(newHp);
-
+            ally.setHealth(Math.min(maxHp, ally.getHealth() + HEAL_AMOUNT));
             ally.getWorld().spawnParticle(Particle.HEART, ally.getLocation().add(0, 1.5, 0), 3);
         });
     }

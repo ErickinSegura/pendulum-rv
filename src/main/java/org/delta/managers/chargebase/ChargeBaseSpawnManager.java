@@ -21,21 +21,23 @@ import java.util.*;
 
 public class ChargeBaseSpawnManager {
 
+    // ChargeBaseSpawnManager
     private static final Map<MobClass, Integer> MAX_PER_CLASS = Map.of(
-            MobClass.ATACANTE,    6,
-            MobClass.DEFENSOR,    4,
-            MobClass.HEALER,      3,
-            MobClass.CONTROLADOR, 4,
-            MobClass.HIBRIDO,     1
+            MobClass.ATACANTE,    14,
+            MobClass.DEFENSOR,    8,
+            MobClass.HEALER,      6,
+            MobClass.CONTROLADOR, 8,
+            MobClass.HIBRIDO,     3
     );
 
     private static final Map<MobClass, Long> SPAWN_INTERVAL = Map.of(
-            MobClass.ATACANTE,    200L,  // 10s
-            MobClass.DEFENSOR,    300L,  // 15s
-            MobClass.HEALER,      400L,  // 20s
-            MobClass.CONTROLADOR, 300L,  // 15s
-            MobClass.HIBRIDO,     1200L     // 60s
+            MobClass.ATACANTE,    100L,  // 5s
+            MobClass.DEFENSOR,    160L,  // 8s
+            MobClass.HEALER,      200L,  // 10s
+            MobClass.CONTROLADOR, 160L,  // 8s
+            MobClass.HIBRIDO,     600L   // 30s
     );
+
 
     private final pendulum plugin;
     private final ChargeBaseZone zone;
@@ -143,7 +145,7 @@ public class ChargeBaseSpawnManager {
     }
 
     private LivingEntity spawnMob(MobClass mobClass, Location loc) {
-        double advancedChance = 0.05 + (difficulty * 0.45);
+        double advancedChance = 0.2 + (difficulty * 0.55);
 
         return switch (mobClass) {
             case ATACANTE    -> rng.nextDouble() < advancedChance

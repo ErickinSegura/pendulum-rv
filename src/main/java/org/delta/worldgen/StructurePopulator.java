@@ -14,9 +14,40 @@ import java.util.stream.Collectors;
 
 public class StructurePopulator extends BlockPopulator {
 
-    private static final double SPAWN_CHANCE   = 0.9;
     private static final int    BORDER_PADDING = 3;
     private static final int    MIN_Y          = 60;
+
+    private static final Set<Material> GROUND_MATERIALS = EnumSet.of(
+            Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT,
+            Material.PODZOL, Material.ROOTED_DIRT, Material.STONE,
+            Material.DEEPSLATE, Material.ANDESITE, Material.DIORITE,
+            Material.GRANITE, Material.SAND, Material.RED_SAND,
+            Material.GRAVEL, Material.SANDSTONE, Material.RED_SANDSTONE,
+            Material.SNOW_BLOCK, Material.ICE, Material.PACKED_ICE,
+            Material.MYCELIUM, Material.MUD, Material.MUDDY_MANGROVE_ROOTS
+    );
+
+    private static final Set<Material> VEGETATION = EnumSet.of(
+            Material.OAK_LOG, Material.BIRCH_LOG, Material.SPRUCE_LOG,
+            Material.JUNGLE_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG,
+            Material.MANGROVE_LOG, Material.CHERRY_LOG,
+            Material.OAK_LEAVES, Material.BIRCH_LEAVES, Material.SPRUCE_LEAVES,
+            Material.JUNGLE_LEAVES, Material.ACACIA_LEAVES, Material.DARK_OAK_LEAVES,
+            Material.MANGROVE_LEAVES, Material.CHERRY_LEAVES, Material.AZALEA_LEAVES,
+            Material.FLOWERING_AZALEA_LEAVES,
+            Material.OAK_WOOD, Material.BIRCH_WOOD, Material.SPRUCE_WOOD,
+            Material.JUNGLE_WOOD, Material.ACACIA_WOOD, Material.DARK_OAK_WOOD,
+            Material.SHORT_GRASS, Material.TALL_GRASS, Material.FERN, Material.LARGE_FERN,
+            Material.DEAD_BUSH, Material.DANDELION, Material.POPPY,
+            Material.BLUE_ORCHID, Material.ALLIUM, Material.AZURE_BLUET,
+            Material.RED_TULIP, Material.ORANGE_TULIP, Material.WHITE_TULIP,
+            Material.PINK_TULIP, Material.OXEYE_DAISY, Material.CORNFLOWER,
+            Material.LILY_OF_THE_VALLEY, Material.SUNFLOWER, Material.LILAC,
+            Material.ROSE_BUSH, Material.PEONY, Material.PITCHER_PLANT,
+            Material.TORCHFLOWER, Material.BROWN_MUSHROOM, Material.RED_MUSHROOM,
+            Material.SUGAR_CANE, Material.BAMBOO, Material.VINE,
+            Material.SNOW, Material.SEAGRASS, Material.TALL_SEAGRASS
+    );
 
     private final List<StructureDef> structures = new ArrayList<>();
     private final Logger logger;
@@ -73,56 +104,83 @@ public class StructurePopulator extends BlockPopulator {
 
         if (groundY < MIN_Y) return;
 
-        if (!isValidSurface(limitedRegion, worldX, groundY, worldZ)) return;
-
         placeStructure(limitedRegion, structure, worldX, groundY, worldZ);
     }
 
-
     private int findGroundLevel(LimitedRegion region, int originX, int originZ,
                                 int maxRelX, int maxRelZ) {
-        int halfX = maxRelX / 2;
-        int halfZ = maxRelZ / 2;
+        int cx = maxRelX / 2;
+        int cz = maxRelZ / 2;
 
         int[][] samples = {
-                {originX,         originZ},
+                {originX,          originZ},
                 {originX + maxRelX, originZ},
-                {originX,         originZ + maxRelZ},
+                {originX,          originZ + maxRelZ},
                 {originX + maxRelX, originZ + maxRelZ},
-                {originX + halfX, originZ + halfZ}   // centro
+                {originX + cx,     originZ + cz}       // centro
         };
 
         int minY = Integer.MAX_VALUE;
-        for (int[] sample : samples) {
-            if (!region.isInRegion(sample[0], 64, sample[1])) continue;
-            int y = region.getHighestBlockYAt(sample[0], sample[1],
-                    HeightMap.MOTION_BLOCKING_NO_LEAVES);
+        int maxY = Integer.MIN_VALUE;
+
+        for (int[] s : samples) {
+            if (!region.isInRegion(s[0], 64, s[1])) return -1;
+            int y = getSolidGroundY(region, s[0], s[1]);
+            if (y < 0) return -1;
             if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
         }
-        return minY == Integer.MAX_VALUE ? 64 : minY;
+
+        if (minY == Integer.MAX_VALUE) return -1;
+        if (maxY - minY > 2) return -1;
+
+        return minY;
     }
 
+    private int getSolidGroundY(LimitedRegion region, int x, int z) {
+        int startY = region.getHighestBlockYAt(x, z, HeightMap.WORLD_SURFACE);
 
-    private boolean isValidSurface(LimitedRegion region, int x, int y, int z) {
-        if (!region.isInRegion(x, y, z)) return false;
-        Material surface = region.getType(x, y, z);
+        for (int y = startY; y >= MIN_Y - 10; y--) {
+            if (!region.isInRegion(x, y, z)) continue;
+            Material m = region.getType(x, y, z);
+            if (GROUND_MATERIALS.contains(m)) return y;
 
-        if (!surface.isSolid())                  return false;
-        if (surface == Material.WATER)           return false;
-        if (surface == Material.LAVA)            return false;
-        if (surface.name().contains("LEAVES"))   return false;
-        if (surface.name().contains("LOG"))      return false;  // copa de árbol
-        if (surface == Material.LILY_PAD)        return false;
-
-        return true;
+        }
+        return -1;
     }
 
 
     private void placeStructure(LimitedRegion region, StructureDef structure,
                                 int originX, int originY, int originZ) {
+
+        Set<Long> footprint = new HashSet<>();
+        for (StructureDef.BlockEntry entry : structure.getBlocks()) {
+            if (entry.relY() >= 0) {
+                footprint.add(((long) entry.relX() << 32) | (entry.relZ() & 0xFFFFFFFFL));
+            }
+        }
+
+        for (long key : footprint) {
+            int relX = (int) (key >> 32);
+            int relZ = (int) (key & 0xFFFFFFFFL);
+            int wx   = originX + relX;
+            int wz   = originZ + relZ;
+
+
+            for (int wy = originY + 1; wy <= originY + 30; wy++) {
+                if (!region.isInRegion(wx, wy, wz)) break;
+                Material m = region.getType(wx, wy, wz);
+                if (m.isAir()) break;
+                if (VEGETATION.contains(m)) {
+                    region.setType(wx, wy, wz, Material.AIR);
+                }
+            }
+        }
+
+
         for (StructureDef.BlockEntry entry : structure.getBlocks()) {
             int wx = originX + entry.relX();
-            int wy = originY + entry.relY();
+            int wy = originY + 1 + entry.relY();   // <-- el +1 que faltaba
             int wz = originZ + entry.relZ();
             if (!region.isInRegion(wx, wy, wz)) continue;
             region.setType(wx, wy, wz, entry.material());
@@ -131,25 +189,27 @@ public class StructurePopulator extends BlockPopulator {
         Set<Long> basePrint = new HashSet<>();
         for (StructureDef.BlockEntry entry : structure.getBlocks()) {
             if (entry.relY() == 0) {
-                basePrint.add(((long)(entry.relX()) << 32) | (entry.relZ() & 0xFFFFFFFFL));
+                basePrint.add(((long) entry.relX() << 32) | (entry.relZ() & 0xFFFFFFFFL));
             }
         }
 
         for (long key : basePrint) {
-            int relX = (int)(key >> 32);
-            int relZ = (int)(key & 0xFFFFFFFFL);
+            int relX = (int) (key >> 32);
+            int relZ = (int) (key & 0xFFFFFFFFL);
             int wx   = originX + relX;
             int wz   = originZ + relZ;
 
-            for (int wy = originY - 1; wy >= MIN_Y - 5; wy--) {
+            // Rellenar desde originY hacia abajo hasta suelo sólido
+            for (int wy = originY; wy >= MIN_Y - 5; wy--) {
                 if (!region.isInRegion(wx, wy, wz)) break;
                 Material m = region.getType(wx, wy, wz);
-                if (m.isSolid()) break;  // ya hay suelo, parar
-                region.setType(wx, wy, wz, Material.DIRT); // rellenar hueco
+                if (GROUND_MATERIALS.contains(m)) break; // suelo real, parar
+                if (!m.isAir() && !VEGETATION.contains(m)) break; // bloque raro, respetar
+                region.setType(wx, wy, wz, Material.DIRT);
             }
         }
 
         logger.info("[StructurePopulator] Colocando " + structure.getId()
-                + " en " + originX + ", " + originY + ", " + originZ);
+                + " en " + originX + ", " + (originY + 1) + ", " + originZ);
     }
 }

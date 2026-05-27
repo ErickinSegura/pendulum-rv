@@ -21,8 +21,4 @@ public class WorldGenListener implements Listener {
 
         world.getPopulators().add(structurePopulator);
     }
-
-    public StructurePopulator getPopulator() {
-        return structurePopulator;
-    }
 }

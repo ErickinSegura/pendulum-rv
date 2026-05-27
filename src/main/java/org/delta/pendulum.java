@@ -28,6 +28,7 @@ import org.delta.libs.PendulumSettings;
 import org.delta.listeners.death.DeathListener;
 import org.delta.managers.perks.PerkManager;
 import org.delta.managers.teamChest.TeamChestManager;
+import org.delta.worldgen.StructurePopulator;
 
 import java.util.Objects;
 
@@ -40,6 +41,7 @@ public final class pendulum extends JavaPlugin {
     private DatabaseManager databaseManager;
     private ChargeBaseManager chargeBaseManager;
     private CustomCraftingListener customCraftingListener;
+    private StructurePopulator structurePopulator;
 
     @Override
     public void onEnable() {
@@ -68,7 +70,14 @@ public final class pendulum extends JavaPlugin {
         PerkManager.getInstance();
         customCraftingListener = new CustomCraftingListener(this);
         CustomCraftingRegistry.register(customCraftingListener);
+        structurePopulator = new StructurePopulator(getLogger());
 
+        for (org.bukkit.World world : getServer().getWorlds()) {
+            if (world.getEnvironment() == org.bukkit.World.Environment.NORMAL) {
+                world.getPopulators().add(structurePopulator);
+                getLogger().info("[StructurePopulator] Añadido a mundo ya cargado: " + world.getName());
+            }
+        }
 
         new EventRegistry(this, lifeManager).registerAll();
         registerCommands();
@@ -108,4 +117,6 @@ public final class pendulum extends JavaPlugin {
     }
 
     public ChargeBaseManager getChargeBaseManager() { return chargeBaseManager; }
+
+    public StructurePopulator getStructurePopulator() { return structurePopulator; }
 }

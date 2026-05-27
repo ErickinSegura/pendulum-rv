@@ -13,7 +13,7 @@ public class RelojsCommand implements SubCommand {
 
     @Override
     public String getName() {
-        return "relojs";
+        return "relojes";
     }
 
     @Override

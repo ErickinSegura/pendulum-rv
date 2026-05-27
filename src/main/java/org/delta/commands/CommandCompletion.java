@@ -116,10 +116,10 @@ public class CommandCompletion implements TabCompleter {
                 return filterCompletions(retoCompletions, args[1]);
             }
 
-            if (args[0].equalsIgnoreCase("relojs") && checkPermission(player)) {
-                List<String> relojsCompletions = subCommandCompletions.get("relojs");
-                if (relojsCompletions != null) {
-                    return filterCompletions(relojsCompletions, args[1]);
+            if (args[0].equalsIgnoreCase("relojes") && checkPermission(player)) {
+                List<String> relojesCompletions = subCommandCompletions.get("relojes");
+                if (relojesCompletions != null) {
+                    return filterCompletions(relojesCompletions, args[1]);
                 }
             }
 
@@ -189,7 +189,7 @@ public class CommandCompletion implements TabCompleter {
                 return getOnlinePlayerNames(args[2]);
             }
 
-            if (args[0].equalsIgnoreCase("relojs") &&
+            if (args[0].equalsIgnoreCase("relojes") &&
                     (args[1].equalsIgnoreCase("set") ||
                             args[1].equalsIgnoreCase("reset") ||
                             args[1].equalsIgnoreCase("sacrifice")) &&
@@ -259,7 +259,7 @@ public class CommandCompletion implements TabCompleter {
         }
 
         if (args.length == 4) {
-            if (args[0].equalsIgnoreCase("relojs") &&
+            if (args[0].equalsIgnoreCase("relojes") &&
                     args[1].equalsIgnoreCase("sacrifice") &&
                     checkPermission(player)) {
                 return Collections.emptyList();
@@ -289,7 +289,7 @@ public class CommandCompletion implements TabCompleter {
         }
 
         if (args.length == 5) {
-            if (args[0].equalsIgnoreCase("relojs") &&
+            if (args[0].equalsIgnoreCase("relojes") &&
                     args[1].equalsIgnoreCase("sacrifice") &&
                     checkPermission(player)) {
                 return getOnlinePlayerNames(args[4]);

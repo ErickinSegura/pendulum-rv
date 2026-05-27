@@ -1,6 +1,7 @@
 package org.delta;
 
 import org.bukkit.plugin.PluginManager;
+import org.delta.commands.subcommand.StructureDevCommand;
 import org.delta.listeners.bingo.*;
 import org.delta.listeners.chargebase.AtacanteBehaviorListener;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
@@ -14,6 +15,7 @@ import org.delta.listeners.spawns.CustomMobListener;
 import org.delta.listeners.spawns.PolarBear;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
+import org.delta.listeners.worldgen.WorldGenListener;
 import org.delta.managers.death.LifeManager;
 
 public class EventRegistry {
@@ -71,5 +73,12 @@ public class EventRegistry {
         pm.registerEvents(new ZombieSpawner(plugin), plugin);
         pm.registerEvents(new PolarBear(plugin), plugin);
         pm.registerEvents(new CustomMobListener(plugin), plugin);
+
+        // World Generation
+        WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());
+        pm.registerEvents(worldGenListener, plugin);
+
+        StructureDevCommand structureDev = new StructureDevCommand(plugin.getStructurePopulator(), plugin.getDataFolder());
+        pm.registerEvents(structureDev, plugin);
     }
 }

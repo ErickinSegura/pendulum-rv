@@ -18,6 +18,7 @@ import org.delta.listeners.perks.impl.SharedSpaceListener;
 import org.delta.listeners.player.*;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
+import org.delta.listeners.worldgen.PendingEntitySpawner;
 import org.delta.managers.bingo.BingoDataManager;
 import org.delta.managers.bingo.BingoProgressManager;
 import org.delta.managers.chargebase.ChargeBaseManager;
@@ -42,6 +43,8 @@ public final class pendulum extends JavaPlugin {
     private ChargeBaseManager chargeBaseManager;
     private CustomCraftingListener customCraftingListener;
     private StructurePopulator structurePopulator;
+    private PendingEntitySpawner pendingEntitySpawner;
+
 
     @Override
     public void onEnable() {
@@ -70,7 +73,8 @@ public final class pendulum extends JavaPlugin {
         PerkManager.getInstance();
         customCraftingListener = new CustomCraftingListener(this);
         CustomCraftingRegistry.register(customCraftingListener);
-        structurePopulator = new StructurePopulator(getLogger());
+        pendingEntitySpawner = new PendingEntitySpawner(this);
+        structurePopulator = new StructurePopulator(getLogger(), pendingEntitySpawner);
 
         for (org.bukkit.World world : getServer().getWorlds()) {
             if (world.getEnvironment() == org.bukkit.World.Environment.NORMAL) {
@@ -119,4 +123,6 @@ public final class pendulum extends JavaPlugin {
     public ChargeBaseManager getChargeBaseManager() { return chargeBaseManager; }
 
     public StructurePopulator getStructurePopulator() { return structurePopulator; }
+
+    public PendingEntitySpawner getPendingEntitySpawner() { return pendingEntitySpawner; }
 }

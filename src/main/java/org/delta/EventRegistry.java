@@ -77,7 +77,7 @@ public class EventRegistry {
         // World Generation
         WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());
         pm.registerEvents(worldGenListener, plugin);
-
+        pm.registerEvents(plugin.getPendingEntitySpawner(), plugin); // ← línea nueva
         StructureDevCommand structureDev = new StructureDevCommand(plugin.getStructurePopulator(), plugin.getDataFolder());
         pm.registerEvents(structureDev, plugin);
     }

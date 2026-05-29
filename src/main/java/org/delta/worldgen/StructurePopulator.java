@@ -6,6 +6,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
+import org.delta.listeners.worldgen.PendingEntitySpawner;
 import org.delta.worldgen.structures.RuinasTorre;
 
 import java.util.*;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 
 public class StructurePopulator extends BlockPopulator {
 
-    private static final int    BORDER_PADDING = 3;
-    private static final int    MIN_Y          = 60;
+    private static final int BORDER_PADDING = 3;
+    private static final int MIN_Y          = 60;
 
     private static final Set<Material> GROUND_MATERIALS = EnumSet.of(
             Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT,
@@ -49,11 +50,14 @@ public class StructurePopulator extends BlockPopulator {
             Material.SNOW, Material.SEAGRASS, Material.TALL_SEAGRASS
     );
 
-    private final List<StructureDef> structures = new ArrayList<>();
-    private final Logger logger;
+    private final List<StructureDef>   structures;
+    private final PendingEntitySpawner entitySpawner;
+    private final Logger               logger;
 
-    public StructurePopulator(Logger logger) {
-        this.logger = logger;
+    public StructurePopulator(Logger logger, PendingEntitySpawner entitySpawner) {
+        this.logger        = logger;
+        this.entitySpawner = entitySpawner;
+        this.structures    = new ArrayList<>();
         registerDefaultStructures();
     }
 
@@ -71,6 +75,8 @@ public class StructurePopulator extends BlockPopulator {
     public List<StructureDef> getStructures() {
         return Collections.unmodifiableList(structures);
     }
+
+    // ─── Populate ───────────────────────────────────────────────────────────────
 
     @Override
     public void populate(WorldInfo worldInfo, Random random,
@@ -101,23 +107,23 @@ public class StructurePopulator extends BlockPopulator {
 
         int groundY = findGroundLevel(limitedRegion, worldX, worldZ,
                 structure.getMaxRelX(), structure.getMaxRelZ());
-
         if (groundY < MIN_Y) return;
 
-        placeStructure(limitedRegion, structure, worldX, groundY, worldZ);
+        placeStructure(limitedRegion, structure, worldX, groundY, worldZ, chunkX, chunkZ);
     }
+
+    // ─── Ground detection ───────────────────────────────────────────────────────
 
     private int findGroundLevel(LimitedRegion region, int originX, int originZ,
                                 int maxRelX, int maxRelZ) {
         int cx = maxRelX / 2;
         int cz = maxRelZ / 2;
-
         int[][] samples = {
-                {originX,          originZ},
+                {originX,           originZ},
                 {originX + maxRelX, originZ},
-                {originX,          originZ + maxRelZ},
+                {originX,           originZ + maxRelZ},
                 {originX + maxRelX, originZ + maxRelZ},
-                {originX + cx,     originZ + cz}       // centro
+                {originX + cx,      originZ + cz}
         };
 
         int minY = Integer.MAX_VALUE;
@@ -133,83 +139,126 @@ public class StructurePopulator extends BlockPopulator {
 
         if (minY == Integer.MAX_VALUE) return -1;
         if (maxY - minY > 2) return -1;
-
         return minY;
     }
 
     private int getSolidGroundY(LimitedRegion region, int x, int z) {
         int startY = region.getHighestBlockYAt(x, z, HeightMap.WORLD_SURFACE);
-
         for (int y = startY; y >= MIN_Y - 10; y--) {
             if (!region.isInRegion(x, y, z)) continue;
-            Material m = region.getType(x, y, z);
-            if (GROUND_MATERIALS.contains(m)) return y;
-
+            if (GROUND_MATERIALS.contains(region.getType(x, y, z))) return y;
         }
         return -1;
     }
 
+    // ─── Placement ──────────────────────────────────────────────────────────────
 
     private void placeStructure(LimitedRegion region, StructureDef structure,
-                                int originX, int originY, int originZ) {
+                                int originX, int originY, int originZ,
+                                int chunkX, int chunkZ) {
 
-        Set<Long> footprint = new HashSet<>();
-        for (StructureDef.BlockEntry entry : structure.getBlocks()) {
-            if (entry.relY() >= 0) {
-                footprint.add(((long) entry.relX() << 32) | (entry.relZ() & 0xFFFFFFFFL));
-            }
-        }
+        // 1. Limpiar vegetación
+        clearVegetation(region, structure, originX, originY, originZ);
 
-        for (long key : footprint) {
-            int relX = (int) (key >> 32);
-            int relZ = (int) (key & 0xFFFFFFFFL);
-            int wx   = originX + relX;
-            int wz   = originZ + relZ;
-
-
-            for (int wy = originY + 1; wy <= originY + 30; wy++) {
-                if (!region.isInRegion(wx, wy, wz)) break;
-                Material m = region.getType(wx, wy, wz);
-                if (m.isAir()) break;
-                if (VEGETATION.contains(m)) {
-                    region.setType(wx, wy, wz, Material.AIR);
-                }
-            }
-        }
-
-
+        // 2. Colocar bloques
         for (StructureDef.BlockEntry entry : structure.getBlocks()) {
             int wx = originX + entry.relX();
-            int wy = originY + 1 + entry.relY();   // <-- el +1 que faltaba
+            int wy = originY + 1 + entry.relY();
             int wz = originZ + entry.relZ();
             if (!region.isInRegion(wx, wy, wz)) continue;
             region.setType(wx, wy, wz, entry.material());
         }
 
-        Set<Long> basePrint = new HashSet<>();
-        for (StructureDef.BlockEntry entry : structure.getBlocks()) {
-            if (entry.relY() == 0) {
-                basePrint.add(((long) entry.relX() << 32) | (entry.relZ() & 0xFFFFFFFFL));
-            }
-        }
+        // 3. Rellenar huecos bajo la base
+        fillUnderBase(region, structure, originX, originY, originZ);
 
-        for (long key : basePrint) {
-            int relX = (int) (key >> 32);
-            int relZ = (int) (key & 0xFFFFFFFFL);
-            int wx   = originX + relX;
-            int wz   = originZ + relZ;
+        // 4. Programar llenado de cofres (diferido — LimitedRegion no soporta tile entities)
+        scheduleChests(structure, originX, originY, originZ, chunkX, chunkZ);
 
-            // Rellenar desde originY hacia abajo hasta suelo sólido
-            for (int wy = originY; wy >= MIN_Y - 5; wy--) {
-                if (!region.isInRegion(wx, wy, wz)) break;
-                Material m = region.getType(wx, wy, wz);
-                if (GROUND_MATERIALS.contains(m)) break; // suelo real, parar
-                if (!m.isAir() && !VEGETATION.contains(m)) break; // bloque raro, respetar
-                region.setType(wx, wy, wz, Material.DIRT);
-            }
-        }
+        // 5. Programar spawns de entidades (diferido — Location necesita World real)
+        scheduleEntities(structure, originX, originY, originZ, chunkX, chunkZ);
 
         logger.info("[StructurePopulator] Colocando " + structure.getId()
                 + " en " + originX + ", " + (originY + 1) + ", " + originZ);
+    }
+
+    private void clearVegetation(LimitedRegion region, StructureDef structure,
+                                 int originX, int originY, int originZ) {
+        Set<Long> footprint = new HashSet<>();
+        for (StructureDef.BlockEntry entry : structure.getBlocks()) {
+            if (entry.relY() >= 0)
+                footprint.add(((long) entry.relX() << 32) | (entry.relZ() & 0xFFFFFFFFL));
+        }
+        for (long key : footprint) {
+            int relX = (int) (key >> 32);
+            int relZ = (int) (key & 0xFFFFFFFFL);
+            int wx = originX + relX;
+            int wz = originZ + relZ;
+            for (int wy = originY + 1; wy <= originY + 30; wy++) {
+                if (!region.isInRegion(wx, wy, wz)) break;
+                Material m = region.getType(wx, wy, wz);
+                if (m.isAir()) break;
+                if (VEGETATION.contains(m)) region.setType(wx, wy, wz, Material.AIR);
+            }
+        }
+    }
+
+    private void fillUnderBase(LimitedRegion region, StructureDef structure,
+                               int originX, int originY, int originZ) {
+        Set<Long> basePrint = new HashSet<>();
+        for (StructureDef.BlockEntry entry : structure.getBlocks()) {
+            if (entry.relY() == 0)
+                basePrint.add(((long) entry.relX() << 32) | (entry.relZ() & 0xFFFFFFFFL));
+        }
+        for (long key : basePrint) {
+            int relX = (int) (key >> 32);
+            int relZ = (int) (key & 0xFFFFFFFFL);
+            int wx = originX + relX;
+            int wz = originZ + relZ;
+            for (int wy = originY; wy >= MIN_Y - 5; wy--) {
+                if (!region.isInRegion(wx, wy, wz)) break;
+                Material m = region.getType(wx, wy, wz);
+                if (GROUND_MATERIALS.contains(m)) break;
+                if (!m.isAir() && !VEGETATION.contains(m)) break;
+                region.setType(wx, wy, wz, Material.DIRT);
+            }
+        }
+    }
+
+    /**
+     * Programa el llenado de cofres para cuando el chunk se cargue por primera vez.
+     * NO se hace aquí porque LimitedRegion.getBlockState() no inicializa el tile entity
+     * del cofre correctamente durante la generación — el cast a Container falla en silencio.
+     */
+    private void scheduleChests(StructureDef structure,
+                                int originX, int originY, int originZ,
+                                int chunkX, int chunkZ) {
+        for (StructureDef.BlockEntry entry : structure.getBlocks()) {
+            LootTable loot = structure.getChestLoot(entry.relX(), entry.relY(), entry.relZ());
+            if (loot == null) continue;
+
+            int wx = originX + entry.relX();
+            int wy = originY + 1 + entry.relY();
+            int wz = originZ + entry.relZ();
+
+            entitySpawner.scheduleChest(chunkX, chunkZ, wx, wy, wz, loot);
+        }
+    }
+
+    /**
+     * Programa el spawn de entidades para cuando el chunk se cargue.
+     * NO se hace aquí porque Location necesita un World real, no disponible en LimitedRegion.
+     */
+    private void scheduleEntities(StructureDef structure,
+                                  int originX, int originY, int originZ,
+                                  int chunkX, int chunkZ) {
+        for (StructureDef.EntityEntry entry : structure.getEntities()) {
+            int wx = originX + entry.relX();
+            int wy = originY + 1 + entry.relY();
+            int wz = originZ + entry.relZ();
+
+            entitySpawner.scheduleEntity(chunkX, chunkZ, wx, wy, wz,
+                    entry.type(), entry.customizer());
+        }
     }
 }

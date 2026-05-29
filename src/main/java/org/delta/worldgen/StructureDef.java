@@ -10,24 +10,16 @@ import java.util.function.Consumer;
 
 public class StructureDef {
 
-    // ─── Entries ────────────────────────────────────────────────────────────────
 
-    /** Un bloque de la estructura con su posición relativa. */
     public record BlockEntry(int relX, int relY, int relZ, Material material) {}
 
-    /**
-     * Una entidad declarada en la estructura.
-     * El customizer es opcional (puede ser null); se ejecuta justo después del spawn.
-     */
     public record EntityEntry(int relX, int relY, int relZ,
                               EntityType type, Consumer<Entity> customizer) {}
-
-    // ─── Campos ─────────────────────────────────────────────────────────────────
 
     private final String              id;
     private final List<BlockEntry>    blocks;
     private final List<EntityEntry>   entities;
-    private final Map<Long, LootTable> chestLoot;   // key = posKey(relX,relY,relZ)
+    private final Map<Long, LootTable> chestLoot;
     private final Set<Biome>          allowedBiomes;
     private final double              spawnChance;
     private final int                 maxRelX;
@@ -49,8 +41,6 @@ public class StructureDef {
         this.maxRelZ      = blocks.stream().mapToInt(BlockEntry::relZ).max().orElse(0);
     }
 
-    // ─── Getters ────────────────────────────────────────────────────────────────
-
     public String             getId()            { return id; }
     public List<BlockEntry>   getBlocks()        { return blocks; }
     public List<EntityEntry>  getEntities()      { return entities; }
@@ -59,7 +49,6 @@ public class StructureDef {
     public int                getMaxRelX()       { return maxRelX; }
     public int                getMaxRelZ()       { return maxRelZ; }
 
-    /** Devuelve la LootTable para un cofre en esa posición relativa, o null si no tiene. */
     public LootTable getChestLoot(int relX, int relY, int relZ) {
         return chestLoot.get(posKey(relX, relY, relZ));
     }
@@ -68,14 +57,11 @@ public class StructureDef {
         return allowedBiomes.isEmpty() || allowedBiomes.contains(biome);
     }
 
-    // ─── Utilidad ───────────────────────────────────────────────────────────────
 
     static long posKey(int x, int y, int z) {
-        // Empaqueta coordenadas relativas (todas < 64) en un long
         return ((long) (x & 0xFFFF) << 32) | ((long) (y & 0xFFFF) << 16) | (z & 0xFFFF);
     }
 
-    // ─── Builder ────────────────────────────────────────────────────────────────
 
     public static class Builder {
         private final String              id;
@@ -97,8 +83,6 @@ public class StructureDef {
             return this;
         }
 
-        // ── Bloques ─────────────────────────────────────────────────────────────
-
         public Builder block(int relX, int relY, int relZ, Material material) {
             blocks.add(new BlockEntry(relX, relY, relZ, material));
             return this;
@@ -117,12 +101,6 @@ public class StructureDef {
             return this;
         }
 
-        // ── Cofres con loot ─────────────────────────────────────────────────────
-
-        /**
-         * Coloca un cofre en la posición dada y asocia una LootTable.
-         * El material puede ser CHEST o TRAPPED_CHEST.
-         */
         public Builder chest(int relX, int relY, int relZ, LootTable lootTable) {
             return chest(relX, relY, relZ, Material.CHEST, lootTable);
         }
@@ -137,27 +115,10 @@ public class StructureDef {
             return this;
         }
 
-        // ── Entidades ───────────────────────────────────────────────────────────
-
-        /** Programa el spawn de una entidad en la posición relativa dada. */
         public Builder entity(int relX, int relY, int relZ, EntityType type) {
             return entity(relX, relY, relZ, type, null);
         }
 
-        /**
-         * Programa el spawn de una entidad con un customizer.
-         * El customizer recibe la entidad ya spawneada para setear nombre,
-         * equipo, atributos, etc.
-         *
-         * Ejemplo:
-         * <pre>
-         *   .entity(2, 1, 2, EntityType.ZOMBIE, e -> {
-         *       Zombie z = (Zombie) e;
-         *       z.customName(Component.text("Guardián"));
-         *       z.setCustomNameVisible(true);
-         *   })
-         * </pre>
-         */
         public Builder entity(int relX, int relY, int relZ, EntityType type,
                               Consumer<Entity> customizer) {
             entities.add(new EntityEntry(relX, relY, relZ, type, customizer));

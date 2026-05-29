@@ -37,7 +37,6 @@ public class PendingEntitySpawner implements Listener {
         this.logger = plugin.getLogger();
     }
 
-    // ─── API pública ────────────────────────────────────────────────────────────
 
     public void scheduleEntity(int chunkX, int chunkZ,
                                int x, int y, int z,
@@ -60,7 +59,6 @@ public class PendingEntitySpawner implements Listener {
                 .add(new PendingChestFill(x, y, z, lootTable));
     }
 
-    // ─── Listener ───────────────────────────────────────────────────────────────
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
@@ -74,11 +72,8 @@ public class PendingEntitySpawner implements Listener {
 
         if (spawns == null && chests == null) return;
 
-        // Diferir un tick: en este momento el chunk aún está siendo finalizado
-        // por Paper y los tile entities / entity tracking no están listos todavía.
         Bukkit.getScheduler().runTask(plugin, () -> {
 
-            // ── Cofres ────────────────────────────────────────────────────────
             if (chests != null) {
                 Random random = new Random();
                 for (PendingChestFill fill : chests) {
@@ -88,8 +83,6 @@ public class PendingEntitySpawner implements Listener {
 
                         if (state instanceof Container container) {
                             fill.lootTable().fill(container.getInventory(), random);
-                            // update() NO es necesario para inventarios: la referencia
-                            // ya es al inventory vivo del tile entity.
                             logger.info(String.format(
                                     "[PendingEntitySpawner] Cofre '%s' llenado en %d, %d, %d",
                                     fill.lootTable().getId(), fill.x(), fill.y(), fill.z()));
@@ -104,7 +97,6 @@ public class PendingEntitySpawner implements Listener {
                 }
             }
 
-            // ── Entidades ──────────────────────────────────────────────────────
             if (spawns != null) {
                 for (PendingSpawn spawn : spawns) {
                     try {
@@ -112,6 +104,7 @@ public class PendingEntitySpawner implements Listener {
                                 new org.bukkit.Location(world, spawn.x(), spawn.y(), spawn.z()),
                                 spawn.type()
                         );
+                        entity.setPersistent(true);
                         if (spawn.customizer() != null) spawn.customizer().accept(entity);
                         logger.info(String.format(
                                 "[PendingEntitySpawner] Spawneado %s en %d, %d, %d",
@@ -124,8 +117,6 @@ public class PendingEntitySpawner implements Listener {
             }
         });
     }
-
-    // ─── Interno ────────────────────────────────────────────────────────────────
 
     private long chunkKey(int chunkX, int chunkZ) {
         return ((long) chunkX << 32) | (chunkZ & 0xFFFFFFFFL);

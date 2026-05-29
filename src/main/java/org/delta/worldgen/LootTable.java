@@ -57,7 +57,7 @@ public class LootTable {
             cumulative += e.weight();
             if (roll < cumulative) return e;
         }
-        return entries.get(entries.size() - 1); // fallback
+        return entries.get(entries.size() - 1);
     }
 
 

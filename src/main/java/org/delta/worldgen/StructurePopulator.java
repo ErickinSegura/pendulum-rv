@@ -76,7 +76,6 @@ public class StructurePopulator extends BlockPopulator {
         return Collections.unmodifiableList(structures);
     }
 
-    // ─── Populate ───────────────────────────────────────────────────────────────
 
     @Override
     public void populate(WorldInfo worldInfo, Random random,
@@ -111,8 +110,6 @@ public class StructurePopulator extends BlockPopulator {
 
         placeStructure(limitedRegion, structure, worldX, groundY, worldZ, chunkX, chunkZ);
     }
-
-    // ─── Ground detection ───────────────────────────────────────────────────────
 
     private int findGroundLevel(LimitedRegion region, int originX, int originZ,
                                 int maxRelX, int maxRelZ) {
@@ -151,16 +148,12 @@ public class StructurePopulator extends BlockPopulator {
         return -1;
     }
 
-    // ─── Placement ──────────────────────────────────────────────────────────────
-
     private void placeStructure(LimitedRegion region, StructureDef structure,
                                 int originX, int originY, int originZ,
                                 int chunkX, int chunkZ) {
 
-        // 1. Limpiar vegetación
         clearVegetation(region, structure, originX, originY, originZ);
 
-        // 2. Colocar bloques
         for (StructureDef.BlockEntry entry : structure.getBlocks()) {
             int wx = originX + entry.relX();
             int wy = originY + 1 + entry.relY();
@@ -169,13 +162,10 @@ public class StructurePopulator extends BlockPopulator {
             region.setType(wx, wy, wz, entry.material());
         }
 
-        // 3. Rellenar huecos bajo la base
         fillUnderBase(region, structure, originX, originY, originZ);
 
-        // 4. Programar llenado de cofres (diferido — LimitedRegion no soporta tile entities)
         scheduleChests(structure, originX, originY, originZ, chunkX, chunkZ);
 
-        // 5. Programar spawns de entidades (diferido — Location necesita World real)
         scheduleEntities(structure, originX, originY, originZ, chunkX, chunkZ);
 
         logger.info("[StructurePopulator] Colocando " + structure.getId()
@@ -225,11 +215,6 @@ public class StructurePopulator extends BlockPopulator {
         }
     }
 
-    /**
-     * Programa el llenado de cofres para cuando el chunk se cargue por primera vez.
-     * NO se hace aquí porque LimitedRegion.getBlockState() no inicializa el tile entity
-     * del cofre correctamente durante la generación — el cast a Container falla en silencio.
-     */
     private void scheduleChests(StructureDef structure,
                                 int originX, int originY, int originZ,
                                 int chunkX, int chunkZ) {
@@ -245,10 +230,6 @@ public class StructurePopulator extends BlockPopulator {
         }
     }
 
-    /**
-     * Programa el spawn de entidades para cuando el chunk se cargue.
-     * NO se hace aquí porque Location necesita un World real, no disponible en LimitedRegion.
-     */
     private void scheduleEntities(StructureDef structure,
                                   int originX, int originY, int originZ,
                                   int chunkX, int chunkZ) {

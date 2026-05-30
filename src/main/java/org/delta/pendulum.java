@@ -74,7 +74,7 @@ public final class pendulum extends JavaPlugin {
         customCraftingListener = new CustomCraftingListener(this);
         CustomCraftingRegistry.register(customCraftingListener);
         pendingEntitySpawner = new PendingEntitySpawner(this);
-        structurePopulator = new StructurePopulator(getLogger(), pendingEntitySpawner);
+        structurePopulator = new StructurePopulator(getLogger(), pendingEntitySpawner, this);
 
         for (org.bukkit.World world : getServer().getWorlds()) {
             if (world.getEnvironment() == org.bukkit.World.Environment.NORMAL) {

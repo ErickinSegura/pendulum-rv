@@ -138,18 +138,14 @@ public class StructureDevCommand implements SubCommand, Listener {
         }
 
         UUID uuid = player.getUniqueId();
-
-
         if (!pos1Map.containsKey(uuid) || !pos2Map.containsKey(uuid)) {
             player.sendMessage(MessageUtils.color("&cPrimero selecciona dos esquinas con el wand."));
-            player.sendMessage(MessageUtils.color("&7Usa &e/pendulum structdev wand &7para obtenerlo."));
             return;
         }
 
         String id = args[2].toLowerCase().replace(" ", "_");
         Location p1 = pos1Map.get(uuid);
         Location p2 = pos2Map.get(uuid);
-
 
         if (!p1.getWorld().equals(p2.getWorld())) {
             player.sendMessage(MessageUtils.color("&cLas dos posiciones deben estar en el mismo mundo."));
@@ -166,8 +162,11 @@ public class StructureDevCommand implements SubCommand, Listener {
         int maxZ = Math.max(p1.getBlockZ(), p2.getBlockZ());
 
         World world = p1.getWorld();
-        List<String> entries = new ArrayList<>();
+        StringBuilder json = new StringBuilder();
+        json.append("{\n  \"id\": \"").append(id).append("\",\n  \"blocks\": [\n");
+
         int blockCount = 0;
+        List<String> entries = new ArrayList<>();
 
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
@@ -177,39 +176,37 @@ public class StructureDevCommand implements SubCommand, Listener {
                             || block.getType() == Material.CAVE_AIR
                             || block.getType() == Material.VOID_AIR) continue;
 
-                    entries.add(String.format("            .block(%d, %d, %d, Material.%s)",
+                    entries.add(String.format("    {\"x\":%d,\"y\":%d,\"z\":%d,\"m\":\"%s\"}",
                             x - minX, y - minY, z - minZ, block.getType().name()));
                     blockCount++;
                 }
             }
         }
 
-
-
         if (blockCount == 0) {
             player.sendMessage(MessageUtils.color("&cNo se encontraron bloques sólidos en la selección."));
             return;
         }
 
-        StringBuilder code = new StringBuilder();
-        code.append("new StructureDef.Builder(\"").append(id).append("\")\n");
-        for (String entry : entries) code.append(entry).append("\n");
-        code.append("    .build()");
+        for (int i = 0; i < entries.size(); i++) {
+            json.append(entries.get(i));
+            if (i < entries.size() - 1) json.append(",");
+            json.append("\n");
+        }
+        json.append("  ]\n}");
 
-        File outFile = new File(outputFolder, id + ".txt");
+        File outFile = new File(outputFolder, id + ".json");
         try (FileWriter fw = new FileWriter(outFile)) {
-            fw.write(code.toString());
+            fw.write(json.toString());
         } catch (IOException e) {
-            player.sendMessage(MessageUtils.color("&cError al guardar el archivo: " + e.getMessage()));
+            player.sendMessage(MessageUtils.color("&cError al guardar: " + e.getMessage()));
             return;
         }
 
-        player.sendMessage("");
         player.sendMessage(MessageUtils.color("&a&l✔ Estructura exportada!"));
         player.sendMessage(MessageUtils.color("&8└ &7ID: &e" + id));
         player.sendMessage(MessageUtils.color("&8└ &7Bloques: &e" + blockCount));
         player.sendMessage(MessageUtils.color("&8└ &7Archivo: &e" + outFile.getPath()));
-        player.sendMessage("");
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
     }
 

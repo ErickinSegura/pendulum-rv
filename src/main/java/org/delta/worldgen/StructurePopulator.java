@@ -6,9 +6,11 @@ import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.plugin.Plugin;
 import org.delta.listeners.worldgen.PendingEntitySpawner;
 import org.delta.worldgen.structures.RuinasTorre;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -54,16 +56,37 @@ public class StructurePopulator extends BlockPopulator {
     private final PendingEntitySpawner entitySpawner;
     private final Logger               logger;
 
-    public StructurePopulator(Logger logger, PendingEntitySpawner entitySpawner) {
+    private final Plugin plugin;  // añadir campo
+
+    public StructurePopulator(Logger logger, PendingEntitySpawner entitySpawner, Plugin plugin) {
         this.logger        = logger;
         this.entitySpawner = entitySpawner;
+        this.plugin        = plugin;
         this.structures    = new ArrayList<>();
         registerDefaultStructures();
     }
 
+
     private void registerDefaultStructures() {
+        // Estructuras en código
         for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
             register(new RuinasTorre(rot));
+        }
+
+        // Estructuras desde JSON
+        JsonLootTableLoader lootLoader = new JsonLootTableLoader(plugin.getDataFolder(), logger);
+        lootLoader.loadAll();
+
+        File structuresFolder = new File(plugin.getDataFolder(), "structure_exports");
+        if (!structuresFolder.exists()) structuresFolder.mkdirs();
+
+        File[] files = structuresFolder.listFiles((d, n) -> n.endsWith(".json"));
+        if (files == null) return;
+
+        for (File f : files) {
+            for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
+                register(new JsonStructure(f, logger, lootLoader).rotation(rot));
+            }
         }
     }
 
@@ -77,6 +100,7 @@ public class StructurePopulator extends BlockPopulator {
     public List<StructureDef> getStructures() {
         return Collections.unmodifiableList(structures);
     }
+
 
     @Override
     public void populate(WorldInfo worldInfo, Random random,
@@ -96,8 +120,8 @@ public class StructurePopulator extends BlockPopulator {
         Biome biome = limitedRegion.getBiome(worldX, 64, worldZ);
         List<StructureDef> candidates = structures.stream()
                 .filter(s -> s.allowedIn(biome))
-                .filter(s -> localX + s.getMaxRelX() < 16 - BORDER_PADDING)
-                .filter(s -> localZ + s.getMaxRelZ() < 16 - BORDER_PADDING)
+                // Para estructuras multi-chunk no filtramos por tamaño,
+                // isInRegion() en placeStructure descarta lo que se salga
                 .filter(s -> chunkRandom.nextDouble() <= s.getSpawnChance())
                 .collect(Collectors.toList());
 

@@ -62,7 +62,9 @@ public class StructurePopulator extends BlockPopulator {
     }
 
     private void registerDefaultStructures() {
-        register(new RuinasTorre());
+        for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
+            register(new RuinasTorre(rot));
+        }
     }
 
     public void register(StructureTemplate template) {
@@ -75,7 +77,6 @@ public class StructurePopulator extends BlockPopulator {
     public List<StructureDef> getStructures() {
         return Collections.unmodifiableList(structures);
     }
-
 
     @Override
     public void populate(WorldInfo worldInfo, Random random,
@@ -104,11 +105,18 @@ public class StructurePopulator extends BlockPopulator {
 
         StructureDef structure = candidates.get(chunkRandom.nextInt(candidates.size()));
 
-        int groundY = findGroundLevel(limitedRegion, worldX, worldZ,
-                structure.getMaxRelX(), structure.getMaxRelZ());
-        if (groundY < MIN_Y) return;
+        int originY;
+        if (structure.getSpawnMode() == StructureDef.SpawnMode.AIR) {
+            originY = findAirLevel(limitedRegion, worldX, worldZ, structure, chunkRandom);
+        } else {
+            originY = findGroundLevel(limitedRegion, worldX, worldZ,
+                    structure.getMaxRelX(), structure.getMaxRelZ());
+            if (originY < MIN_Y) return;
+        }
 
-        placeStructure(limitedRegion, structure, worldX, groundY, worldZ, chunkX, chunkZ);
+        if (originY < 0) return;
+
+        placeStructure(limitedRegion, structure, worldX, originY, worldZ, chunkX, chunkZ);
     }
 
     private int findGroundLevel(LimitedRegion region, int originX, int originZ,
@@ -139,6 +147,29 @@ public class StructurePopulator extends BlockPopulator {
         return minY;
     }
 
+    private int findAirLevel(LimitedRegion region, int originX, int originZ,
+                             StructureDef structure, Random random) {
+        int minY = structure.getMinAirY();
+        int maxY = structure.getMaxAirY();
+        if (minY >= maxY) return -1;
+
+        int candidateY = minY + random.nextInt(maxY - minY);
+
+        int cx = originX + structure.getMaxRelX() / 2;
+        int cz = originZ + structure.getMaxRelZ() / 2;
+
+        if (!region.isInRegion(cx, candidateY, cz)) return -1;
+
+        int clearance = structure.getMinClearance();
+        for (int dy = 0; dy < clearance; dy++) {
+            int checkY = candidateY + dy;
+            if (!region.isInRegion(cx, checkY, cz)) return -1;
+            if (!region.getType(cx, checkY, cz).isAir()) return -1;
+        }
+
+        return candidateY;
+    }
+
     private int getSolidGroundY(LimitedRegion region, int x, int z) {
         int startY = region.getHighestBlockYAt(x, z, HeightMap.WORLD_SURFACE);
         for (int y = startY; y >= MIN_Y - 10; y--) {
@@ -152,7 +183,9 @@ public class StructurePopulator extends BlockPopulator {
                                 int originX, int originY, int originZ,
                                 int chunkX, int chunkZ) {
 
-        clearVegetation(region, structure, originX, originY, originZ);
+        boolean isAir = structure.getSpawnMode() == StructureDef.SpawnMode.AIR;
+
+        if (!isAir) clearVegetation(region, structure, originX, originY, originZ);
 
         for (StructureDef.BlockEntry entry : structure.getBlocks()) {
             int wx = originX + entry.relX();
@@ -162,10 +195,9 @@ public class StructurePopulator extends BlockPopulator {
             region.setType(wx, wy, wz, entry.material());
         }
 
-        fillUnderBase(region, structure, originX, originY, originZ);
+        if (!isAir) fillUnderBase(region, structure, originX, originY, originZ);
 
         scheduleChests(structure, originX, originY, originZ, chunkX, chunkZ);
-
         scheduleEntities(structure, originX, originY, originZ, chunkX, chunkZ);
 
         logger.info("[StructurePopulator] Colocando " + structure.getId()

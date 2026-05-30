@@ -13,6 +13,14 @@ import org.delta.worldgen.StructureTemplate;
 
 public class RuinasTorre extends StructureTemplate {
 
+    private final StructureDef.Rotation rotation;
+
+    public RuinasTorre() { this(StructureDef.Rotation.ROT_0); }
+
+    public RuinasTorre(StructureDef.Rotation rotation) {
+        this.rotation = rotation;
+    }
+
     private static final LootTable LOOT_RUINAS = new LootTable.Builder("ruinas_torre_cofre")
             .rolls(3, 7)
             .entry(Material.BREAD,           1, 3, 60)
@@ -32,7 +40,9 @@ public class RuinasTorre extends StructureTemplate {
     @Override
     public StructureDef build() {
         return new StructureDef.Builder("ruinas_torre")
-                .spawnChance(0.9)
+                .spawnChance(0)
+                .airSpawn(5, 80, 120)
+                .rotation(rotation)
                 .biomes(
                         Biome.PLAINS,
                         Biome.SUNFLOWER_PLAINS,

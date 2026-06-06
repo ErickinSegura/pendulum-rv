@@ -65,7 +65,7 @@
                             <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
                         </manifestEntries>
                     </archive>
-                    <outputDirectory>/home/erick/Proyectos/pendulum_server/plugins</outputDirectory>
+                    <outputDirectory>C:\Users\PC\Proyectos\pendulum_server\plugins</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>

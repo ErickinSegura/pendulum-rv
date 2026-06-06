@@ -1,6 +1,8 @@
 package org.delta.customs.items;
 
 import org.delta.customs.items.chargebase.*;
+import org.delta.customs.items.chargebase.crafteos.lanzapapas.Lanzapapas;
+import org.delta.customs.items.chargebase.crafteos.lanzapapas.PapaExplosiva;
 import org.delta.customs.items.tools.Clawn;
 
 import java.util.HashMap;
@@ -25,6 +27,9 @@ public class ItemRegistry {
         register(new NucleoDistorsion());
         register(new NucleoInestable());
         register(new Placeholder());
+
+        register(new PapaExplosiva());
+        register(new Lanzapapas());
     }
 
     private static void register(CustomItem item) {

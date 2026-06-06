@@ -112,12 +112,10 @@ public class StructurePopulator extends BlockPopulator {
                 ^ ((long) chunkZ * 132897987541L);
         Random chunkRandom = new Random(seed);
 
-        int localX = 8 - structure.getOriginOffsetX();
-        int localZ = 8 - structure.getOriginOffsetZ();
-        int worldX = (chunkX << 4) + localX;
-        int worldZ = (chunkZ << 4) + localZ;
-
-        Biome biome = limitedRegion.getBiome(worldX, 64, worldZ);
+        // 1. Get the biome using the center of the chunk first
+        int chunkCenterX = (chunkX << 4) + 8;
+        int chunkCenterZ = (chunkZ << 4) + 8;
+        Biome biome = limitedRegion.getBiome(chunkCenterX, 64, chunkCenterZ);
 
         // ── Construcción de candidatos sin stream ──────────────────────────
         List<StructureDef> candidates = new ArrayList<>();
@@ -143,8 +141,15 @@ public class StructurePopulator extends BlockPopulator {
             return;
         }
 
+        // 2. Select the structure
         StructureDef structure = candidates.get(chunkRandom.nextInt(candidates.size()));
         logger.info("[DEBUG] Estructura elegida: " + structure.getId());
+
+        // 3. NOW calculate worldX and worldZ since 'structure' has been defined
+        int localX = 8 - (structure.getMaxRelX() / 2);
+        int localZ = 8 - (structure.getMaxRelZ() / 2);
+        int worldX = (chunkX << 4) + localX;
+        int worldZ = (chunkZ << 4) + localZ;
 
         int originY;
         if (structure.getSpawnMode() == StructureDef.SpawnMode.AIR) {

@@ -1,4 +1,4 @@
-package org.delta.customs.items.chargebase.crafteos.lanzapapas;
+package org.delta.customs.items.base;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

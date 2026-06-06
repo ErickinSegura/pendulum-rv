@@ -1,8 +1,12 @@
 package org.delta.customs.items;
 
-import org.delta.customs.items.chargebase.*;
-import org.delta.customs.items.chargebase.crafteos.lanzapapas.Lanzapapas;
-import org.delta.customs.items.chargebase.crafteos.lanzapapas.PapaExplosiva;
+import org.delta.customs.items.base.escencias.EsenciaVital;
+import org.delta.customs.items.base.escencias.FragmentoEscudo;
+import org.delta.customs.items.base.escencias.FragmentoTemporal;
+import org.delta.customs.items.base.escencias.GarraEnergizada;
+import org.delta.customs.items.base.nucleos.*;
+import org.delta.customs.items.tools.Lanzapapas;
+import org.delta.customs.items.base.PapaExplosiva;
 import org.delta.customs.items.tools.Clawn;
 
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package org.delta.customs.items.chargebase;
+package org.delta.customs.items.base.nucleos;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

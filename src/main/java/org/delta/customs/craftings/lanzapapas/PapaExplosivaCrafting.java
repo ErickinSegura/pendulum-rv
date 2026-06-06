@@ -3,7 +3,7 @@ package org.delta.customs.craftings.lanzapapas;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.delta.customs.craftings.CustomCrafting;
-import org.delta.customs.items.chargebase.crafteos.lanzapapas.PapaExplosiva;
+import org.delta.customs.items.base.PapaExplosiva;
 import org.delta.libs.builders.CustomRecipeBuilder;
 
 public class PapaExplosivaCrafting implements CustomCrafting {

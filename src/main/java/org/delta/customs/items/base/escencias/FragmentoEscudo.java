@@ -1,4 +1,4 @@
-package org.delta.customs.items.chargebase;
+package org.delta.customs.items.base.escencias;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -7,11 +7,11 @@ import org.delta.libs.builders.ItemBuilder;
 
 import java.util.List;
 
-public class NucleoProteccion implements CustomItem {
-    @Override public String getKey() { return "nucleo_proteccion"; }
+public class FragmentoEscudo implements CustomItem {
+    @Override public String getKey() { return "fragmento_escudo"; }
     @Override public ItemStack build() {
-        return new ItemBuilder(Material.IRON_INGOT)
-                .setDisplayName("&b&lNúcleo de Protección")
+        return new ItemBuilder(Material.SHIELD)
+                .setDisplayName("&b&lFragmento de Escudo")
                 .setLore(List.of(ItemBuilder.format("&7Drop de mob &bDefensor&7."), ItemBuilder.format("&8Clase: &bDefensor")))
                 .build();
     }

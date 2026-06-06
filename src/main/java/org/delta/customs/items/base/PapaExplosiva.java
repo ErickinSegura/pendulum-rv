@@ -14,7 +14,7 @@ public class PapaExplosiva implements CustomItem {
     }
 
     @Override
-    public ItemStack build() {
+    public ItemStack buildItem() {
         return new ItemBuilder(Material.POTATO)
                 .setDisplayName(ItemBuilder.format("&cPapa Explosiva"))
                 .addEnchant(Enchantment.MENDING, 1)

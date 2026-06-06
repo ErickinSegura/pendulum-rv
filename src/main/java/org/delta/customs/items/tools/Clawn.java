@@ -15,7 +15,7 @@ public class Clawn implements CustomItem {
     }
 
     @Override
-    public ItemStack build() {
+    public ItemStack buildItem() {
         return new ItemBuilder(Material.RESIN_CLUMP)
                 .setDisplayName(ItemBuilder.format("&6Clawn"))
                 .setLore(List.of(

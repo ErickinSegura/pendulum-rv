@@ -8,6 +8,7 @@ import org.delta.listeners.chargebase.ChargeBaseDeathListener;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.listeners.chargebase.mobs.*;
 import org.delta.listeners.death.DeathListener;
+import org.delta.listeners.items.LanzapapasListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
 import org.delta.listeners.player.*;
@@ -74,10 +75,13 @@ public class EventRegistry {
         pm.registerEvents(new PolarBear(plugin), plugin);
         pm.registerEvents(new CustomMobListener(plugin), plugin);
 
+        // Items
+        pm.registerEvents(new LanzapapasListener(), plugin);
+
         // World Generation
         WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());
         pm.registerEvents(worldGenListener, plugin);
-        pm.registerEvents(plugin.getPendingEntitySpawner(), plugin); // ← línea nueva
+        pm.registerEvents(plugin.getPendingEntitySpawner(), plugin);
         StructureDevCommand structureDev = new StructureDevCommand(plugin.getStructurePopulator(), plugin.getDataFolder());
         pm.registerEvents(structureDev, plugin);
     }

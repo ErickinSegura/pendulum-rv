@@ -1,16 +1,11 @@
 package org.delta.commands.subcommand;
 
 import org.bukkit.Sound;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.Material;
 import org.delta.customs.items.CustomItem;
 import org.delta.customs.items.ItemRegistry;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
-import org.delta.libs.builders.ItemBuilder;
 
 public class GiveCommand implements SubCommand {
 

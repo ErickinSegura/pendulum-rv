@@ -9,7 +9,7 @@ import java.util.List;
 
 public class NucleoInestable implements CustomItem {
     @Override public String getKey() { return "nucleo_inestable"; }
-    @Override public ItemStack build() {
+    @Override public ItemStack buildItem() {
         return new ItemBuilder(Material.NETHER_STAR)
                 .setDisplayName("&d&lNúcleo Inestable")
                 .setLore(List.of(ItemBuilder.format("&7Drop de mob &dHíbrido&7."), ItemBuilder.format("&8Clase: &dHíbrido")))

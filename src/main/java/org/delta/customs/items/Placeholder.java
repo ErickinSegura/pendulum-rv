@@ -16,7 +16,7 @@ public class Placeholder implements CustomItem {
     }
 
     @Override
-    public ItemStack build() {
+    public ItemStack buildItem() {
         return new ItemBuilder(Material.STICK)
                 .setDisplayName(ItemBuilder.format("Placeholder"))
                 .setLore(List.of(

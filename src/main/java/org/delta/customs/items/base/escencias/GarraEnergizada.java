@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GarraEnergizada implements CustomItem {
     @Override public String getKey() { return "garra_energizada"; }
-    @Override public ItemStack build() {
+    @Override public ItemStack buildItem() {
         return new ItemBuilder(Material.PHANTOM_MEMBRANE)
                 .setDisplayName("&c&lGarra Energizada")
                 .setLore(List.of(ItemBuilder.format("&7Drop de mob &cAtacante&7."), ItemBuilder.format("&8Clase: &cAtacante")))

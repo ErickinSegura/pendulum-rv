@@ -9,7 +9,7 @@ import org.delta.libs.builders.CustomRecipeBuilder;
 public class PapaExplosivaCrafting implements CustomCrafting {
     @Override
     public CustomRecipeBuilder.CustomRecipe build() {
-        ItemStack papaExplosiva = new PapaExplosiva().build();
+        ItemStack papaExplosiva = new PapaExplosiva().buildItem();
 
         return CustomRecipeBuilder.of("lanzapapas")
                 .result(papaExplosiva)

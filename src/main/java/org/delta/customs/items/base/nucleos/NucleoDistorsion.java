@@ -9,7 +9,7 @@ import java.util.List;
 
 public class NucleoDistorsion implements CustomItem {
     @Override public String getKey() { return "nucleo_distorsion"; }
-    @Override public ItemStack build() {
+    @Override public ItemStack buildItem() {
         return new ItemBuilder(Material.ENDER_PEARL)
                 .setDisplayName("&e&lNúcleo de Distorsión")
                 .setLore(List.of(ItemBuilder.format("&7Drop de mob &eControlador&7."), ItemBuilder.format("&8Clase: &eControlador")))

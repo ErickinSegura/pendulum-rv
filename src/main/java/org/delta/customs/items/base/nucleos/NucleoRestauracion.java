@@ -9,7 +9,7 @@ import java.util.List;
 
 public class NucleoRestauracion implements CustomItem {
     @Override public String getKey() { return "nucleo_restauracion"; }
-    @Override public ItemStack build() {
+    @Override public ItemStack buildItem() {
         return new ItemBuilder(Material.EXPERIENCE_BOTTLE)
                 .setDisplayName("&a&lNúcleo de Restauración")
                 .setLore(List.of(ItemBuilder.format("&7Drop de mob &aHealer&7."), ItemBuilder.format("&8Clase: &aHealer")))

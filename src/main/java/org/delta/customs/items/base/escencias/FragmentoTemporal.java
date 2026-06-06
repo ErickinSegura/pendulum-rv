@@ -9,7 +9,7 @@ import java.util.List;
 
 public class FragmentoTemporal implements CustomItem {
     @Override public String getKey() { return "fragmento_temporal"; }
-    @Override public ItemStack build() {
+    @Override public ItemStack buildItem() {
         return new ItemBuilder(Material.CLOCK)
                 .setDisplayName("&e&lFragmento Temporal")
                 .setLore(List.of(ItemBuilder.format("&7Drop de mob &eControlador&7."), ItemBuilder.format("&8Clase: &eControlador")))

@@ -2,7 +2,10 @@ package org.delta.customs.items.tools;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.delta.customs.items.CustomItem;
+import org.delta.libs.builders.ItemBuilder;
 
 public class Lanzapapas implements CustomItem {
     @Override
@@ -11,13 +14,12 @@ public class Lanzapapas implements CustomItem {
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack build() {
-        return new org.delta.libs.builders.ItemBuilder(Material.CROSSBOW)
-                .setDisplayName(org.delta.libs.builders.ItemBuilder.format("&6Lanzapapas"))
+    public ItemStack buildItem() {
+        return new ItemBuilder(Material.CROSSBOW)
+                .setDisplayName(ItemBuilder.format("&6Lanzapapas"))
                 .addEnchant(Enchantment.INFINITY, 1)
-                .addItemFlag(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS)
+                .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .setCustomModelData(1)
                 .build();
     }
-
 }

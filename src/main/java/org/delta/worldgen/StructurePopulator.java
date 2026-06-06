@@ -70,7 +70,7 @@ public class StructurePopulator extends BlockPopulator {
     private void registerDefaultStructures() {
         // Estructuras en código
         for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
-            register(new RuinasTorre(rot));
+            //register(new RuinasTorre(rot));
         }
 
         // Estructuras desde JSON
@@ -112,33 +112,58 @@ public class StructurePopulator extends BlockPopulator {
                 ^ ((long) chunkZ * 132897987541L);
         Random chunkRandom = new Random(seed);
 
-        int localX = BORDER_PADDING + chunkRandom.nextInt(16 - BORDER_PADDING * 2);
-        int localZ = BORDER_PADDING + chunkRandom.nextInt(16 - BORDER_PADDING * 2);
+        int localX = 8 - structure.getOriginOffsetX();
+        int localZ = 8 - structure.getOriginOffsetZ();
         int worldX = (chunkX << 4) + localX;
         int worldZ = (chunkZ << 4) + localZ;
 
         Biome biome = limitedRegion.getBiome(worldX, 64, worldZ);
-        List<StructureDef> candidates = structures.stream()
-                .filter(s -> s.allowedIn(biome))
-                // Para estructuras multi-chunk no filtramos por tamaño,
-                // isInRegion() en placeStructure descarta lo que se salga
-                .filter(s -> chunkRandom.nextDouble() <= s.getSpawnChance())
-                .collect(Collectors.toList());
 
-        if (candidates.isEmpty()) return;
+        // ── Construcción de candidatos sin stream ──────────────────────────
+        List<StructureDef> candidates = new ArrayList<>();
+
+        for (StructureDef s : structures) {
+            if (!s.allowedIn(biome)) {
+                logger.info("[DEBUG] " + s.getId() + " RECHAZADO por bioma: " + biome);
+                continue;
+            }
+            double roll = chunkRandom.nextDouble();
+            logger.info("[DEBUG] " + s.getId() + " roll=" + roll + " chance=" + s.getSpawnChance());
+            if (roll <= s.getSpawnChance()) {
+                logger.info("[DEBUG] " + s.getId() + " ACEPTADO");
+                candidates.add(s);
+            }
+        }
+        // ──────────────────────────────────────────────────────────────────
+
+        if (candidates.isEmpty()) {
+            logger.info("[DEBUG] Estructuras totales: " + structures.size()
+                    + " | bioma: " + biome
+                    + " | candidatos finales: 0");
+            return;
+        }
 
         StructureDef structure = candidates.get(chunkRandom.nextInt(candidates.size()));
+        logger.info("[DEBUG] Estructura elegida: " + structure.getId());
 
         int originY;
         if (structure.getSpawnMode() == StructureDef.SpawnMode.AIR) {
             originY = findAirLevel(limitedRegion, worldX, worldZ, structure, chunkRandom);
+            logger.info("[DEBUG] findAirLevel retornó: " + originY);
         } else {
             originY = findGroundLevel(limitedRegion, worldX, worldZ,
                     structure.getMaxRelX(), structure.getMaxRelZ());
-            if (originY < MIN_Y) return;
+            logger.info("[DEBUG] findGroundLevel retornó: " + originY + " (MIN_Y=" + MIN_Y + ")");
+            if (originY < MIN_Y) {
+                logger.info("[DEBUG] ABORTADO: originY < MIN_Y");
+                return;
+            }
         }
 
-        if (originY < 0) return;
+        if (originY < 0) {
+            logger.info("[DEBUG] ABORTADO: originY < 0");
+            return;
+        }
 
         placeStructure(limitedRegion, structure, worldX, originY, worldZ, chunkX, chunkZ);
     }
@@ -167,7 +192,7 @@ public class StructurePopulator extends BlockPopulator {
         }
 
         if (minY == Integer.MAX_VALUE) return -1;
-        if (maxY - minY > 2) return -1;
+        if (maxY - minY > 6) return -1;
         return minY;
     }
 
@@ -223,9 +248,21 @@ public class StructurePopulator extends BlockPopulator {
 
         scheduleChests(structure, originX, originY, originZ, chunkX, chunkZ);
         scheduleEntities(structure, originX, originY, originZ, chunkX, chunkZ);
+        scheduleBlockData(structure, originX, originY, originZ, chunkX, chunkZ); // <- nuevo
 
         logger.info("[StructurePopulator] Colocando " + structure.getId()
                 + " en " + originX + ", " + (originY + 1) + ", " + originZ);
+    }
+
+    private void scheduleBlockData(StructureDef structure,
+                                   int originX, int originY, int originZ,
+                                   int chunkX, int chunkZ) {
+        for (StructureDef.BlockDataEntry entry : structure.getBlockDataEntries()) {
+            int wx = originX + entry.relX();
+            int wy = originY + 1 + entry.relY();
+            int wz = originZ + entry.relZ();
+            entitySpawner.scheduleBlockData(chunkX, chunkZ, wx, wy, wz, entry.blockData());
+        }
     }
 
     private void clearVegetation(LimitedRegion region, StructureDef structure,

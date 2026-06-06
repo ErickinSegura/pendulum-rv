@@ -77,12 +77,22 @@ public class JsonStructure extends StructureTemplate {
                 int z         = extractInt(obj, "z", 0);
                 String matStr = extractString(obj, "m");
                 String lootId = extractString(obj, "loot");
+                String bdStr  = extractString(obj, "bd");
 
                 Material mat = null;
                 try { mat = Material.valueOf(matStr); }
                 catch (IllegalArgumentException e) {
                     logger.warning("[JsonStructure] Material desconocido: " + matStr);
                     continue;
+                }
+
+                if (!bdStr.isEmpty()) {
+                    try {
+                        org.bukkit.block.data.BlockData bd = Bukkit.createBlockData(bdStr);
+                        b.blockData(x, y, z, bd);
+                    } catch (Exception e) {
+                        logger.warning("[JsonStructure] BlockData inválido: " + bdStr);
+                    }
                 }
 
                 if (!lootId.isEmpty()) {

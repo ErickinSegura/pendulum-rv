@@ -5,6 +5,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -26,8 +27,11 @@ public class PendingEntitySpawner implements Listener {
 
     public record PendingChestFill(int x, int y, int z, LootTable lootTable) {}
 
-    private final Map<Long, List<PendingSpawn>>     pendingSpawns = new ConcurrentHashMap<>();
-    private final Map<Long, List<PendingChestFill>> pendingChests = new ConcurrentHashMap<>();
+    public record PendingBlockData(int x, int y, int z, BlockData blockData) {}
+
+    private final Map<Long, List<PendingSpawn>>     pendingSpawns      = new ConcurrentHashMap<>();
+    private final Map<Long, List<PendingChestFill>> pendingChests      = new ConcurrentHashMap<>();
+    private final Map<Long, List<PendingBlockData>> pendingBlockData   = new ConcurrentHashMap<>();
 
     private final Plugin plugin;
     private final Logger logger;
@@ -36,7 +40,6 @@ public class PendingEntitySpawner implements Listener {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
     }
-
 
     public void scheduleEntity(int chunkX, int chunkZ,
                                int x, int y, int z,
@@ -59,20 +62,40 @@ public class PendingEntitySpawner implements Listener {
                 .add(new PendingChestFill(x, y, z, lootTable));
     }
 
+    public void scheduleBlockData(int chunkX, int chunkZ,
+                                  int x, int y, int z, BlockData blockData) {
+        pendingBlockData
+                .computeIfAbsent(chunkKey(chunkX, chunkZ),
+                        k -> Collections.synchronizedList(new ArrayList<>()))
+                .add(new PendingBlockData(x, y, z, blockData));
+    }
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         if (!event.isNewChunk()) return;
 
-        final World world  = event.getChunk().getWorld();
-        final long  key    = chunkKey(event.getChunk().getX(), event.getChunk().getZ());
+        final World world = event.getChunk().getWorld();
+        final long  key   = chunkKey(event.getChunk().getX(), event.getChunk().getZ());
 
-        final List<PendingSpawn>     spawns = pendingSpawns.remove(key);
-        final List<PendingChestFill> chests = pendingChests.remove(key);
+        final List<PendingSpawn>     spawns     = pendingSpawns.remove(key);
+        final List<PendingChestFill> chests     = pendingChests.remove(key);
+        final List<PendingBlockData> blockDatas = pendingBlockData.remove(key);
 
-        if (spawns == null && chests == null) return;
+        if (spawns == null && chests == null && blockDatas == null) return;
 
         Bukkit.getScheduler().runTask(plugin, () -> {
+
+            // BlockData primero — antes que cofres y entidades
+            if (blockDatas != null) {
+                for (PendingBlockData pending : blockDatas) {
+                    try {
+                        Block block = world.getBlockAt(pending.x(), pending.y(), pending.z());
+                        block.setBlockData(pending.blockData(), false);
+                    } catch (Exception e) {
+                        logger.warning("[PendingEntitySpawner] Error BlockData: " + e.getMessage());
+                    }
+                }
+            }
 
             if (chests != null) {
                 Random random = new Random();
@@ -80,12 +103,8 @@ public class PendingEntitySpawner implements Listener {
                     try {
                         Block      block = world.getBlockAt(fill.x(), fill.y(), fill.z());
                         BlockState state = block.getState();
-
                         if (state instanceof Container container) {
                             fill.lootTable().fill(container.getInventory(), random);
-                            logger.info(String.format(
-                                    "[PendingEntitySpawner] Cofre '%s' llenado en %d, %d, %d",
-                                    fill.lootTable().getId(), fill.x(), fill.y(), fill.z()));
                         } else {
                             logger.warning(String.format(
                                     "[PendingEntitySpawner] Esperaba cofre en %d,%d,%d pero hay %s",
@@ -106,9 +125,6 @@ public class PendingEntitySpawner implements Listener {
                         );
                         entity.setPersistent(true);
                         if (spawn.customizer() != null) spawn.customizer().accept(entity);
-                        logger.info(String.format(
-                                "[PendingEntitySpawner] Spawneado %s en %d, %d, %d",
-                                spawn.type(), spawn.x(), spawn.y(), spawn.z()));
                     } catch (Exception e) {
                         logger.warning("[PendingEntitySpawner] Error entidad "
                                 + spawn.type() + ": " + e.getMessage());

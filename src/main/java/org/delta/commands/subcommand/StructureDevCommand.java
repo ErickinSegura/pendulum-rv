@@ -176,8 +176,10 @@ public class StructureDevCommand implements SubCommand, Listener {
                             || block.getType() == Material.CAVE_AIR
                             || block.getType() == Material.VOID_AIR) continue;
 
-                    entries.add(String.format("    {\"x\":%d,\"y\":%d,\"z\":%d,\"m\":\"%s\"}",
-                            x - minX, y - minY, z - minZ, block.getType().name()));
+                    entries.add(String.format("    {\"x\":%d,\"y\":%d,\"z\":%d,\"m\":\"%s\",\"bd\":\"%s\"}",
+                            x - minX, y - minY, z - minZ,
+                            block.getType().name(),
+                            block.getBlockData().getAsString()));
                     blockCount++;
                 }
             }
@@ -228,6 +230,8 @@ public class StructureDevCommand implements SubCommand, Listener {
 
         Location origin = player.getLocation().getBlock().getLocation();
         int placed = 0;
+
+        // Primero colocar materiales
         for (StructureDef.BlockEntry entry : structure.getBlocks()) {
             player.getWorld().getBlockAt(
                     origin.getBlockX() + entry.relX(),
@@ -237,6 +241,14 @@ public class StructureDevCommand implements SubCommand, Listener {
             placed++;
         }
 
+        // Después aplicar BlockData encima
+        for (StructureDef.BlockDataEntry entry : structure.getBlockDataEntries()) {
+            player.getWorld().getBlockAt(
+                    origin.getBlockX() + entry.relX(),
+                    origin.getBlockY() + entry.relY(),
+                    origin.getBlockZ() + entry.relZ()
+            ).setBlockData(entry.blockData().clone(), false);
+        }
 
         player.sendMessage("");
         player.sendMessage(MessageUtils.color("&a&l✔ Estructura spawneada!"));

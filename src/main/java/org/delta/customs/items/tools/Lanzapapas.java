@@ -19,6 +19,7 @@ public class Lanzapapas implements CustomItem {
                 .setDisplayName(ItemBuilder.format("&6Lanzapapas"))
                 .addEnchant(Enchantment.INFINITY, 1)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                .addItemFlag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
                 .setCustomModelData(1)
                 .build();
     }

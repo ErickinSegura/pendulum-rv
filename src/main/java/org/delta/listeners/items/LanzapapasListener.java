@@ -1,23 +1,33 @@
 package org.delta.listeners.items;
 
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.delta.customs.items.CustomItem;
-import org.delta.libs.builders.ItemBuilder;
+import org.delta.customs.items.base.PapaExplosiva;
+import org.delta.pendulum;
+
+import java.util.*;
 
 public class LanzapapasListener implements Listener {
+
+    private static final long LOAD_TICKS = 25L;
+    private final Set<UUID> loading = new HashSet<>();
+    private final Set<UUID> ready = new HashSet<>();
+    private final Map<UUID, Player> papasEnVuelo = new HashMap<>();
+
 
     @EventHandler
     public void onCrossbowLoad(PlayerInteractEvent event) {
@@ -33,32 +43,49 @@ public class LanzapapasListener implements Listener {
 
         event.setCancelled(true);
 
-        if (!hasItem(player, "papa_explosiva")) {
-            player.sendActionBar(
-                    ItemBuilder.format("&cNecesitas &6Papas Explosivas &cpara cargar esto!")
+        if (loading.contains(player.getUniqueId())) return;
+
+        if (!hasItem(player, "papa_explosiva")) return;
+
+        loading.add(player.getUniqueId());
+        consumeItem(player, "papa_explosiva");
+
+        player.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_START, 1f, 1f);
+
+        org.bukkit.Bukkit.getScheduler().runTaskLater(pendulum.getInstance(), () -> {
+            loading.remove(player.getUniqueId());
+
+            if (!player.isOnline()) {
+                giveBack(player);
+                return;
+            }
+            ItemStack current = player.getInventory().getItemInMainHand();
+            if (!isCustomItem(current, "lanzapapas")) {
+                giveBack(player);
+                return;
+            }
+
+            net.minecraft.world.item.ItemStack nmsItem =
+                    org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(current);
+
+            net.minecraft.world.item.ItemStack nmsArrow =
+                    new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW);
+
+            net.minecraft.world.item.component.ChargedProjectiles charged =
+                    net.minecraft.world.item.component.ChargedProjectiles.of(nmsArrow);
+
+            nmsItem.set(
+                    net.minecraft.core.component.DataComponents.CHARGED_PROJECTILES,
+                    charged
             );
-            return;
-        }
 
-        // Forzar carga via NMS con una flecha real (no EMPTY)
-        net.minecraft.world.item.ItemStack nmsItem =
-                org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(held);
+            ItemStack loadedItem = org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitCopy(nmsItem);
+            player.getInventory().setItemInMainHand(loadedItem);
 
-        net.minecraft.world.item.ItemStack nmsArrow =
-                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW);
+            ready.add(player.getUniqueId());
+            player.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1f, 1f);
 
-        net.minecraft.world.item.component.ChargedProjectiles charged =
-                net.minecraft.world.item.component.ChargedProjectiles.of(nmsArrow);
-
-        nmsItem.set(
-                net.minecraft.core.component.DataComponents.CHARGED_PROJECTILES,
-                charged
-        );
-
-        ItemStack loadedItem = org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitCopy(nmsItem);
-        player.getInventory().setItemInMainHand(loadedItem);
-        player.playSound(player.getLocation(),
-                org.bukkit.Sound.ITEM_CROSSBOW_LOADING_END, 1f, 1f);
+        }, LOAD_TICKS);
     }
 
     @EventHandler
@@ -68,27 +95,66 @@ public class LanzapapasListener implements Listener {
 
         event.setCancelled(true);
 
-        if (player.getGameMode() != GameMode.CREATIVE) {
-            player.getInventory().remove(Material.ARROW);
-        }
+        if (!ready.contains(player.getUniqueId())) return;
 
-        if (!consumeItem(player, "papa_explosiva")) {
-            player.sendActionBar(ItemBuilder.format("&cNo tienes &6Papas Explosivas&c!"));
-            unloadCrossbow(event.getBow());
-            return;
-        }
+        ready.remove(player.getUniqueId());
+        unloadCrossbow(event.getBow());
 
         Snowball projectile = player.launchProjectile(Snowball.class);
         projectile.setVelocity(event.getProjectile().getVelocity());
+        projectile.setItem(new PapaExplosiva().build());
         projectile.getPersistentDataContainer().set(
                 new NamespacedKey("delta", "papa_explosiva"),
                 PersistentDataType.BYTE,
                 (byte) 1
         );
 
-        unloadCrossbow(event.getBow());
+        papasEnVuelo.put(projectile.getUniqueId(), player);
+
+        player.playSound(player.getLocation(), Sound.ENTITY_TNT_PRIMED, 1f, 1f);
     }
 
+    @EventHandler
+    public void onPapaHit(ProjectileHitEvent event) {
+        if (!(event.getEntity() instanceof Snowball snowball)) return;
+
+        if (!snowball.getPersistentDataContainer().has(
+                new NamespacedKey("delta", "papa_explosiva"),
+                PersistentDataType.BYTE
+        )) return;
+
+        Player shooter = papasEnVuelo.remove(snowball.getUniqueId());
+        org.bukkit.Location loc = snowball.getLocation();
+        snowball.remove();
+
+        net.minecraft.world.level.Level nmsWorld =
+                ((org.bukkit.craftbukkit.CraftWorld) loc.getWorld()).getHandle();
+
+        net.minecraft.world.entity.player.Player nmsPlayer = shooter != null
+                ? ((org.bukkit.craftbukkit.entity.CraftPlayer) shooter).getHandle()
+                : null;
+
+        nmsWorld.explode(
+                nmsPlayer,
+                loc.getX(), loc.getY(), loc.getZ(),
+                3f,
+                false,
+                net.minecraft.world.level.Level.ExplosionInteraction.BLOCK
+        );
+
+        if (shooter != null) {
+            double distance = shooter.getLocation().distance(loc);
+            if (distance < 5.0) {
+                double damage = Math.max(1.0, 10.0 - (distance * 2));
+                shooter.damage(damage);
+            }
+        }
+    }
+
+
+    private void giveBack(Player player) {
+        player.getInventory().addItem(new org.delta.customs.items.base.PapaExplosiva().build());
+    }
 
     private boolean isCustomItem(ItemStack item, String key) {
         if (item == null) return false;

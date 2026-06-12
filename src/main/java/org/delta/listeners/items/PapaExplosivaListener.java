@@ -13,6 +13,7 @@ import org.delta.customs.items.CustomItem;
 public class PapaExplosivaListener implements Listener {
 
     private static final NamespacedKey COMIO_PAPA = new NamespacedKey("delta", "comio_papa");
+    private Player currentPapaEater = null;
 
     @EventHandler
     public void onEat(PlayerItemConsumeEvent event) {
@@ -21,36 +22,54 @@ public class PapaExplosivaListener implements Listener {
 
         if (!isCustomItem(item, "papa_explosiva")) return;
 
-        net.minecraft.world.level.Level nmsWorld =
-                ((org.bukkit.craftbukkit.CraftWorld) player.getWorld()).getHandle();
-
-        net.minecraft.world.entity.player.Player nmsPlayer =
-                ((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle();
-
-        nmsWorld.explode(
-                nmsPlayer,
-                player.getLocation().getX(),
-                player.getLocation().getY()+1,
-                player.getLocation().getZ(),
-                6f,
-                false,
-                net.minecraft.world.level.Level.ExplosionInteraction.BLOCK
-        );
-
         player.getPersistentDataContainer().set(COMIO_PAPA, PersistentDataType.BYTE, (byte) 1);
-        player.damage(player.getMaxHealth());
+        currentPapaEater = player;
+
+        try {
+            net.minecraft.world.level.Level nmsWorld =
+                    ((org.bukkit.craftbukkit.CraftWorld) player.getWorld()).getHandle();
+
+            net.minecraft.world.entity.player.Player nmsPlayer =
+                    ((org.bukkit.craftbukkit.entity.CraftPlayer) player).getHandle();
+
+            nmsWorld.explode(
+                    nmsPlayer,
+                    player.getLocation().getX(),
+                    player.getLocation().getY() + 1,
+                    player.getLocation().getZ(),
+                    6f,
+                    false,
+                    net.minecraft.world.level.Level.ExplosionInteraction.BLOCK
+            );
+
+            if (!player.isDead()) {
+                player.damage(player.getMaxHealth());
+            }
+        } finally {
+            currentPapaEater = null;
+        }
     }
 
     @EventHandler
     public void onDeath(org.bukkit.event.entity.PlayerDeathEvent event) {
         Player player = event.getEntity();
-        if (!player.getPersistentDataContainer().has(COMIO_PAPA, PersistentDataType.BYTE)) return;
 
-        player.getPersistentDataContainer().remove(COMIO_PAPA);
-        event.setDeathMessage(
-                player.getName() +
-                        org.bukkit.ChatColor.GRAY + " se suicidó comiendo una Papa Explosiva"
-        );
+        if (player.getPersistentDataContainer().has(COMIO_PAPA, PersistentDataType.BYTE)) {
+            player.getPersistentDataContainer().remove(COMIO_PAPA);
+            event.setDeathMessage(
+                    player.getName() +
+                            org.bukkit.ChatColor.GRAY + " se suicidó comiendo una Papa Explosiva"
+            );
+            return;
+        }
+
+        if (currentPapaEater != null && player != currentPapaEater) {
+            event.setDeathMessage(
+                    player.getName() +
+                            org.bukkit.ChatColor.GRAY + " fue volado por la Papa Explosiva de " +
+                            currentPapaEater.getName()
+            );
+        }
     }
 
     private boolean isCustomItem(ItemStack item, String key) {

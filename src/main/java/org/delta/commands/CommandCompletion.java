@@ -9,6 +9,7 @@ import org.delta.customs.items.ItemRegistry;
 import org.delta.customs.mobs.MobRegistry;
 import org.delta.libs.PendulumSettings;
 import org.delta.managers.perks.Perk;
+import org.delta.worldgen.StructurePopulator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -16,8 +17,10 @@ import java.util.stream.Collectors;
 
 public class CommandCompletion implements TabCompleter {
     private final Map<String, List<String>> subCommandCompletions;
+    private final StructurePopulator structurePopulator;
 
-    public CommandCompletion() {
+    public CommandCompletion(StructurePopulator structurePopulator) {
+        this.structurePopulator = structurePopulator;
         this.subCommandCompletions = new HashMap<>();
         initializeCompletions();
     }
@@ -29,7 +32,7 @@ public class CommandCompletion implements TabCompleter {
         subCommandCompletions.put("basic", basicCommands);
 
         List<String> adminCommands = Arrays.asList(
-                "dia", "give", "summon", "chargebase"
+                "dia", "give", "summon", "chargebase", "structdev"
         );
         subCommandCompletions.put("admin", adminCommands);
 
@@ -49,8 +52,8 @@ public class CommandCompletion implements TabCompleter {
                 "stats", "lb"
         ));
 
-        subCommandCompletions.put("bingo_admin", List.of(
-                "reset"
+        subCommandCompletions.put("bingo_admin", Arrays.asList(
+                "reset", "generate", "debug"
         ));
 
         subCommandCompletions.put("health_admin", Arrays.asList(
@@ -81,6 +84,10 @@ public class CommandCompletion implements TabCompleter {
 
         subCommandCompletions.put("chargebase_admin", Arrays.asList(
                 "start", "stop"
+        ));
+
+        subCommandCompletions.put("structdev_admin", Arrays.asList(
+                "wand", "scan", "spawn", "list"
         ));
     }
 
@@ -179,6 +186,10 @@ public class CommandCompletion implements TabCompleter {
                 return filterCompletions(chargebaseCompletions, args[1]);
             }
 
+            if (args[0].equalsIgnoreCase("structdev") && checkPermission(player)) {
+                return filterCompletions(subCommandCompletions.get("structdev_admin"), args[1]);
+            }
+
 
         }
 
@@ -255,6 +266,12 @@ public class CommandCompletion implements TabCompleter {
 
             if (args[0].equalsIgnoreCase("summon") && checkPermission(player)) {
                 return List.of(String.valueOf((int) player.getLocation().getX()), "~");
+            }
+
+            if (args[0].equalsIgnoreCase("structdev") &&
+                    args[1].equalsIgnoreCase("spawn") &&
+                    checkPermission(player)) {
+                return filterCompletions(getStructureIds(), args[2]);
             }
         }
 
@@ -334,6 +351,16 @@ public class CommandCompletion implements TabCompleter {
                 .filter(name -> name.toLowerCase().startsWith(partial.toLowerCase()))
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    private List<String> getStructureIds() {
+        if (structurePopulator == null) {
+            return Collections.emptyList();
+        }
+        return structurePopulator.getStructures().stream()
+                .map(org.delta.worldgen.StructureDef::getId)
+                .sorted()
+                .toList();
     }
 
     private List<String> getTeamNames(String partial) {

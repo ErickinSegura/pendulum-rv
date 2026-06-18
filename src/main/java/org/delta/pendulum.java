@@ -105,7 +105,7 @@ public final class pendulum extends JavaPlugin {
 
     private void registerCommands() {
         Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setExecutor(new PendulumCommand(this));
-        Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setTabCompleter(new CommandCompletion());
+        Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setTabCompleter(new CommandCompletion(structurePopulator));
     }
 
     public static pendulum getInstance(){

@@ -1,7 +1,6 @@
 package org.delta.customs.items.tools;
 
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
 import org.delta.customs.items.CustomItem;
 import org.delta.libs.builders.ItemBuilder;
@@ -16,14 +15,13 @@ public class Clawn implements CustomItem {
 
     @Override
     public ItemStack buildItem() {
-        return new ItemBuilder(Material.RESIN_CLUMP)
+        return new ItemBuilder(Material.POPPED_CHORUS_FRUIT)
                 .setDisplayName(ItemBuilder.format("&6Clawn"))
                 .setLore(List.of(
-                        ItemBuilder.format("Consigue más rango de acción con esta garra de resina.")
+                        ItemBuilder.format("&7Aumenta el rango de acción en &a+4&7,"),
+                        ItemBuilder.format("&7pero reduce tu daño en &c-5&7."),
+                        ItemBuilder.format("&8No funciona con mazo ni lanza.")
                 ))
-                .addAttributeFlat(Attribute.BLOCK_INTERACTION_RANGE, "clawn_block_int_range", 5.0)
-                .addAttributeFlat(Attribute.ENTITY_INTERACTION_RANGE, "clawn_entity_int_range", 5.0)
-                .addAttributeFlat(Attribute.ATTACK_DAMAGE, "clawn_dmg", -5.0)
                 .setCustomModelData(1)
                 .build();
     }

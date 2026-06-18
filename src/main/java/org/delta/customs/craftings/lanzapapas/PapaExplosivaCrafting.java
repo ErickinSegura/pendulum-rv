@@ -11,17 +11,14 @@ public class PapaExplosivaCrafting implements CustomCrafting {
     public CustomRecipeBuilder.CustomRecipe build() {
         ItemStack papaExplosiva = new PapaExplosiva().buildItem();
 
-        return CustomRecipeBuilder.of("lanzapapas")
+        CustomRecipeBuilder.CustomRecipe lanzapapas = CustomRecipeBuilder.of("lanzapapas")
                 .result(papaExplosiva)
-                .ingredient(0, Material.GUNPOWDER, 1)
-                .ingredient(1, Material.MAGMA_CREAM, 1)
-                .ingredient(2, Material.GUNPOWDER, 1)
+                .ingredient(1, Material.GUNPOWDER, 1)
                 .ingredient(3, Material.BLAZE_POWDER, 1)
                 .ingredient(4, Material.POTATO, 1)
                 .ingredient(5, Material.BLAZE_POWDER, 1)
-                .ingredient(6, Material.GUNPOWDER, 1)
-                .ingredient(7, Material.MAGMA_CREAM, 1)
-                .ingredient(8, Material.GUNPOWDER, 1)
+                .ingredient(7, Material.GUNPOWDER, 1)
                 .build();
+        return lanzapapas;
     }
 }

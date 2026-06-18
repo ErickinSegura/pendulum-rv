@@ -1,10 +1,11 @@
 package org.delta.customs.items;
 
-import org.delta.customs.items.base.escencias.EsenciaVital;
-import org.delta.customs.items.base.escencias.FragmentoEscudo;
-import org.delta.customs.items.base.escencias.FragmentoTemporal;
-import org.delta.customs.items.base.escencias.GarraEnergizada;
+import org.delta.customs.items.base.fragmentos.FragmentoHeal;
+import org.delta.customs.items.base.fragmentos.FragmentoDefensa;
+import org.delta.customs.items.base.fragmentos.FragmentoControl;
+import org.delta.customs.items.base.fragmentos.FragmentoAtaque;
 import org.delta.customs.items.base.nucleos.*;
+import org.delta.customs.items.base.uniones.*;
 import org.delta.customs.items.tools.Lanzapapas;
 import org.delta.customs.items.base.PapaExplosiva;
 import org.delta.customs.items.tools.Clawn;
@@ -21,15 +22,27 @@ public class ItemRegistry {
     static {
         register(new Clawn());
         // ChargeBase drops
-        register(new NucleoImpulso());
-        register(new GarraEnergizada());
-        register(new NucleoProteccion());
-        register(new FragmentoEscudo());
-        register(new EsenciaVital());
-        register(new NucleoRestauracion());
-        register(new FragmentoTemporal());
-        register(new NucleoDistorsion());
-        register(new NucleoInestable());
+        register(new UnionAtaque());
+        register(new FragmentoAtaque());
+        register(new UnionDefensa());
+        register(new FragmentoDefensa());
+        register(new FragmentoHeal());
+        register(new UnionHeal());
+        register(new FragmentoControl());
+        register(new UnionControl());
+        register(new UnionHibrida());
+
+        // Núcleos por clase
+        register(new NucleoAtacante());
+        register(new NucleoDefensor());
+        register(new NucleoHeal());
+        register(new NucleoControl());
+        // Núcleos con unión híbrida
+        register(new NucleoAtacanteHibrido());
+        register(new NucleoDefensorHibrido());
+        register(new NucleoHealHibrido());
+        register(new NucleoControlHibrido());
+
         register(new Placeholder());
 
         register(new PapaExplosiva());

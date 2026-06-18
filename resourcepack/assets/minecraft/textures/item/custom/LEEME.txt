@@ -1,0 +1,29 @@
+Coloca aquí tus texturas PNG (16x16 recomendado). El nombre del archivo
+debe coincidir EXACTAMENTE con el de la lista de abajo (sin mayúsculas, .png):
+
+  clawn.png
+  fragmento_ataque.png
+  union_ataque.png
+  fragmento_defensa.png
+  union_defensa.png
+  fragmento_heal.png
+  union_heal.png
+  fragmento_control.png
+  union_control.png
+  union_hibrida.png
+  nucleo_atacante.png
+  nucleo_defensor.png
+  nucleo_heal.png
+  nucleo_control.png
+  nucleo_atacante_hibrido.png
+  nucleo_defensor_hibrido.png
+  nucleo_heal_hibrido.png
+  nucleo_control_hibrido.png
+  papa_explosiva.png
+  lanzapapas.png
+  placeholder.png
+
+Cualquier item sin su PNG correspondiente se verá como textura faltante
+(cuadros negro/morado), pero NO rompe el resto del pack.
+
+Puedes borrar este archivo LEEME.txt cuando termines.

@@ -1,0 +1,31 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "minecraft:item/popped_chorus_fruit"
+    },
+    "entries": [
+      { "threshold": 1,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/clawn" } },
+      { "threshold": 2,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/fragmento_ataque" } },
+      { "threshold": 3,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/union_ataque" } },
+      { "threshold": 4,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/fragmento_defensa" } },
+      { "threshold": 5,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/union_defensa" } },
+      { "threshold": 6,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/fragmento_heal" } },
+      { "threshold": 7,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/union_heal" } },
+      { "threshold": 8,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/fragmento_control" } },
+      { "threshold": 9,  "model": { "type": "minecraft:model", "model": "minecraft:item/custom/union_control" } },
+      { "threshold": 10, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/union_hibrida" } },
+      { "threshold": 11, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_atacante" } },
+      { "threshold": 12, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_defensor" } },
+      { "threshold": 13, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_heal" } },
+      { "threshold": 14, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_control" } },
+      { "threshold": 15, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_atacante_hibrido" } },
+      { "threshold": 16, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_defensor_hibrido" } },
+      { "threshold": 17, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_heal_hibrido" } },
+      { "threshold": 18, "model": { "type": "minecraft:model", "model": "minecraft:item/custom/nucleo_control_hibrido" } }
+    ]
+  }
+}

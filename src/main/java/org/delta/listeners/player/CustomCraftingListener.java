@@ -11,13 +11,17 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.delta.customs.items.CustomItem;
 import org.delta.libs.builders.CustomRecipeBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class CustomCraftingListener implements Listener {
 
@@ -43,15 +47,37 @@ public class CustomCraftingListener implements Listener {
                 ItemStack inSlot = matrix[slot];
 
                 if (required == null || required.getType() == Material.AIR) {
+                    // El slot debe estar vacío: ningún ingrediente extra permitido.
                     if (inSlot != null && inSlot.getType() != Material.AIR) continue outer;
                 } else {
-                    if (inSlot == null || inSlot.getType() != required.getType()) continue outer;
-                    if (inSlot.getAmount() < required.getAmount()) continue outer;
+                    if (!ingredientMatches(required, inSlot)) continue outer;
                 }
             }
             return recipe;
         }
         return null;
+    }
+
+    /**
+     * Un slot coincide con el ingrediente requerido sólo si:
+     * - es el mismo material,
+     * - tiene al menos la cantidad pedida, y
+     * - su identidad de item custom coincide exactamente: si la receta pide un
+     *   item custom, el slot debe ser ese mismo custom; si la receta pide un item
+     *   base (vanilla), el slot NO puede ser un item custom.
+     */
+    private boolean ingredientMatches(ItemStack required, ItemStack inSlot) {
+        if (inSlot == null || inSlot.getType() == Material.AIR) return false;
+        if (inSlot.getType() != required.getType()) return false;
+        if (inSlot.getAmount() < required.getAmount()) return false;
+        return Objects.equals(customKey(required), customKey(inSlot));
+    }
+
+    private String customKey(ItemStack item) {
+        if (item == null) return null;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return null;
+        return meta.getPersistentDataContainer().get(CustomItem.ITEM_KEY, PersistentDataType.STRING);
     }
 
     private int calculateMaxCrafts(ItemStack[] matrix, CustomRecipeBuilder.CustomRecipe match) {
@@ -72,9 +98,15 @@ public class CustomCraftingListener implements Listener {
             ItemStack inSlot = matrix[slot];
             if (inSlot == null || inSlot.getType() == Material.AIR) continue;
             int remaining = inSlot.getAmount() - (required.getAmount() * times);
-            matrix[slot] = remaining <= 0
-                    ? new ItemStack(Material.AIR)
-                    : new ItemStack(inSlot.getType(), remaining);
+            if (remaining <= 0) {
+                matrix[slot] = new ItemStack(Material.AIR);
+            } else {
+                // Conservamos el item original (incluido su PDC custom) y sólo
+                // reducimos la cantidad sobrante.
+                ItemStack leftover = inSlot.clone();
+                leftover.setAmount(remaining);
+                matrix[slot] = leftover;
+            }
         }
         inv.setMatrix(matrix);
 

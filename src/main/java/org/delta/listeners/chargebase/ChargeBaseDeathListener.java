@@ -51,7 +51,7 @@ public class ChargeBaseDeathListener implements Listener {
             if (rng.nextDouble() <= drop.chance()) {
                 ItemRegistry.get(drop.key()).ifPresent(item ->
                         event.getEntity().getWorld().dropItemNaturally(
-                                event.getEntity().getLocation(), item.buildItem()
+                                event.getEntity().getLocation(), item.build()
                         )
                 );
             }

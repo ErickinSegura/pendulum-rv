@@ -9,9 +9,9 @@ import org.delta.libs.builders.CustomRecipeBuilder;
 public class PapaExplosivaCrafting implements CustomCrafting {
     @Override
     public CustomRecipeBuilder.CustomRecipe build() {
-        ItemStack papaExplosiva = new PapaExplosiva().buildItem();
+        ItemStack papaExplosiva = new PapaExplosiva().build();
 
-        CustomRecipeBuilder.CustomRecipe lanzapapas = CustomRecipeBuilder.of("lanzapapas")
+        CustomRecipeBuilder.CustomRecipe lanzapapas = CustomRecipeBuilder.of("papa_explosiva")
                 .result(papaExplosiva)
                 .ingredient(1, Material.GUNPOWDER, 1)
                 .ingredient(3, Material.BLAZE_POWDER, 1)

@@ -9,6 +9,7 @@ import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.listeners.chargebase.mobs.*;
 import org.delta.listeners.death.DeathListener;
 import org.delta.listeners.items.ClawnListener;
+import org.delta.listeners.items.GiveMenuListener;
 import org.delta.listeners.items.LanzapapasListener;
 import org.delta.listeners.items.PapaExplosivaListener;
 import org.delta.listeners.perks.*;
@@ -81,6 +82,7 @@ public class EventRegistry {
         pm.registerEvents(new LanzapapasListener(), plugin);
         pm.registerEvents(new PapaExplosivaListener(), plugin);
         pm.registerEvents(new ClawnListener(), plugin);
+        pm.registerEvents(new GiveMenuListener(), plugin);
 
         // World Generation
         WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());

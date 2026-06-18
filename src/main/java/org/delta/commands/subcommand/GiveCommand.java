@@ -2,6 +2,7 @@ package org.delta.commands.subcommand;
 
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.delta.commands.menu.GiveMenuHolder;
 import org.delta.customs.items.CustomItem;
 import org.delta.customs.items.ItemRegistry;
 import org.delta.libs.MessageUtils;
@@ -23,7 +24,8 @@ public class GiveCommand implements SubCommand {
         }
 
         if (args.length < 2) {
-            showUsage(player);
+            player.openInventory(new GiveMenuHolder().getInventory());
+            player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 0.6f, 1.2f);
             return;
         }
 

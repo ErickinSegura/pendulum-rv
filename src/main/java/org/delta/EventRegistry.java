@@ -11,6 +11,9 @@ import org.delta.listeners.death.DeathListener;
 import org.delta.listeners.items.ClawnListener;
 import org.delta.listeners.items.GiveMenuListener;
 import org.delta.listeners.items.LanzapapasListener;
+import org.delta.listeners.items.LazoListener;
+import org.delta.listeners.items.ZanahoriaRellenableListener;
+import org.delta.listeners.items.ZanahoriaRellenableCraftListener;
 import org.delta.listeners.items.PapaExplosivaListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
@@ -83,6 +86,9 @@ public class EventRegistry {
         pm.registerEvents(new PapaExplosivaListener(), plugin);
         pm.registerEvents(new ClawnListener(), plugin);
         pm.registerEvents(new GiveMenuListener(), plugin);
+        pm.registerEvents(new LazoListener(), plugin);
+        pm.registerEvents(new ZanahoriaRellenableListener(), plugin);
+        pm.registerEvents(new ZanahoriaRellenableCraftListener(), plugin);
 
         // World Generation
         WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());

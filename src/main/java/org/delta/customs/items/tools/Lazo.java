@@ -19,11 +19,6 @@ public class Lazo implements CustomItem {
     public ItemStack buildItem() {
         return new ItemBuilder(Material.FISHING_ROD)
                 .setDisplayName(ItemBuilder.format("&aLazo"))
-                .setLore(List.of(
-                        ItemBuilder.format("&7Lanza el anzuelo a un bloque y"),
-                        ItemBuilder.format("&7te impulsará hacia él para balancearte."),
-                        ItemBuilder.format("&8Agáchate para soltarte.")
-                ))
                 .addEnchant(Enchantment.UNBREAKING, 3)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .setUnbrekeable(true)

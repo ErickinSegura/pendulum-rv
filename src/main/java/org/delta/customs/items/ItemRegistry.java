@@ -10,7 +10,7 @@ import org.delta.customs.items.tools.Lanzapapas;
 import org.delta.customs.items.base.PapaExplosiva;
 import org.delta.customs.items.tools.Clawn;
 import org.delta.customs.items.tools.Lazo;
-import org.delta.customs.items.consumables.ZanahoriaRellenable;
+import org.delta.customs.items.consumables.ZanahoriaEncantada;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class ItemRegistry {
         register(new PapaExplosiva());
         register(new Lanzapapas());
         register(new Lazo());
-        register(new ZanahoriaRellenable());
+        register(new ZanahoriaEncantada());
     }
 
     private static void register(CustomItem item) {

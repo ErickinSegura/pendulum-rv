@@ -2,6 +2,8 @@ package org.delta.customs.items.consumables;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -10,25 +12,23 @@ import org.delta.libs.builders.ItemBuilder;
 
 import java.util.List;
 
-/**
- * Zanahoria dorada que nunca se gasta al comerla: en su lugar consume una de las
- * "cargas" guardadas en su PersistentDataContainer. Se rellena con zanahorias
- * normales (hasta {@link #MAX_CHARGES}). Sin cargas, no se puede comer.
- */
-public class ZanahoriaRellenable implements CustomItem {
+
+public class ZanahoriaEncantada implements CustomItem {
 
     public static final int MAX_CHARGES = 256;
     public static final NamespacedKey CHARGES_KEY = new NamespacedKey("delta", "carrot_charges");
 
     @Override
     public String getKey() {
-        return "zanahoria_rellenable";
+        return "zanahoria_encantada";
     }
 
     @Override
     public ItemStack buildItem() {
         ItemStack item = new ItemBuilder(Material.GOLDEN_CARROT)
-                .setDisplayName(ItemBuilder.format("&6Zanahoria Rellenable"))
+                .setDisplayName(ItemBuilder.format("&6Zanahoria Encantada"))
+                .addEnchant(Enchantment.INFINITY, 1)
+                .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .build();
         setCharges(item, MAX_CHARGES);
         return item;
@@ -54,12 +54,7 @@ public class ZanahoriaRellenable implements CustomItem {
 
     private static List<String> buildLore(int charges) {
         return List.of(
-                ItemBuilder.format("&7Una zanahoria dorada que nunca se gasta."),
-                ItemBuilder.format("&7Cómela mientras le queden cargas."),
-                ItemBuilder.format(""),
-                ItemBuilder.format("&6Cargas: &e" + charges + "&7/&e" + MAX_CHARGES),
-                ItemBuilder.format("&8Combínala con zanahorias en la mesa"),
-                ItemBuilder.format("&8de crafteo para rellenarla.")
+                ItemBuilder.format("&6Cargas: &e" + charges + "&7/&e" + MAX_CHARGES)
         );
     }
 }

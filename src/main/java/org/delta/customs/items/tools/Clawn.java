@@ -17,11 +17,6 @@ public class Clawn implements CustomItem {
     public ItemStack buildItem() {
         return new ItemBuilder(Material.POPPED_CHORUS_FRUIT)
                 .setDisplayName(ItemBuilder.format("&6Clawn"))
-                .setLore(List.of(
-                        ItemBuilder.format("&7Aumenta el rango de acción en &a+4&7,"),
-                        ItemBuilder.format("&7pero reduce tu daño en &c-5&7."),
-                        ItemBuilder.format("&8No funciona con mazo ni lanza.")
-                ))
                 .setCustomModelData(1)
                 .build();
     }

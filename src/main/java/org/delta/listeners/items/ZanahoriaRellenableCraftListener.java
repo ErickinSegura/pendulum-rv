@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.delta.customs.items.CustomItem;
-import org.delta.customs.items.consumables.ZanahoriaRellenable;
+import org.delta.customs.items.consumables.ZanahoriaEncantada;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -119,8 +119,8 @@ public class ZanahoriaRellenableCraftListener implements Listener {
 
         if (refillSlot == -1 || totalCarrots <= 0) return null;
 
-        int charges = ZanahoriaRellenable.getCharges(refillItem);
-        int space = ZanahoriaRellenable.MAX_CHARGES - charges;
+        int charges = ZanahoriaEncantada.getCharges(refillItem);
+        int space = ZanahoriaEncantada.MAX_CHARGES - charges;
         if (space <= 0) return null;
 
         int used = Math.min(space, totalCarrots);
@@ -143,7 +143,7 @@ public class ZanahoriaRellenableCraftListener implements Listener {
         ItemStack preview() {
             ItemStack result = refillItem.clone();
             result.setAmount(1);
-            ZanahoriaRellenable.setCharges(result, resultCharges);
+            ZanahoriaEncantada.setCharges(result, resultCharges);
             return result;
         }
     }

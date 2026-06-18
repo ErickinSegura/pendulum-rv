@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.delta.customs.items.CustomItem;
-import org.delta.customs.items.consumables.ZanahoriaRellenable;
+import org.delta.customs.items.consumables.ZanahoriaEncantada;
 import org.delta.libs.MessageUtils;
 
 /**
@@ -35,7 +35,7 @@ public class ZanahoriaRellenableListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        int charges = ZanahoriaRellenable.getCharges(item);
+        int charges = ZanahoriaEncantada.getCharges(item);
         if (charges <= 0) {
             denied(player, "&cLa zanahoria está vacía. Rellénala en la mesa de crafteo.");
             return;
@@ -45,7 +45,7 @@ public class ZanahoriaRellenableListener implements Listener {
         player.setSaturation(Math.min(player.getFoodLevel(), player.getSaturation() + SATURATION_RESTORE));
 
         // event.getItem() es una copia: hay que reescribir el item en la mano.
-        ZanahoriaRellenable.setCharges(item, charges - 1);
+        ZanahoriaEncantada.setCharges(item, charges - 1);
         if (event.getHand() == EquipmentSlot.OFF_HAND) {
             player.getInventory().setItemInOffHand(item);
         } else {
@@ -65,7 +65,7 @@ public class ZanahoriaRellenableListener implements Listener {
         if (!isCarrot(item)) return;
 
         // Si está vacía, evita la animación de comer inútil.
-        if (ZanahoriaRellenable.getCharges(item) <= 0) {
+        if (ZanahoriaEncantada.getCharges(item) <= 0) {
             event.setCancelled(true);
             denied(event.getPlayer(), "&cLa zanahoria está vacía. Rellénala en la mesa de crafteo.");
         }

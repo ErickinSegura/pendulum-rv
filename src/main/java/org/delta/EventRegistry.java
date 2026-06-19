@@ -13,6 +13,9 @@ import org.delta.listeners.items.GiveMenuListener;
 import org.delta.listeners.items.LanzapapasListener;
 import org.delta.listeners.items.LazoListener;
 import org.delta.listeners.items.VaritaCurativaListener;
+import org.delta.listeners.items.VaritaBarreraListener;
+import org.delta.listeners.items.VaritaBarreraMejoradaListener;
+import org.delta.listeners.items.FrenesiListener;
 import org.delta.listeners.items.ZanahoriaRellenableListener;
 import org.delta.listeners.items.ZanahoriaRellenableCraftListener;
 import org.delta.listeners.items.PapaExplosivaListener;
@@ -89,6 +92,9 @@ public class EventRegistry {
         pm.registerEvents(new GiveMenuListener(), plugin);
         pm.registerEvents(new LazoListener(), plugin);
         pm.registerEvents(new VaritaCurativaListener(), plugin);
+        pm.registerEvents(new VaritaBarreraListener(), plugin);
+        pm.registerEvents(new VaritaBarreraMejoradaListener(), plugin);
+        pm.registerEvents(new FrenesiListener(), plugin);
         pm.registerEvents(new ZanahoriaRellenableListener(), plugin);
         pm.registerEvents(new ZanahoriaRellenableCraftListener(), plugin);
 

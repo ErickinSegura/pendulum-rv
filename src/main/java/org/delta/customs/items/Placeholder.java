@@ -25,7 +25,6 @@ public class Placeholder implements CustomItem {
                 ))
                 .addEnchant(Enchantment.MENDING, 1)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                .setCustomModelData(1)
                 .build();
     }
 }

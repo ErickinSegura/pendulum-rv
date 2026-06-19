@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.delta.database.repositories.CargoZoneRepository;
 import org.delta.libs.MessageUtils;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.pendulum;
@@ -30,8 +31,11 @@ public class ChargeBaseManager {
     private BukkitRunnable shrinkTask;
     private BukkitTask endTask;
 
+    private final CargoZoneRepository cargoZoneRepository;
+
     public ChargeBaseManager(pendulum plugin) {
         this.plugin = plugin;
+        this.cargoZoneRepository = new CargoZoneRepository(plugin.getDatabaseManager());
         scheduleTrigger();
     }
 
@@ -64,6 +68,7 @@ public class ChargeBaseManager {
         activeZone = new ChargeBaseZone(new Location(world, x, y, z), INITIAL_RADIUS);
         spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);
         spawnManager.start();
+        recordZone(world, x, y, z);
         Bukkit.broadcastMessage("§d§l[Pendulum] §rBase de Carga activa en §e" + x + ", " + z);
         startShrinking();
         endTask = new BukkitRunnable() {
@@ -77,6 +82,7 @@ public class ChargeBaseManager {
         activeZone = new ChargeBaseZone(loc, radius);
         spawnManager = new ChargeBaseSpawnManager(plugin, activeZone);
         spawnManager.start();
+        recordZone(loc.getWorld(), (int) loc.getX(), (int) loc.getY(), (int) loc.getZ());
         Bukkit.getServer().broadcast(MessageUtils.color("&d&l[Pendulum] &rBase de Carga activa en &e" + (int)loc.getX() + ", " + (int)loc.getZ()));
         startShrinking();
         endTask = new BukkitRunnable() {
@@ -121,6 +127,23 @@ public class ChargeBaseManager {
         Bukkit.broadcastMessage("§d§l[Pendulum] §rLa Base de Carga ha finalizado.");
     }
 
+
+    private void recordZone(World world, int x, int y, int z) {
+        cargoZoneRepository.recordZone("Zona de carga", dimensionOf(world), x, y, z)
+                .exceptionally(t -> {
+                    plugin.getLogger().warning("No se pudo registrar la zona de carga: " + t.getMessage());
+                    return null;
+                });
+    }
+
+    private String dimensionOf(World world) {
+        if (world == null) return "Overworld";
+        return switch (world.getEnvironment()) {
+            case NETHER -> "Nether";
+            case THE_END -> "End";
+            default -> "Overworld";
+        };
+    }
 
     public void forceEnd() { endEvent(); }
 

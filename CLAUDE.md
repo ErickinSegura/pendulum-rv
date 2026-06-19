@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+Dont add any comment to the code
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview

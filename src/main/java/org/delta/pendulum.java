@@ -19,6 +19,7 @@ import org.delta.listeners.player.*;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
 import org.delta.listeners.worldgen.PendingEntitySpawner;
+import org.delta.managers.ArmorTrimManager;
 import org.delta.managers.bingo.BingoDataManager;
 import org.delta.managers.bingo.BingoProgressManager;
 import org.delta.managers.chargebase.ChargeBaseManager;
@@ -68,6 +69,7 @@ public final class pendulum extends JavaPlugin {
         BingoProgressManager bingoProgressManager = BingoProgressManager.getInstance();
         BingoSyncManager bingoSyncManager = BingoSyncManager.getInstance(this, databaseManager);
         chargeBaseManager = new ChargeBaseManager(this);
+        new ArmorTrimManager(this);
         TeamChestManager.initialize(getDataFolder());
         PerkManager.initialize(getDataFolder());
         PerkManager.getInstance();

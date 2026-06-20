@@ -1,4 +1,4 @@
-package org.delta.customs.craftings.nucleos;
+package org.delta.customs.craftings.items.nucleos;
 
 import org.bukkit.inventory.ItemStack;
 import org.delta.customs.craftings.CustomCrafting;
@@ -15,6 +15,7 @@ public class NucleoAtacanteHibridoCrafting implements CustomCrafting {
 
         return CustomRecipeBuilder.of("nucleo_atacante_hibrido")
                 .result(new NucleoAtacanteHibrido().build())
+                .minDay(10)
                 .ingredient(1, fragmento)
                 .ingredient(3, fragmento)
                 .ingredient(4, union)

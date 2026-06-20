@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.delta.customs.items.CustomItem;
+import org.delta.libs.PendulumSettings;
 import org.delta.libs.builders.CustomRecipeBuilder;
 
 import java.util.ArrayList;
@@ -38,8 +39,10 @@ public class CustomCraftingListener implements Listener {
     }
 
     private CustomRecipeBuilder.CustomRecipe matchRecipe(ItemStack[] matrix) {
+        int diaActual = PendulumSettings.getInstance().getDia();
         outer:
         for (CustomRecipeBuilder.CustomRecipe recipe : recipes) {
+            if (diaActual < recipe.getMinDay()) continue;
             Map<Integer, ItemStack> ingredients = recipe.getIngredients();
 
             for (int slot = 0; slot < 9; slot++) {

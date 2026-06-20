@@ -20,7 +20,7 @@ public class PolarBear implements Listener {
 
     @EventHandler
     public void onSpawn(CreatureSpawnEvent event) {
-        if (settings.getDia() <= 5 || event.getEntity().getType() != EntityType.POLAR_BEAR) return;
+        if (settings.getDia() < 5 || event.getEntity().getType() != EntityType.POLAR_BEAR) return;
 
         LivingEntity bear = event.getEntity();
 

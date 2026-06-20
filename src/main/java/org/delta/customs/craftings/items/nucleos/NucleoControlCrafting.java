@@ -1,4 +1,4 @@
-package org.delta.customs.craftings.nucleos;
+package org.delta.customs.craftings.items.nucleos;
 
 import org.bukkit.inventory.ItemStack;
 import org.delta.customs.craftings.CustomCrafting;

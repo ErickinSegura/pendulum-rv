@@ -1,4 +1,4 @@
-package org.delta.customs.craftings.lanzapapas;
+package org.delta.customs.craftings.items;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

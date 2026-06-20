@@ -8,6 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.delta.database.repositories.CargoZoneRepository;
 import org.delta.libs.MessageUtils;
+import org.delta.libs.PendulumSettings;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
 import org.delta.pendulum;
 
@@ -17,6 +18,7 @@ import java.util.Random;
 public class ChargeBaseManager {
 
     private static final int MAP_BOUND = 4000;
+    private static final int DIA_MINIMO = 5;
     private static final double INITIAL_RADIUS = 150.0;
     private static final long DURATION_TICKS = 72000L;   // 1 hora
     private static final long SHRINK_INTERVAL = 1200L;   // cada minuto
@@ -46,8 +48,9 @@ public class ChargeBaseManager {
                 LocalTime now = LocalTime.now();
                 boolean isEventHour = (now.getHour() == 10 || now.getHour() == 22);
                 boolean isOnTime = now.getMinute() == 0 && now.getSecond() < 2;
+                boolean diaValido = PendulumSettings.getInstance().getDia() >= DIA_MINIMO;
 
-                if (isEventHour && isOnTime && !active) {
+                if (isEventHour && isOnTime && diaValido && !active) {
                     startEvent();
                 }
             }

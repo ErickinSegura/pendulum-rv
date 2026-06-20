@@ -41,14 +41,14 @@ public class DeathEvents {
         if (player == null || !player.isOnline()) return;
 
         World world = player.getWorld();
-        long originalTime = world.getTime();
+        long originalFullTime = world.getFullTime();
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            animateClockForPlayer(onlinePlayer, player.getName(), world, originalTime);
+            animateClockForPlayer(onlinePlayer, player.getName(), world, originalFullTime);
         }
     }
 
-    private void animateClockForPlayer(Player viewer, String deadPlayerName, World world, long originalTime) {
+    private void animateClockForPlayer(Player viewer, String deadPlayerName, World world, long originalFullTime) {
         final int framesPerCycle = 63;
         final int totalFrames = framesPerCycle * CLOCK_CYCLES;
 
@@ -85,8 +85,7 @@ public class DeathEvents {
                     viewer.showTitle(title);
 
                     if (SYNC_DAY_NIGHT) {
-                        long newTime = (originalTime + (timePerTick * frameNumber * DAY_NIGHT_SPEED)) % 24000;
-                        world.setTime(newTime);
+                        world.setFullTime(originalFullTime + (timePerTick * frameNumber * DAY_NIGHT_SPEED));
                     }
                 }
             }, delay);
@@ -94,7 +93,7 @@ public class DeathEvents {
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (SYNC_DAY_NIGHT) {
-                world.setTime(originalTime);
+                world.setFullTime(originalFullTime);
             }
 
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {

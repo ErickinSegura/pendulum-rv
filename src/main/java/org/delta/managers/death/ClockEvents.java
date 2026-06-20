@@ -10,6 +10,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.libs.MessageUtils;
+import org.delta.pendulum;
 
 import java.time.Duration;
 import static org.bukkit.Bukkit.getServer;
@@ -27,6 +28,7 @@ public class ClockEvents {
         PilarEvents.placeDeathPilar(player, location, event);
         placeDeathChest(player, location, event);
         broadcastClockSound();
+        pendulum.getInstance().getLifeManager().playClockLossAnimation(player);
         //temporaryBanPlayer(player);
     }
 

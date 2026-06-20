@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -57,6 +58,7 @@ public class FrenesiListener implements Listener {
 
         player.getWorld().spawnParticle(Particle.LAVA, player.getLocation().add(0, 1, 0), 20);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 1.0f, 1.2f);
+        pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.MODO_FRENESI);
     }
 
     @EventHandler
@@ -64,6 +66,14 @@ public class FrenesiListener implements Listener {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!berserk.contains(player.getUniqueId())) return;
         event.setDamage(event.getDamage() * DAMAGE_TAKEN_MULTIPLIER);
+    }
+
+    @EventHandler
+    public void onBerserkKill(EntityDeathEvent event) {
+        Player killer = event.getEntity().getKiller();
+        if (killer == null || !berserk.contains(killer.getUniqueId())) return;
+        pendulum.getInstance().getAchievementManager()
+                .unlock(killer, org.delta.managers.achievements.Achievement.FURIA_DESATADA);
     }
 
     private boolean isFrenesi(ItemStack item) {

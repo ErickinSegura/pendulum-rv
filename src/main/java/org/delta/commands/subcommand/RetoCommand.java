@@ -192,6 +192,13 @@ public class RetoCommand implements SubCommand {
 
         retoManager.marcarComoEntregado(player);
 
+        var logros = org.delta.pendulum.getInstance().getAchievementManager();
+        int entregas = logros.addProgress(player, "retos_entregados", 1);
+        logros.unlock(player, org.delta.managers.achievements.Achievement.DESAFIO_SUPERADO);
+        if (entregas >= 5) {
+            logros.unlock(player, org.delta.managers.achievements.Achievement.VETERANO_DE_RETOS);
+        }
+
         rewardManager.otorgarRecompensa(player);
 
         effectsManager.reproducirEfectosCompletado(player);

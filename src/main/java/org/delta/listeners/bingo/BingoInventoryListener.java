@@ -66,6 +66,13 @@ public class BingoInventoryListener implements Listener {
         if (completeChallengeManually(player, team, challenge)) {
             player.sendMessage(MessageUtils.color("&a¡Reto completado exitosamente!"));
 
+            var logros = org.delta.pendulum.getInstance().getAchievementManager();
+            int casillas = logros.addProgress(player, "bingo_casillas", 1);
+            logros.unlock(player, org.delta.managers.achievements.Achievement.CASILLA_MARCADA);
+            if (casillas >= 5) {
+                logros.unlock(player, org.delta.managers.achievements.Achievement.MAESTRO_DEL_BINGO);
+            }
+
             notifyTeamCompletion(team, challenge, player.getName());
 
             player.closeInventory();
@@ -144,11 +151,24 @@ public class BingoInventoryListener implements Listener {
 
         BingoDataManager.getInstance().saveProgress();
 
+        int lineasAntes = contarLineasBingo(team);
         checkBingoLines(team);
-
         checkFullBingo(team);
+        if (contarLineasBingo(team) > lineasAntes) {
+            org.delta.pendulum.getInstance().getAchievementManager()
+                    .unlock(player, org.delta.managers.achievements.Achievement.PLENO_AL_BINGO);
+        }
 
         return true;
+    }
+
+    private int contarLineasBingo(Team team) {
+        BingoProgressManager pm = BingoProgressManager.getInstance();
+        int diagonales = (pm.hasCompletedDiagonal1(team.getName()) ? 1 : 0)
+                + (pm.hasCompletedDiagonal2(team.getName()) ? 1 : 0);
+        return pm.getCompletedRows(team.getName()).size()
+                + pm.getCompletedColumns(team.getName()).size()
+                + diagonales;
     }
 
     private boolean removeItems(Player player, String materialName, int amount) {

@@ -11,6 +11,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.libs.PendulumSettings;
+import org.delta.managers.achievements.Achievement;
 import org.delta.pendulum;
 
 import java.util.HashMap;
@@ -88,5 +89,9 @@ public class ArmorTrimManager {
 
         int amplificador = todoValioso ? 1 : 0;
         player.addPotionEffect(new PotionEffect(tipo, DURATION, amplificador, true, false, true));
+        plugin.getAchievementManager().unlock(player, Achievement.ALTA_COSTURA);
+        if (todoValioso) {
+            plugin.getAchievementManager().unlock(player, Achievement.COSTURA_DE_LUJO);
+        }
     }
 }

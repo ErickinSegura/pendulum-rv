@@ -83,6 +83,11 @@ public class ZanahoriaRellenableCraftListener implements Listener {
         HashMap<Integer, ItemStack> overflow = player.getInventory().addItem(result);
         overflow.values().forEach(item -> player.getWorld().dropItemNaturally(player.getLocation(), item));
 
+        if (scenario.resultCharges() >= ZanahoriaEncantada.MAX_CHARGES) {
+            org.delta.pendulum.getInstance().getAchievementManager()
+                    .unlock(player, org.delta.managers.achievements.Achievement.DESPENSA_LLENA);
+        }
+
         // Recalcula el resultado por si quedan ingredientes para otro relleno.
         RefillScenario next = detect(matrix);
         inv.setResult(next != null ? next.preview() : new ItemStack(Material.AIR));
@@ -128,7 +133,7 @@ public class ZanahoriaRellenableCraftListener implements Listener {
     }
 
     private boolean isRefillCarrot(ItemStack item) {
-        return "zanahoria_rellenable".equals(customKey(item));
+        return "zanahoria_encantada".equals(customKey(item));
     }
 
     private String customKey(ItemStack item) {

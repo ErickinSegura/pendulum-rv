@@ -4,9 +4,15 @@ public enum Perk {
 
     LAST_STAND(1, "last_stand", "Last Stand", PerkCategory.BENEFICIAL),
     LIFE_STEAL(2, "life_steal", "Life Steal", PerkCategory.BENEFICIAL),
+    PIES_LIGEROS(5, "pies_ligeros", "Pies Ligeros", PerkCategory.BENEFICIAL),
+    SANACION_COMPARTIDA(6, "sanacion_compartida", "Sanación Compartida", PerkCategory.BENEFICIAL),
+    FORJA_EFICIENTE(7, "forja_eficiente", "Forja Eficiente", PerkCategory.BENEFICIAL),
 
     FUMBLE(3, "fumble", "Fumble", PerkCategory.HARMFUL),
-    SHARED_SPACE(4, "shared_space", "Shared Space", PerkCategory.HARMFUL);
+    SHARED_SPACE(4, "shared_space", "Shared Space", PerkCategory.HARMFUL),
+    HAMBRE_VORAZ(8, "hambre_voraz", "Hambre Voraz", PerkCategory.HARMFUL),
+    ECO_VACIO(9, "eco_vacio", "Eco Vacío", PerkCategory.HARMFUL),
+    VINCULO_DOLOROSO(10, "vinculo_doloroso", "Vínculo Doloroso", PerkCategory.HARMFUL);
 
     private final int id;
     private final String displayName;

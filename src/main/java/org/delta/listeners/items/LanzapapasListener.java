@@ -112,6 +112,7 @@ public class LanzapapasListener implements Listener {
         papasEnVuelo.put(projectile.getUniqueId(), player);
 
         player.playSound(player.getLocation(), Sound.ENTITY_TNT_PRIMED, 1f, 1f);
+        pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.FUEGO_DE_PAPAS);
     }
 
     @EventHandler

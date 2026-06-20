@@ -31,6 +31,8 @@ public class LastStandListener extends BasePerkListener {
         if (belowThreshold && !alreadyActive) {
             defender.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, DURATION, RESISTANCE_AMP));
             defender.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, DURATION, STRENGTH_AMP));
+            org.delta.pendulum.getInstance().getAchievementManager()
+                    .unlock(defender, org.delta.managers.achievements.Achievement.ULTIMO_ALIENTO);
         }
     }
 }

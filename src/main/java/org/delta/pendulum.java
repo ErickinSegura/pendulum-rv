@@ -20,6 +20,7 @@ import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
 import org.delta.listeners.worldgen.PendingEntitySpawner;
 import org.delta.managers.ArmorTrimManager;
+import org.delta.managers.achievements.AchievementManager;
 import org.delta.managers.bingo.BingoDataManager;
 import org.delta.managers.bingo.BingoProgressManager;
 import org.delta.managers.chargebase.ChargeBaseManager;
@@ -40,6 +41,7 @@ public final class pendulum extends JavaPlugin {
 
     public static String prefix = "&d&lPendulum&r";
     private LifeManager lifeManager;
+    private AchievementManager achievementManager;
     private DatabaseManager databaseManager;
     private ChargeBaseManager chargeBaseManager;
     private CustomCraftingListener customCraftingListener;
@@ -64,6 +66,7 @@ public final class pendulum extends JavaPlugin {
 
         // Inicializar managers
         lifeManager = new LifeManager(this);
+        achievementManager = new AchievementManager(this);
         DeathEvents deathEvents = new DeathEvents();
         BingoDataManager bingoDataManager = BingoDataManager.getInstance(this);
         BingoProgressManager bingoProgressManager = BingoProgressManager.getInstance();
@@ -116,6 +119,10 @@ public final class pendulum extends JavaPlugin {
 
     public LifeManager getLifeManager() {
         return lifeManager;
+    }
+
+    public AchievementManager getAchievementManager() {
+        return achievementManager;
     }
 
     public DatabaseManager getDatabaseManager() {

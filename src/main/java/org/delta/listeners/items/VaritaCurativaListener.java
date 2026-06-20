@@ -16,6 +16,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Team;
 import org.delta.customs.items.CustomItem;
+import org.delta.managers.achievements.Achievement;
+import org.delta.pendulum;
 
 /**
  * Varita Curativa: con click derecho libera una onda de "Vida Instantánea II"
@@ -51,6 +53,7 @@ public class VaritaCurativaListener implements Listener {
             if (!(entity instanceof Player other)) continue;
             if (team == null || !team.hasEntry(other.getName())) continue;
             heal(other);
+            pendulum.getInstance().getAchievementManager().unlock(player, Achievement.TOQUE_SANADOR);
         }
 
         player.setCooldown(item.getType(), COOLDOWN_TICKS);

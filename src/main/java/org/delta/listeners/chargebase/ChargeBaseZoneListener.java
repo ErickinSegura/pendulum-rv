@@ -47,6 +47,8 @@ public class ChargeBaseZoneListener implements Listener {
             insideZone.add(uid);
             player.sendMessage(MessageUtils.color("&8[&d&l!&8] &7Entraste a la &d&lBase de Carga&7."));
             applyZoneEffects(player);
+            pendulum.getInstance().getAchievementManager()
+                    .unlock(player, org.delta.managers.achievements.Achievement.EN_EL_OJO_DEL_HURACAN);
         } else if (!inside && wasInside) {
             insideZone.remove(uid);
             player.sendMessage(MessageUtils.color("&8[&d&l!&8] &7Saliste de la &d&lBase de Carga&7."));

@@ -2,6 +2,7 @@ package org.delta;
 
 import org.bukkit.plugin.PluginManager;
 import org.delta.commands.subcommand.StructureDevCommand;
+import org.delta.listeners.achievements.AchievementListener;
 import org.delta.listeners.bingo.*;
 import org.delta.listeners.chargebase.AtacanteBehaviorListener;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
@@ -53,6 +54,9 @@ public class EventRegistry {
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
 
+        // Achievements
+        pm.registerEvents(new AchievementListener(plugin.getAchievementManager()), plugin);
+
         // ChargeBase
         pm.registerEvents(new ChargeBaseDeathListener(plugin.getChargeBaseManager()), plugin);
         pm.registerEvents(zoneListener, plugin);
@@ -70,6 +74,12 @@ public class EventRegistry {
         pm.registerEvents(new FumbleListener(), plugin);
         pm.registerEvents(new SharedSpaceListener(), plugin);
         pm.registerEvents(new LifestealListener(), plugin);
+        pm.registerEvents(new PiesLigerosListener(), plugin);
+        pm.registerEvents(new SanacionCompartidaListener(), plugin);
+        pm.registerEvents(new ForjaEficienteListener(), plugin);
+        pm.registerEvents(new HambreVorazListener(), plugin);
+        pm.registerEvents(new EcoVacioListener(), plugin);
+        pm.registerEvents(new VinculoDolorosoListener(), plugin);
 
         // TeamChest
         pm.registerEvents(new TeamChestListener(), plugin);

@@ -44,6 +44,7 @@ public class VaritaBarreraListener implements Listener {
         player.setCooldown(item.getType(), COOLDOWN_TICKS);
 
         List<Block> placed = buildDome(player);
+        pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.TRAS_EL_CRISTAL);
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 0.8f, 1.2f);
 

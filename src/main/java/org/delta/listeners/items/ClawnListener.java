@@ -110,6 +110,7 @@ public class ClawnListener implements Listener {
     }
 
     private void applyAll(Player player) {
+        pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.GARRAS_FUERA);
         apply(player, Attribute.BLOCK_INTERACTION_RANGE, KEY_BLOCK_RANGE, RANGE_BONUS);
         apply(player, Attribute.ENTITY_INTERACTION_RANGE, KEY_ENTITY_RANGE, RANGE_BONUS);
         apply(player, Attribute.ATTACK_DAMAGE, KEY_DAMAGE, DAMAGE_PENALTY);

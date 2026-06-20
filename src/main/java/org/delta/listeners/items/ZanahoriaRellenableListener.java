@@ -53,6 +53,7 @@ public class ZanahoriaRellenableListener implements Listener {
         }
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_BURP, 0.6f, 1.0f);
+        org.delta.pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.RESERVAS_INFINITAS);
     }
 
     @EventHandler
@@ -81,7 +82,7 @@ public class ZanahoriaRellenableListener implements Listener {
         if (item == null) return false;
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return false;
-        return "zanahoria_rellenable".equals(
+        return "zanahoria_encantada".equals(
                 meta.getPersistentDataContainer().get(CustomItem.ITEM_KEY, PersistentDataType.STRING));
     }
 }

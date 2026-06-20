@@ -92,6 +92,7 @@ public class LazoListener implements Listener {
         Location anchor = hook.getLocation().clone();
         swinging.add(id);
         player.playSound(player.getLocation(), Sound.BLOCK_TRIPWIRE_ATTACH, 1f, 1.2f);
+        pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.COLUMPIO_URBANO);
 
         new BukkitRunnable() {
             int ticks = 0;

@@ -49,6 +49,7 @@ public class VaritaBarreraMejoradaListener implements Listener {
 
         List<Block> placed = buildDome(player);
         applyResistance(player);
+        pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.BASTION_DE_CRISTAL);
 
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 0.8f, 1.2f);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.6f, 2.0f);

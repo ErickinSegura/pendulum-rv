@@ -9,6 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.delta.customs.items.CustomItem;
+import org.delta.managers.achievements.Achievement;
+import org.delta.pendulum;
 
 public class PapaExplosivaListener implements Listener {
 
@@ -48,6 +50,14 @@ public class PapaExplosivaListener implements Listener {
         } finally {
             currentPapaEater = null;
         }
+
+        pendulum.getInstance().getServer().getScheduler().runTaskLater(pendulum.getInstance(), () -> {
+            if (player.isOnline() && !player.isDead()
+                    && player.getPersistentDataContainer().has(COMIO_PAPA, PersistentDataType.BYTE)) {
+                player.getPersistentDataContainer().remove(COMIO_PAPA);
+                pendulum.getInstance().getAchievementManager().unlock(player, Achievement.ESTOMAGO_DE_HIERRO);
+            }
+        }, 1L);
     }
 
     @EventHandler

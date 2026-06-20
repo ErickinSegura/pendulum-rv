@@ -6,8 +6,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.delta.customs.items.ItemRegistry;
 import org.delta.customs.mobs.chargebase.MobClass;
+import org.delta.managers.achievements.Achievement;
 import org.delta.managers.chargebase.ChargeBaseManager;
 import org.delta.managers.chargebase.ChargeBaseSpawnManager;
+import org.delta.pendulum;
 
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,15 @@ public class ChargeBaseDeathListener implements Listener {
 
         Player killer = event.getEntity().getKiller();
         if (killer == null || mobClass == null) return;
+
+        var achievements = pendulum.getInstance().getAchievementManager();
+        int kills = achievements.addProgress(killer, "cb_kills", 1);
+        achievements.unlock(killer, Achievement.REPELIENDO_LA_OLEADA);
+        if (kills >= 10) achievements.unlock(killer, Achievement.CAZADOR_DE_OLEADAS);
+        if (kills >= 50) achievements.unlock(killer, Achievement.AZOTE_DE_LA_ZONA);
+
+        int roles = achievements.addToSet(killer, "cb_roles", mobClass.name());
+        if (roles >= 5) achievements.unlock(killer, Achievement.ESTRATEGA_DE_LA_ZONA);
 
         List<DropEntry> drops = DROPS.get(mobClass);
         for (DropEntry drop : drops) {

@@ -34,6 +34,8 @@ public class LifestealListener extends BasePerkListener {
         double newHp = Math.min(attacker.getHealth() + healAmount, getMaxHealth(attacker));
 
         attacker.setHealth(newHp);
+        org.delta.pendulum.getInstance().getAchievementManager()
+                .unlock(attacker, org.delta.managers.achievements.Achievement.SED_DE_SANGRE);
         attacker.getWorld().spawnParticle(
                 Particle.HEART,
                 attacker.getLocation().add(0, 1.5, 0),

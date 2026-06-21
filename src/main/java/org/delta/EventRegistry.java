@@ -4,6 +4,7 @@ import org.bukkit.plugin.PluginManager;
 import org.delta.commands.subcommand.StructureDevCommand;
 import org.delta.listeners.achievements.AchievementListener;
 import org.delta.listeners.bingo.*;
+import org.delta.listeners.castigo.CastigoListener;
 import org.delta.listeners.chargebase.AtacanteBehaviorListener;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
 import org.delta.listeners.chargebase.ChargeBaseZoneListener;
@@ -53,6 +54,9 @@ public class EventRegistry {
         pm.registerEvents(new PotionListener(), plugin);
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
+
+        // Castigos
+        pm.registerEvents(new CastigoListener(plugin.getCastigoManager()), plugin);
 
         // Achievements
         pm.registerEvents(new AchievementListener(plugin.getAchievementManager()), plugin);

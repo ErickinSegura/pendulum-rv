@@ -16,15 +16,26 @@ reto:
   retoActualIndex: 0
   castigoActualIndex: 0
   premio: 2 tótems de la inmortalidad
-  castigo: Tu equipo tendrá que regalar 3 totems
   cantidadPremio: 2
   materialPremio: TOTEM_OF_UNDYING
 
   castigos:
-    - Perderá tu equipo 1 contenedor de vida
-    - Tu equipo no podrá usar Elytra por 1 día
-    - Tu equipo tendrá que donar 5 diamantes
-    - Tu equipo perderá acceso al End por 1 día
+    - tipo: PERDER_ITEMS
+      descripcion: Pierdes 5 diamantes
+      material: DIAMOND
+      cantidad: 5
+
+    - tipo: BLOQUEAR_SLOTS
+      descripcion: Se te bloquean 9 slots del inventario
+      cantidad: 9
+
+    - tipo: REDUCIR_CORAZONES
+      descripcion: Pierdes 2 corazones
+      cantidad: 2
+
+    - tipo: PROHIBIR_ITEM
+      descripcion: No puedes usar perlas de ender
+      material: ENDER_PEARL
     - Tu equipo deberá construir un monumento
     - Tu equipo tendrá que regalar 3 totems
     - Tu equipo no podrá usar portales del Nether por 1 día

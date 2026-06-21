@@ -5,7 +5,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.delta.database.repositories.CastigoRepository;
 import org.delta.database.repositories.PlayerRepository;
+import org.delta.database.repositories.RetoRepository;
 import org.delta.database.repositories.TeamRepository;
 
 import java.io.File;
@@ -19,9 +21,12 @@ public class DatabaseManager {
 
     private PlayerRepository playerRepository;
     private TeamRepository teamRepository;
+    private RetoRepository retoRepository;
+    private CastigoRepository castigoRepository;
 
     public DatabaseManager(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.castigoRepository = new CastigoRepository(this);
     }
 
     public void connect() {
@@ -56,6 +61,7 @@ public class DatabaseManager {
             dataSource = new HikariDataSource(config);
             playerRepository = new PlayerRepository(this);
             teamRepository = new TeamRepository(this);
+            retoRepository = new RetoRepository(this);
             plugin.getLogger().info("Conexión a la base de datos establecida.");
         } catch (Exception e) {
             plugin.getLogger().warning("Error al conectar con la DB: " + e.getMessage());
@@ -82,5 +88,13 @@ public class DatabaseManager {
 
     public TeamRepository teams() {
         return teamRepository;
+    }
+
+    public RetoRepository retos() {
+        return retoRepository;
+    }
+
+    public CastigoRepository castigos() {
+        return castigoRepository;
     }
 }

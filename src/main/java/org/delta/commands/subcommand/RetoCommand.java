@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.libs.Icons;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
+import org.delta.libs.castigo.Castigo;
 import org.delta.libs.reto.Reto;
 import org.delta.libs.reto.RetoItem;
 import org.delta.managers.reto.*;
@@ -26,12 +27,15 @@ public class RetoCommand implements SubCommand {
     private final RetoRewardManager rewardManager;
     private final RetoEffectsManager effectsManager;
     private final RetoNotificationManager notificationManager;
+    private final org.delta.database.repositories.RetoRepository retoRepo;
 
     public RetoCommand() {
         this.retoManager = RetoManager.getInstance();
         this.rewardManager = RetoRewardManager.getInstance();
         this.effectsManager = RetoEffectsManager.getInstance();
         this.notificationManager = RetoNotificationManager.getInstance();
+        this.retoRepo = new org.delta.database.repositories.RetoRepository(
+                org.delta.pendulum.getInstance().getDatabaseManager());
     }
 
     @Override
@@ -95,6 +99,19 @@ public class RetoCommand implements SubCommand {
             return;
         }
 
+        Long retoId = org.delta.pendulum.getInstance().getRetoActualId();
+        java.util.concurrent.CompletableFuture<Boolean> consulta = retoId == null
+                ? java.util.concurrent.CompletableFuture.completedFuture(false)
+                : retoRepo.yaCompleto(retoId, player.getUniqueId().toString());
+
+        consulta.exceptionally(e -> false)
+                .thenAccept(yaCompletoDb -> Bukkit.getScheduler().runTask(
+                        org.delta.pendulum.getInstance(),
+                        () -> mostrarDetalleReto(player, reto, yaCompletoDb)));
+    }
+
+    private void mostrarDetalleReto(Player player, Reto reto, boolean yaCompletado) {
+        boolean yaEntrego = yaCompletado || retoManager.yaEntrego(player);
         boolean retoCumplido = retoManager.verificarCompletado(player);
 
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
@@ -112,9 +129,12 @@ public class RetoCommand implements SubCommand {
         player.sendMessage(MessageUtils.color("&8└ &7Progreso: &d" + progreso));
 
         player.sendMessage("");
-        if (retoCumplido) {
-            player.sendMessage(MessageUtils.color("&8└ &7Estado: &a✔ Completado"));
-            player.sendMessage(MessageUtils.color("&8   &7¡Felicitaciones por completar el reto!"));
+        if (yaEntrego) {
+            player.sendMessage(MessageUtils.color("&8└ &7Estado: &a✔ Ya completaste este reto"));
+            player.sendMessage(MessageUtils.color("&8   &7¡Felicitaciones por completarlo!"));
+        } else if (retoCumplido) {
+            player.sendMessage(MessageUtils.color("&8└ &7Estado: &a✔ Listo para entregar"));
+            player.sendMessage(MessageUtils.color("&8   &7Usa &d/pdl reto entregar"));
         } else {
             player.sendMessage(MessageUtils.color("&8└ &7Estado: &c✘ Pendiente"));
             player.sendMessage(MessageUtils.color("&8   &7Usa &d/pdl reto entregar &7cuando completes el reto"));
@@ -122,7 +142,7 @@ public class RetoCommand implements SubCommand {
 
         player.sendMessage("");
 
-        float pitch = retoCumplido ? 1.5f : 1.0f;
+        float pitch = yaEntrego || retoCumplido ? 1.5f : 1.0f;
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, pitch);
     }
 
@@ -201,6 +221,8 @@ public class RetoCommand implements SubCommand {
 
         rewardManager.otorgarRecompensa(player);
 
+        registrarEntrega(player);
+
         effectsManager.reproducirEfectosCompletado(player);
 
         notificationManager.enviarMensajeCompletado(player, reto.getTitulo(),
@@ -250,7 +272,7 @@ public class RetoCommand implements SubCommand {
     private void girarRuleta(Player player) {
         PendulumSettings settings = PendulumSettings.getInstance();
         Reto[] retos = settings.getRetosDisponibles();
-        String[] castigos = settings.getCastigos();
+        Castigo[] castigos = settings.getCastigosDisponibles();
 
         if (retos == null || retos.length == 0) {
             player.sendMessage(MessageUtils.color("&c✘ No hay retos disponibles."));
@@ -269,13 +291,13 @@ public class RetoCommand implements SubCommand {
         animarRuleta(player, retos, castigos);
     }
 
-    private void animarRuleta(Player player, Reto[] retos, String[] castigos) {
+    private void animarRuleta(Player player, Reto[] retos, Castigo[] castigos) {
         Random random = new Random();
 
         int indiceRetoGanador = random.nextInt(retos.length);
         int indiceCastigoGanador = random.nextInt(castigos.length);
         Reto retoGanador = retos[indiceRetoGanador];
-        String castigoGanador = castigos[indiceCastigoGanador];
+        Castigo castigoGanador = castigos[indiceCastigoGanador];
 
         World world = player.getWorld();
         long originalTime = world.getTime();
@@ -387,18 +409,58 @@ public class RetoCommand implements SubCommand {
         }, totalAnimationTicks);
     }
 
-    private void finalizarRuleta(Player player, Reto retoGanador, String castigoGanador,
+    private void finalizarRuleta(Player player, Reto retoGanador, Castigo castigoGanador,
                                  int indiceReto, int indiceCastigo) {
+        java.util.Set<String> completados = retoManager.obtenerNombresCompletados();
+        Castigo castigoAnterior = PendulumSettings.getInstance().getCastigoActual();
+
+        org.delta.pendulum plugin = org.delta.pendulum.getInstance();
+        org.delta.managers.castigo.CastigoManager castigoManager = plugin.getCastigoManager();
+
         retoManager.resetearTodos();
 
         actualizarConfig(indiceReto, indiceCastigo);
 
         PendulumSettings.getInstance().load();
 
+        plugin.crearRetoHistorial();
+
+        castigoManager.levantarTodos().thenRun(() -> Bukkit.getScheduler().runTask(plugin, () -> {
+            if (castigoAnterior != null) {
+                aplicarCastigoANoCompletadores(castigoAnterior, completados);
+            }
+        }));
+
         effectsManager.reproducirEfectosRuleta(player);
 
         notificationManager.anunciarResultadoRuleta(player,
-                retoGanador.getTitulo(), castigoGanador);
+                retoGanador.getTitulo(), castigoGanador.getDescripcion());
+    }
+
+    private void aplicarCastigoANoCompletadores(Castigo castigo, java.util.Set<String> completados) {
+        org.delta.pendulum plugin = org.delta.pendulum.getInstance();
+        org.delta.managers.castigo.CastigoManager castigoManager = plugin.getCastigoManager();
+
+        if (!plugin.getDatabaseManager().isConnected()) {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (!completados.contains(online.getName())) {
+                    castigoManager.aplicar(online.getUniqueId(), online.getName(), castigo);
+                }
+            }
+            return;
+        }
+
+        plugin.getDatabaseManager().players().obtenerTodos().thenAccept(roster ->
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    for (var fila : roster) {
+                        if (fila.name() == null || completados.contains(fila.name())) continue;
+                        try {
+                            castigoManager.aplicar(java.util.UUID.fromString(fila.uuid()),
+                                    fila.name(), castigo);
+                        } catch (IllegalArgumentException ignored) {
+                        }
+                    }
+                }));
     }
 
     private void actualizarConfig(int nuevoIndiceReto, int nuevoIndiceCastigo) {
@@ -417,6 +479,19 @@ public class RetoCommand implements SubCommand {
             Bukkit.getLogger().severe("[Pendulum] Error al actualizar el config:");
             e.printStackTrace();
         }
+    }
+
+    private void registrarEntrega(Player player) {
+        Long retoId = org.delta.pendulum.getInstance().getRetoActualId();
+        if (retoId == null) return;
+
+        retoRepo.registrarCompletado(retoId, player.getUniqueId().toString(), player.getName())
+                .exceptionally(e -> {
+                    org.delta.pendulum.getInstance().getLogger()
+                            .warning("[RetoSync] Error al registrar reto completado de "
+                                    + player.getName() + ": " + e.getMessage());
+                    return null;
+                });
     }
 
     private void sendRetoDetail(Player player, String icon, String label, String value) {

@@ -20,9 +20,29 @@ public class JoinLeaveListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        double x = player.getLocation().getX();
-        double y = player.getLocation().getY();
-        double z = player.getLocation().getZ();
+
+        var db = pendulum.getInstance().getDatabaseManager();
+        if (db == null || !db.isConnected()) {
+            return;
+        }
+
+        var dataPlayer = new PlayerRepository.PlayerData(
+                player.getUniqueId(),
+                player.getName(),
+                lifeManager.getLives(player),
+                player.getLocation().getX(),
+                player.getLocation().getY(),
+                player.getLocation().getZ(),
+                player.getWorld().getName()
+        );
+
+        db.players().upsert(player.getUniqueId(), dataPlayer)
+                .exceptionally(err -> {
+                    pendulum.getInstance().getLogger().severe(
+                            "Error al registrar jugador " + player.getName() + ": " + err.getMessage()
+                    );
+                    return null;
+                });
     }
 
     @EventHandler
@@ -33,6 +53,10 @@ public class JoinLeaveListener implements Listener {
         double z = player.getLocation().getZ();
 
         var db = pendulum.getInstance().getDatabaseManager();
+        if (db == null || !db.isConnected()) {
+            return;
+        }
+
         var dataPlayer = new PlayerRepository.PlayerData(
                 player.getUniqueId(),
                 player.getName(),

@@ -1,6 +1,5 @@
 package org.delta.listeners.player;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -11,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
-import org.delta.pendulum;
 
 import java.util.Random;
 
@@ -48,10 +46,6 @@ public class TotemListener implements Listener {
 
                     getServer().broadcast(MessageUtils.color("&4&l¡El tótem de " + player.getName() + " ha fallado! " +
                             "\n&c[" + rollPercentage + "% >= 99%]"));
-
-                    Bukkit.getScheduler().runTaskLater(pendulum.getInstance(), () -> {
-                        player.setHealth(0);
-                    }, 1L);
 
                     return;
                 }

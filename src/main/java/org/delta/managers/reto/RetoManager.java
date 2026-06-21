@@ -11,7 +11,9 @@ import org.delta.libs.reto.RetoItem;
 import org.delta.listeners.player.RetoListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RetoManager {
     private static RetoManager instance;
@@ -166,6 +168,30 @@ public class RetoManager {
         public int getOnline() { return online; }
         public int getOffline() { return offline; }
         public int getTotal() { return online + offline; }
+    }
+
+    public Set<String> obtenerNombresCompletados() {
+        Set<String> nombres = new HashSet<>();
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (yaEntrego(online)) {
+                nombres.add(online.getName());
+            }
+        }
+
+        Scoreboard mainScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Objective mainRetoObj = mainScoreboard.getObjective("reto");
+
+        if (mainRetoObj != null) {
+            for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
+                if (!offline.isOnline() && offline.getName() != null
+                        && mainRetoObj.getScore(offline.getName()).getScore() > 0) {
+                    nombres.add(offline.getName());
+                }
+            }
+        }
+
+        return nombres;
     }
 
     public List<String> obtenerJugadoresCompletados() {

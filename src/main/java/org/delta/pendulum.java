@@ -44,6 +44,8 @@ public final class pendulum extends JavaPlugin {
     private AchievementManager achievementManager;
     private DatabaseManager databaseManager;
     private ChargeBaseManager chargeBaseManager;
+    private Long retoActualId;
+    private org.delta.managers.castigo.CastigoManager castigoManager;
     private CustomCraftingListener customCraftingListener;
     private StructurePopulator structurePopulator;
     private PendingEntitySpawner pendingEntitySpawner;
@@ -63,6 +65,11 @@ public final class pendulum extends JavaPlugin {
             getLogger().warning("No se pudo conectar a la base de datos: " + e.getMessage());
             getLogger().warning("El plugin funcionará sin persistencia de datos.");
         }
+
+        inicializarHistorialReto();
+
+        castigoManager = new org.delta.managers.castigo.CastigoManager(this);
+        castigoManager.cargarDesdeDB();
 
         // Inicializar managers
         lifeManager = new LifeManager(this);
@@ -108,6 +115,42 @@ public final class pendulum extends JavaPlugin {
         sendConsole("&d&m                                          ");
     }
 
+    public Long getRetoActualId() {
+        return retoActualId;
+    }
+
+    public void inicializarHistorialReto() {
+        if (databaseManager == null || !databaseManager.isConnected()) return;
+
+        Long ultimo = databaseManager.retos().ultimoRetoId();
+        if (ultimo != null) {
+            retoActualId = ultimo;
+        } else {
+            crearRetoHistorial();
+        }
+    }
+
+    public void crearRetoHistorial() {
+        if (databaseManager == null || !databaseManager.isConnected()) return;
+
+        org.delta.libs.reto.Reto reto = PendulumSettings.getInstance().getRetoActual();
+        if (reto == null) return;
+
+        org.delta.managers.reto.RetoRewardManager rewards =
+                org.delta.managers.reto.RetoRewardManager.getInstance();
+
+        databaseManager.retos().crearReto(
+                        org.delta.database.repositories.RetoRepository.RetoData.from(
+                                reto,
+                                rewards.obtenerDescripcionPremio(),
+                                rewards.obtenerDescripcionCastigo()))
+                .thenAccept(id -> retoActualId = id)
+                .exceptionally(e -> {
+                    getLogger().warning("[RetoSync] Error al registrar reto en historial: " + e.getMessage());
+                    return null;
+                });
+    }
+
     private void registerCommands() {
         Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setExecutor(new PendulumCommand(this));
         Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setTabCompleter(new CommandCompletion(structurePopulator));
@@ -130,6 +173,8 @@ public final class pendulum extends JavaPlugin {
     }
 
     public ChargeBaseManager getChargeBaseManager() { return chargeBaseManager; }
+
+    public org.delta.managers.castigo.CastigoManager getCastigoManager() { return castigoManager; }
 
     public StructurePopulator getStructurePopulator() { return structurePopulator; }
 

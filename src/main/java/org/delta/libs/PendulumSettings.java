@@ -4,10 +4,13 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.delta.libs.castigo.Castigo;
+import org.delta.libs.castigo.TipoCastigo;
 import org.delta.libs.reto.*;
 import org.delta.pendulum;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +19,8 @@ public class PendulumSettings {
 
     private String[] op;
     private String premio;
-    private String castigoActual;
-    private String[] castigos;
+    private Castigo castigoActual;
+    private Castigo[] castigos;
     private int dia;
     private int jugadoresNoche;
     private ItemStack stackPremio;
@@ -82,9 +85,14 @@ public class PendulumSettings {
             }
         }
 
-        List<String> castigosConfig = config.getStringList("reto.castigos");
+        List<Map<?, ?>> castigosConfig = config.getMapList("reto.castigos");
         System.out.println("[Pendulum Debug] Cantidad de castigos encontrados: " + castigosConfig.size());
-        castigos = castigosConfig.toArray(new String[0]);
+        List<Castigo> listaCastigos = new ArrayList<>();
+        for (Map<?, ?> castigoMap : castigosConfig) {
+            Castigo castigo = parsearCastigo(castigoMap);
+            if (castigo != null) listaCastigos.add(castigo);
+        }
+        castigos = listaCastigos.toArray(new Castigo[0]);
 
         int indiceRetoActual = config.getInt("reto.retoActualIndex", 0);
         if (indiceRetoActual < retosDisponibles.length) {
@@ -92,10 +100,10 @@ public class PendulumSettings {
         }
 
         int indiceCastigoActual = config.getInt("reto.castigoActualIndex", 0);
-        if (indiceCastigoActual < castigos.length) {
+        if (castigos.length > 0 && indiceCastigoActual >= 0 && indiceCastigoActual < castigos.length) {
             castigoActual = castigos[indiceCastigoActual];
         } else {
-            castigoActual = config.getString("reto.castigo", "Sin castigo definido");
+            castigoActual = null;
         }
 
         premio = config.getString("reto.premio");
@@ -118,7 +126,35 @@ public class PendulumSettings {
         System.out.println("- Retos disponibles: " + (retosDisponibles != null ? retosDisponibles.length : 0));
         System.out.println("- Reto actual: " + (retoActual != null ? retoActual.getTitulo() : "ninguno"));
         System.out.println("- Castigos disponibles: " + (castigos != null ? castigos.length : 0));
-        System.out.println("- Castigo actual: " + castigoActual);
+        System.out.println("- Castigo actual: " + getCastigo());
+    }
+
+    private Castigo parsearCastigo(Map<?, ?> map) {
+        String tipoStr = (String) map.get("tipo");
+        if (tipoStr == null) return null;
+
+        TipoCastigo tipo;
+        try {
+            tipo = TipoCastigo.valueOf(tipoStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.out.println("[Pendulum Debug] Tipo de castigo desconocido: " + tipoStr);
+            return null;
+        }
+
+        String descripcion = (String) map.get("descripcion");
+
+        Material material = null;
+        if (map.get("material") != null) {
+            try {
+                material = Material.valueOf((String) map.get("material"));
+            } catch (IllegalArgumentException e) {
+                material = null;
+            }
+        }
+
+        int cantidad = map.get("cantidad") != null ? (int) map.get("cantidad") : 0;
+
+        return new Castigo(tipo, descripcion != null ? descripcion : "", material, cantidad);
     }
 
     public Reto getRetoActual() {
@@ -136,10 +172,14 @@ public class PendulumSettings {
     }
 
     public String getCastigo() {
+        return castigoActual != null ? castigoActual.getDescripcion() : "Sin castigo definido";
+    }
+
+    public Castigo getCastigoActual() {
         return castigoActual;
     }
 
-    public String[] getCastigos() {
+    public Castigo[] getCastigosDisponibles() {
         return castigos;
     }
 

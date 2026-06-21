@@ -23,12 +23,13 @@ public class PlayerRepository {
         return CompletableFuture.runAsync(() -> {
             String sql = """
                 UPDATE players
-                SET name  = ?,
-                    lives = ?,
-                    x     = ?,
-                    y     = ?,
-                    z     = ?,
-                    world = ?
+                SET name       = ?,
+                    lives      = ?,
+                    x          = ?,
+                    y          = ?,
+                    z          = ?,
+                    world      = ?,
+                    updated_at = now()
                 WHERE uuid = ?
                 """;
             try (Connection conn = db.getConnection();
@@ -55,15 +56,16 @@ public class PlayerRepository {
         }
         return CompletableFuture.runAsync(() -> {
             String sql = """
-                INSERT INTO players (uuid, name, lives, x, y, z, world)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO players (uuid, name, lives, x, y, z, world, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, now())
                 ON CONFLICT (uuid) DO UPDATE SET
-                    name  = EXCLUDED.name,
-                    lives = EXCLUDED.lives,
-                    x     = EXCLUDED.x,
-                    y     = EXCLUDED.y,
-                    z     = EXCLUDED.z,
-                    world = EXCLUDED.world
+                    name       = EXCLUDED.name,
+                    lives      = EXCLUDED.lives,
+                    x          = EXCLUDED.x,
+                    y          = EXCLUDED.y,
+                    z          = EXCLUDED.z,
+                    world      = EXCLUDED.world,
+                    updated_at = now()
                 """;
             try (Connection conn = db.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -81,6 +83,54 @@ public class PlayerRepository {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public CompletableFuture<Void> upsertConexion(UUID uuid, PlayerData data, boolean online) {
+        if (!db.isConnected()) {
+            return CompletableFuture.completedFuture(null);
+        }
+        return CompletableFuture.runAsync(() -> {
+            String sql = """
+                INSERT INTO players (uuid, name, lives, x, y, z, world, online, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, now())
+                ON CONFLICT (uuid) DO UPDATE SET
+                    name       = EXCLUDED.name,
+                    lives      = EXCLUDED.lives,
+                    x          = EXCLUDED.x,
+                    y          = EXCLUDED.y,
+                    z          = EXCLUDED.z,
+                    world      = EXCLUDED.world,
+                    online     = EXCLUDED.online,
+                    updated_at = now()
+                """;
+            try (Connection conn = db.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, uuid.toString());
+                stmt.setString(2, data.name());
+                stmt.setInt(3, data.lives());
+                setNullableDouble(stmt, 4, data.x());
+                setNullableDouble(stmt, 5, data.y());
+                setNullableDouble(stmt, 6, data.z());
+                stmt.setString(7, data.world());
+                stmt.setBoolean(8, online);
+                stmt.executeUpdate();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public void marcarTodosDesconectados() {
+        if (!db.isConnected()) return;
+        String sql = "UPDATE players SET online = false, updated_at = now() WHERE online = true";
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public CompletableFuture<List<PlayerRow>> obtenerTodos() {

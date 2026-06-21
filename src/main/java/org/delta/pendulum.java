@@ -107,6 +107,14 @@ public final class pendulum extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (databaseManager != null && databaseManager.isConnected()) {
+            try {
+                databaseManager.players().marcarTodosDesconectados();
+            } catch (Exception e) {
+                getLogger().warning("[ConexionSync] Error al marcar desconexiones: " + e.getMessage());
+            }
+        }
+
         if (databaseManager != null) databaseManager.disconnect();
 
         sendConsole("&d&m                                          ");

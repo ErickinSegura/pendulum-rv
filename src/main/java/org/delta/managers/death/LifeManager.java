@@ -8,8 +8,10 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.delta.database.repositories.PlayerRepository;
 import org.delta.libs.Icons;
 import org.delta.libs.MessageUtils;
+import org.delta.pendulum;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -52,9 +54,11 @@ public class LifeManager {
     }
 
     public void setLives(Player player, int lives) {
+        int clamped = Math.max(0, Math.min(lives, MAX_LIVES));
         PersistentDataContainer data = player.getPersistentDataContainer();
-        data.set(livesKey, PersistentDataType.INTEGER, Math.max(0, Math.min(lives, MAX_LIVES)));
+        data.set(livesKey, PersistentDataType.INTEGER, clamped);
         updateHealthDisplay(player);
+        syncToDb(player, clamped);
     }
 
     public void removeLife(Player player) {
@@ -65,7 +69,32 @@ public class LifeManager {
 
             PersistentDataContainer data = player.getPersistentDataContainer();
             data.set(livesKey, PersistentDataType.INTEGER, currentLives);
+
+            syncToDb(player, currentLives);
         }
+    }
+
+    private void syncToDb(Player player, int lives) {
+        var db = pendulum.getInstance().getDatabaseManager();
+        if (db == null || !db.isConnected()) return;
+
+        var loc = player.getLocation();
+        var data = new PlayerRepository.PlayerData(
+                player.getUniqueId(),
+                player.getName(),
+                lives,
+                loc.getX(),
+                loc.getY(),
+                loc.getZ(),
+                loc.getWorld() != null ? loc.getWorld().getName() : null
+        );
+
+        db.players().upsert(player.getUniqueId(), data)
+                .exceptionally(err -> {
+                    pendulum.getInstance().getLogger().warning(
+                            "[LifeSync] Error al actualizar vidas de " + player.getName() + ": " + err.getMessage());
+                    return null;
+                });
     }
 
     public void updateHealthDisplay(Player player) {

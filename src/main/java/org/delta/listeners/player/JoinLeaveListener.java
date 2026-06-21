@@ -36,7 +36,7 @@ public class JoinLeaveListener implements Listener {
                 player.getWorld().getName()
         );
 
-        db.players().upsert(player.getUniqueId(), dataPlayer)
+        db.players().upsertConexion(player.getUniqueId(), dataPlayer, true)
                 .exceptionally(err -> {
                     pendulum.getInstance().getLogger().severe(
                             "Error al registrar jugador " + player.getName() + ": " + err.getMessage()
@@ -65,7 +65,7 @@ public class JoinLeaveListener implements Listener {
                 player.getWorld().getName()
         );
 
-        db.players().update(player.getUniqueId(), dataPlayer)
+        db.players().upsertConexion(player.getUniqueId(), dataPlayer, false)
                 .exceptionally(err -> {
                     pendulum.getInstance().getLogger().severe(
                             "Error al registrar jugador " + player.getName() + ": " + err.getMessage()

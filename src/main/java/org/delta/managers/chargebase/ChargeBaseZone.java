@@ -7,9 +7,6 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ChargeBaseZone {
 
     // ── Muro translúcido continuo ─────────────────────────────────────────
@@ -28,65 +25,87 @@ public class ChargeBaseZone {
 
     private static final AxisAngle4f NO_ROT = new AxisAngle4f(0, 0, 0, 1);
 
-    private final Location           center;
-    private final double             initialRadius;
-    private double                   currentRadius;
-    private final List<BlockDisplay> displays = new ArrayList<>();
+    private final Location center;
+    private final double   initialRadius;
+    private double         currentRadius;
+
+    private int           steps;
+    private double[]      segX;
+    private double[]      segZ;
+    private double[]      segWidth;
+    private float[]       segYaw;
+    private BlockDisplay[] wallDisplays;
+    private BlockDisplay[] beamDisplays;
 
     public ChargeBaseZone(Location center, double initialRadius) {
         this.center        = center;
         this.initialRadius = initialRadius;
         this.currentRadius = initialRadius;
-        spawnDisplays();
+        recomputeGeometry();
+        refresh();
     }
 
     // ─────────────────────────────────────────────────────────────────────
 
-    private void spawnDisplays() {
+    private void recomputeGeometry() {
         removeDisplays();
-        World world = center.getWorld();
-        if (world == null) return;
+        steps = (int) Math.max(48, (2 * Math.PI * currentRadius) / WALL_SEGMENT);
 
-        int steps = (int) Math.max(48, (2 * Math.PI * currentRadius) / WALL_SEGMENT);
-
-        double[] xs = new double[steps];
-        double[] zs = new double[steps];
-        double[] ys = new double[steps];
+        segX     = new double[steps];
+        segZ     = new double[steps];
+        segWidth = new double[steps];
+        segYaw   = new float[steps];
+        wallDisplays = new BlockDisplay[steps];
+        beamDisplays = new BlockDisplay[steps];
 
         for (int i = 0; i < steps; i++) {
             double angle = (2 * Math.PI / steps) * i;
-            double x     = center.getX() + currentRadius * Math.cos(angle);
-            double z     = center.getZ() + currentRadius * Math.sin(angle);
-            xs[i] = x;
-            zs[i] = z;
-            ys[i] = world.getHighestBlockYAt((int) Math.floor(x), (int) Math.floor(z));
+            segX[i] = center.getX() + currentRadius * Math.cos(angle);
+            segZ[i] = center.getZ() + currentRadius * Math.sin(angle);
         }
-
         for (int i = 0; i < steps; i++) {
             int next = (i + 1) % steps;
-            double dx = xs[next] - xs[i];
-            double dz = zs[next] - zs[i];
-            double width = Math.sqrt(dx * dx + dz * dz);
-            float  yaw   = (float) Math.atan2(-dz, dx);
+            double dx = segX[next] - segX[i];
+            double dz = segZ[next] - segZ[i];
+            segWidth[i] = Math.sqrt(dx * dx + dz * dz);
+            segYaw[i]   = (float) Math.atan2(-dz, dx);
+        }
+    }
 
-            Location base = new Location(world, xs[i], ys[i], zs[i]);
-            spawnWallPanel(world, base, width, yaw);
+    public void refresh() {
+        World world = center.getWorld();
+        if (world == null || segX == null) return;
 
-            if (i % MAJOR_EVERY == 0) {
-                spawnBeam(world, base);
+        for (int i = 0; i < steps; i++) {
+            int bx = (int) Math.floor(segX[i]);
+            int bz = (int) Math.floor(segZ[i]);
+            boolean loaded = world.isChunkLoaded(bx >> 4, bz >> 4);
+
+            if (loaded) {
+                boolean needWall = wallDisplays[i] == null || !wallDisplays[i].isValid();
+                boolean needBeam = i % MAJOR_EVERY == 0 && (beamDisplays[i] == null || !beamDisplays[i].isValid());
+                if (!needWall && !needBeam) continue;
+
+                double y = world.getHighestBlockYAt(bx, bz);
+                Location base = new Location(world, segX[i], y, segZ[i]);
+                if (needWall) wallDisplays[i] = spawnWallPanel(world, base, segWidth[i], segYaw[i]);
+                if (needBeam) beamDisplays[i] = spawnBeam(world, base);
+            } else {
+                if (wallDisplays[i] != null) { if (wallDisplays[i].isValid()) wallDisplays[i].remove(); wallDisplays[i] = null; }
+                if (beamDisplays[i] != null) { if (beamDisplays[i].isValid()) beamDisplays[i].remove(); beamDisplays[i] = null; }
             }
         }
     }
 
     // ── Panel del muro: cubo escalado y rotado tangente al círculo ────────
 
-    private void spawnWallPanel(World world, Location base, double width, float yaw) {
+    private BlockDisplay spawnWallPanel(World world, Location base, double width, float yaw) {
         float cos = (float) Math.cos(yaw);
         float sin = (float) Math.sin(yaw);
         Vector3f translation = new Vector3f(-(WALL_THICKNESS / 2f) * sin, 0f, -(WALL_THICKNESS / 2f) * cos);
         AxisAngle4f rot = new AxisAngle4f(yaw, 0f, 1f, 0f);
 
-        displays.add(world.spawn(base, BlockDisplay.class, e -> {
+        return world.spawn(base, BlockDisplay.class, e -> {
             e.setBlock(WALL_MATERIAL.createBlockData());
             e.setPersistent(false);
             e.setVisibleByDefault(true);
@@ -98,14 +117,14 @@ public class ChargeBaseZone {
                     new Vector3f((float) width, WALL_HEIGHT, WALL_THICKNESS),
                     NO_ROT
             ));
-        }));
+        });
     }
 
     // ── Beam: columna alta y brillante ────────────────────────────────────
 
-    private void spawnBeam(World world, Location base) {
+    private BlockDisplay spawnBeam(World world, Location base) {
         float half = BEAM_WIDTH / 2f;
-        displays.add(world.spawn(base, BlockDisplay.class, e -> {
+        return world.spawn(base, BlockDisplay.class, e -> {
             e.setBlock(BEAM_MATERIAL.createBlockData());
             e.setPersistent(false);
             e.setVisibleByDefault(true);
@@ -117,19 +136,26 @@ public class ChargeBaseZone {
                     new Vector3f(BEAM_WIDTH, BEAM_HEIGHT, BEAM_WIDTH),
                     NO_ROT
             ));
-        }));
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────
 
     public void removeDisplays() {
-        displays.forEach(e -> { if (e != null && !e.isDead()) e.remove(); });
-        displays.clear();
+        if (wallDisplays != null) {
+            for (BlockDisplay e : wallDisplays) if (e != null && e.isValid()) e.remove();
+        }
+        if (beamDisplays != null) {
+            for (BlockDisplay e : beamDisplays) if (e != null && e.isValid()) e.remove();
+        }
+        wallDisplays = null;
+        beamDisplays = null;
     }
 
     public void shrink(double amount) {
         currentRadius = Math.max(0, currentRadius - amount);
-        spawnDisplays();
+        recomputeGeometry();
+        refresh();
     }
 
     public boolean isInside(Location loc) {

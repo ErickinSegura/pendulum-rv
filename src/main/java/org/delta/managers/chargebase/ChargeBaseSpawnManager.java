@@ -1,8 +1,10 @@
 package org.delta.managers.chargebase;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.customs.mobs.chargebase.MobClass;
 import org.delta.customs.mobs.chargebase.atacante.AtacanteAvanzado;
@@ -38,6 +40,9 @@ public class ChargeBaseSpawnManager {
             MobClass.HIBRIDO,     600L   // 30s
     );
 
+
+    private static final double SPAWN_MIN_DIST = 14.0;
+    private static final double SPAWN_MAX_DIST = 38.0;
 
     private final pendulum plugin;
     private final ChargeBaseZone zone;
@@ -109,6 +114,8 @@ public class ChargeBaseSpawnManager {
         BukkitRunnable task = new BukkitRunnable() {
             @Override
             public void run() {
+                if (!zoneHasPlayers()) return;
+
                 activeMobs.entrySet().removeIf(entry -> plugin.getServer().getWorlds().stream()
                         .flatMap(w -> w.getEntities().stream())
                         .noneMatch(e -> {
@@ -184,17 +191,35 @@ public class ChargeBaseSpawnManager {
         });
     }
 
+    private boolean zoneHasPlayers() {
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
+            if (zone.isInside(p.getLocation())) return true;
+        }
+        return false;
+    }
+
     private Location randomLocationInZone() {
-        Location center = zone.getCenter();
-        double radius = zone.getCurrentRadius();
+        List<Player> inside = new ArrayList<>();
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
+            if (zone.isInside(p.getLocation())) inside.add(p);
+        }
+        if (inside.isEmpty()) return null;
+
+        World world = zone.getCenter().getWorld();
+        Location anchor = inside.get(rng.nextInt(inside.size())).getLocation();
 
         for (int attempt = 0; attempt < 10; attempt++) {
             double angle = rng.nextDouble() * 2 * Math.PI;
-            double dist = rng.nextDouble() * radius;
-            double x = center.getX() + dist * Math.cos(angle);
-            double z = center.getZ() + dist * Math.sin(angle);
-            int y = center.getWorld().getHighestBlockYAt((int) x, (int) z);
-            Location loc = new Location(center.getWorld(), x, y + 1, z);
+            double dist = SPAWN_MIN_DIST + rng.nextDouble() * (SPAWN_MAX_DIST - SPAWN_MIN_DIST);
+            double x = anchor.getX() + dist * Math.cos(angle);
+            double z = anchor.getZ() + dist * Math.sin(angle);
+            int bx = (int) Math.floor(x);
+            int bz = (int) Math.floor(z);
+
+            if (!world.isChunkLoaded(bx >> 4, bz >> 4)) continue;
+
+            int y = world.getHighestBlockYAt(bx, bz);
+            Location loc = new Location(world, x, y + 1, z);
 
             if (!loc.getBlock().getType().isSolid() &&
                     !loc.clone().add(0, 1, 0).getBlock().getType().isSolid() &&

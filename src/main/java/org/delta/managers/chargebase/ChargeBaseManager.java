@@ -32,6 +32,9 @@ public class ChargeBaseManager {
 
     private BukkitRunnable shrinkTask;
     private BukkitTask endTask;
+    private BukkitTask refreshTask;
+
+    private static final long REFRESH_INTERVAL = 40L;
 
     private final CargoZoneRepository cargoZoneRepository;
 
@@ -94,6 +97,14 @@ public class ChargeBaseManager {
     }
 
     private void startShrinking() {
+        refreshTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!active || activeZone == null) { cancel(); return; }
+                activeZone.refresh();
+            }
+        }.runTaskTimer(plugin, REFRESH_INTERVAL, REFRESH_INTERVAL);
+
         long steps = DURATION_TICKS / SHRINK_INTERVAL;
         double shrinkPerStep = activeZone.getCurrentRadius() / steps;
 
@@ -121,6 +132,7 @@ public class ChargeBaseManager {
     private void endEvent() {
         if (shrinkTask != null) { shrinkTask.cancel(); shrinkTask = null; }
         if (endTask   != null) { endTask.cancel();    endTask   = null; }
+        if (refreshTask != null) { refreshTask.cancel(); refreshTask = null; }
         if (zoneListener != null) zoneListener.cleanupAll();
 
         if (activeZone != null) { activeZone.removeDisplays(); activeZone = null; }

@@ -24,12 +24,8 @@ public enum Achievement {
             Material.REDSTONE, Frame.GOAL, null, null),
 
     ALTA_COSTURA("alta_costura", "Alta Costura",
-            "Equipa una armadura con trims a juego y recibe su efecto.",
+            "Equipa una armadura completa con trims del mismo material y recibe su efecto.",
             Material.NETHERITE_CHESTPLATE, Frame.TASK, null, null),
-
-    COSTURA_DE_LUJO("costura_de_lujo", "Costura de Lujo",
-            "Lleva un conjunto de trims de material valioso (efecto nivel II).",
-            Material.NETHERITE_INGOT, Frame.GOAL, "alta_costura", null),
 
     EN_EL_OJO_DEL_HURACAN("en_el_ojo_del_huracan", "En el Ojo del Huracán",
             "Entra en la zona de una Base de Carga activa.",

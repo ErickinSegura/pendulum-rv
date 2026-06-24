@@ -17,7 +17,6 @@ import org.delta.pendulum;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 public class ArmorTrimManager {
 
@@ -25,61 +24,53 @@ public class ArmorTrimManager {
     private static final int DURATION = 60;
     private static final long INTERVAL = 20L;
 
-    private static final Map<TrimPattern, PotionEffectType> EFECTOS = new HashMap<>();
-    private static final Set<TrimMaterial> MATERIALES_VALIOSOS = Set.of(
-            TrimMaterial.DIAMOND,
-            TrimMaterial.NETHERITE
-    );
-    private static final TrimPattern[] PATRONES;
-    private static final TrimMaterial[] MATERIALES = {
-            TrimMaterial.QUARTZ,
-            TrimMaterial.IRON,
-            TrimMaterial.NETHERITE,
-            TrimMaterial.REDSTONE,
-            TrimMaterial.COPPER,
-            TrimMaterial.GOLD,
-            TrimMaterial.EMERALD,
-            TrimMaterial.DIAMOND,
-            TrimMaterial.LAPIS,
-            TrimMaterial.AMETHYST
+    private static final Map<TrimMaterial, PotionEffectType> EFECTOS = new HashMap<>();
+    private static final TrimMaterial[] MATERIALES;
+    private static final TrimPattern[] PATRONES = {
+            TrimPattern.SENTRY,
+            TrimPattern.DUNE,
+            TrimPattern.COAST,
+            TrimPattern.WILD,
+            TrimPattern.WARD,
+            TrimPattern.EYE,
+            TrimPattern.VEX,
+            TrimPattern.TIDE,
+            TrimPattern.SNOUT,
+            TrimPattern.RIB,
+            TrimPattern.SPIRE,
+            TrimPattern.WAYFINDER,
+            TrimPattern.SHAPER,
+            TrimPattern.SILENCE,
+            TrimPattern.RAISER,
+            TrimPattern.HOST,
+            TrimPattern.FLOW,
+            TrimPattern.BOLT
     };
 
     static {
-        EFECTOS.put(TrimPattern.SENTRY, PotionEffectType.RESISTANCE);
-        EFECTOS.put(TrimPattern.DUNE, PotionEffectType.SPEED);
-        EFECTOS.put(TrimPattern.COAST, PotionEffectType.DOLPHINS_GRACE);
-        EFECTOS.put(TrimPattern.WILD, PotionEffectType.REGENERATION);
-        EFECTOS.put(TrimPattern.WARD, PotionEffectType.ABSORPTION);
-        EFECTOS.put(TrimPattern.EYE, PotionEffectType.NIGHT_VISION);
-        EFECTOS.put(TrimPattern.VEX, PotionEffectType.INVISIBILITY);
-        EFECTOS.put(TrimPattern.TIDE, PotionEffectType.WATER_BREATHING);
-        EFECTOS.put(TrimPattern.SNOUT, PotionEffectType.FIRE_RESISTANCE);
-        EFECTOS.put(TrimPattern.RIB, PotionEffectType.STRENGTH);
-        EFECTOS.put(TrimPattern.SPIRE, PotionEffectType.JUMP_BOOST);
-        EFECTOS.put(TrimPattern.WAYFINDER, PotionEffectType.SLOW_FALLING);
-        EFECTOS.put(TrimPattern.SHAPER, PotionEffectType.HASTE);
-        EFECTOS.put(TrimPattern.SILENCE, PotionEffectType.LUCK);
-        EFECTOS.put(TrimPattern.RAISER, PotionEffectType.HEALTH_BOOST);
-        EFECTOS.put(TrimPattern.HOST, PotionEffectType.HERO_OF_THE_VILLAGE);
-        EFECTOS.put(TrimPattern.FLOW, PotionEffectType.CONDUIT_POWER);
-        EFECTOS.put(TrimPattern.BOLT, PotionEffectType.SATURATION);
-        PATRONES = EFECTOS.keySet().toArray(new TrimPattern[0]);
+        EFECTOS.put(TrimMaterial.QUARTZ, PotionEffectType.JUMP_BOOST);
+        EFECTOS.put(TrimMaterial.IRON, PotionEffectType.RESISTANCE);
+        EFECTOS.put(TrimMaterial.NETHERITE, PotionEffectType.FIRE_RESISTANCE);
+        EFECTOS.put(TrimMaterial.REDSTONE, PotionEffectType.SPEED);
+        EFECTOS.put(TrimMaterial.COPPER, PotionEffectType.DOLPHINS_GRACE);
+        EFECTOS.put(TrimMaterial.GOLD, PotionEffectType.HASTE);
+        EFECTOS.put(TrimMaterial.EMERALD, PotionEffectType.HERO_OF_THE_VILLAGE);
+        EFECTOS.put(TrimMaterial.DIAMOND, PotionEffectType.STRENGTH);
+        EFECTOS.put(TrimMaterial.LAPIS, PotionEffectType.WATER_BREATHING);
+        EFECTOS.put(TrimMaterial.AMETHYST, PotionEffectType.NIGHT_VISION);
+        MATERIALES = EFECTOS.keySet().toArray(new TrimMaterial[0]);
     }
 
-    public static PotionEffectType efectoDe(TrimPattern patron) {
-        return EFECTOS.get(patron);
-    }
-
-    public static boolean esValioso(TrimMaterial material) {
-        return MATERIALES_VALIOSOS.contains(material);
-    }
-
-    public static TrimPattern patronAleatorio(Random random) {
-        return PATRONES[random.nextInt(PATRONES.length)];
+    public static PotionEffectType efectoDe(TrimMaterial material) {
+        return EFECTOS.get(material);
     }
 
     public static TrimMaterial materialAleatorio(Random random) {
         return MATERIALES[random.nextInt(MATERIALES.length)];
+    }
+
+    public static TrimPattern patronAleatorio(Random random) {
+        return PATRONES[random.nextInt(PATRONES.length)];
     }
 
     private final pendulum plugin;
@@ -102,27 +93,21 @@ public class ArmorTrimManager {
     }
 
     private void aplicarEfectos(Player player) {
-        TrimPattern patron = null;
-        boolean todoValioso = true;
+        TrimMaterial material = null;
 
         for (ItemStack pieza : player.getInventory().getArmorContents()) {
             if (pieza == null) return;
             if (!(pieza.getItemMeta() instanceof ArmorMeta meta) || !meta.hasTrim()) return;
             ArmorTrim trim = meta.getTrim();
-            if (patron == null) patron = trim.getPattern();
-            else if (!patron.equals(trim.getPattern())) return;
-            if (!MATERIALES_VALIOSOS.contains(trim.getMaterial())) todoValioso = false;
+            if (material == null) material = trim.getMaterial();
+            else if (!material.equals(trim.getMaterial())) return;
         }
 
-        if (patron == null) return;
-        PotionEffectType tipo = EFECTOS.get(patron);
+        if (material == null) return;
+        PotionEffectType tipo = EFECTOS.get(material);
         if (tipo == null) return;
 
-        int amplificador = todoValioso ? 1 : 0;
-        player.addPotionEffect(new PotionEffect(tipo, DURATION, amplificador, true, false, true));
+        player.addPotionEffect(new PotionEffect(tipo, DURATION, 0, true, false, true));
         plugin.getAchievementManager().unlock(player, Achievement.ALTA_COSTURA);
-        if (todoValioso) {
-            plugin.getAchievementManager().unlock(player, Achievement.COSTURA_DE_LUJO);
-        }
     }
 }

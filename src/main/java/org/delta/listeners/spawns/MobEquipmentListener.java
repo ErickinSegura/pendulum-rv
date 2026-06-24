@@ -70,7 +70,7 @@ public class MobEquipmentListener extends BaseMobSpawnListener {
         eq.setLeggingsDropChance(0f);
         eq.setBootsDropChance(0f);
 
-        aplicarEfectoTrim(entity, pattern, trimMaterial);
+        aplicarEfectoTrim(entity, trimMaterial);
 
         if (random.nextDouble() < TOTEM_CHANCE) {
             eq.setItemInOffHand(new ItemStack(Material.TOTEM_OF_UNDYING));
@@ -87,12 +87,11 @@ public class MobEquipmentListener extends BaseMobSpawnListener {
         return item;
     }
 
-    private void aplicarEfectoTrim(LivingEntity entity, TrimPattern pattern, TrimMaterial trimMaterial) {
-        PotionEffectType tipo = ArmorTrimManager.efectoDe(pattern);
+    private void aplicarEfectoTrim(LivingEntity entity, TrimMaterial trimMaterial) {
+        PotionEffectType tipo = ArmorTrimManager.efectoDe(trimMaterial);
         if (tipo == null) return;
 
-        int amplificador = ArmorTrimManager.esValioso(trimMaterial) ? 1 : 0;
         entity.addPotionEffect(new PotionEffect(
-                tipo, PotionEffect.INFINITE_DURATION, amplificador, true, false, false));
+                tipo, PotionEffect.INFINITE_DURATION, 0, true, false, false));
     }
 }

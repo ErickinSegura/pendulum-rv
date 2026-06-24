@@ -11,18 +11,26 @@ import org.delta.managers.chargebase.ChargeBaseManager;
 import org.delta.managers.chargebase.ChargeBaseSpawnManager;
 import org.delta.pendulum;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 public class ChargeBaseDeathListener implements Listener {
 
-    private static final Map<MobClass, List<DropEntry>> DROPS = Map.of(
-            MobClass.ATACANTE,    List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
-            MobClass.DEFENSOR,    List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
-            MobClass.HEALER,      List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
-            MobClass.CONTROLADOR, List.of(new DropEntry("placeholder", 1), new DropEntry("placeholder", 0.3)),
-            MobClass.HIBRIDO,     List.of(new DropEntry("placeholder", 1))
+    private static final double FRAGMENTO_CHANCE = 0.20;
+    private static final double UNION_CHANCE = 0.10;
+    private static final double HIBRIDO_BASICO_UNION_CHANCE = 0.01;
+
+    private static final Map<String, DropEntry> DROPS = Map.ofEntries(
+            Map.entry("atacante_basico",      new DropEntry("fragmento_ataque",   FRAGMENTO_CHANCE)),
+            Map.entry("atacante_avanzado",    new DropEntry("union_ataque",       UNION_CHANCE)),
+            Map.entry("defensor_basico",      new DropEntry("fragmento_defensa",  FRAGMENTO_CHANCE)),
+            Map.entry("defensor_avanzado",    new DropEntry("union_defensa",      UNION_CHANCE)),
+            Map.entry("controlador_basico",   new DropEntry("fragmento_control",  FRAGMENTO_CHANCE)),
+            Map.entry("controlador_avanzado", new DropEntry("union_control",      UNION_CHANCE)),
+            Map.entry("healer_basico",        new DropEntry("fragmento_heal",     FRAGMENTO_CHANCE)),
+            Map.entry("healer_avanzado",      new DropEntry("union_heal",         UNION_CHANCE)),
+            Map.entry("hibrido_basico",       new DropEntry("union_hibrida",      HIBRIDO_BASICO_UNION_CHANCE)),
+            Map.entry("hibrido_avanzado",     new DropEntry("union_hibrida",      UNION_CHANCE))
     );
 
     private final ChargeBaseManager manager;
@@ -57,8 +65,9 @@ public class ChargeBaseDeathListener implements Listener {
         int roles = achievements.addToSet(killer, "cb_roles", mobClass.name());
         if (roles >= 5) achievements.unlock(killer, Achievement.ESTRATEGA_DE_LA_ZONA);
 
-        List<DropEntry> drops = DROPS.get(mobClass);
-        for (DropEntry drop : drops) {
+        for (String tag : event.getEntity().getScoreboardTags()) {
+            DropEntry drop = DROPS.get(tag);
+            if (drop == null) continue;
             if (rng.nextDouble() <= drop.chance()) {
                 ItemRegistry.get(drop.key()).ifPresent(item ->
                         event.getEntity().getWorld().dropItemNaturally(
@@ -66,6 +75,7 @@ public class ChargeBaseDeathListener implements Listener {
                         )
                 );
             }
+            break;
         }
     }
 

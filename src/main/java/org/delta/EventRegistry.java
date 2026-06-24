@@ -24,8 +24,12 @@ import org.delta.listeners.items.PapaExplosivaListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
 import org.delta.listeners.player.*;
+import org.delta.listeners.spawns.CreeperVariantListener;
 import org.delta.listeners.spawns.CustomMobListener;
+import org.delta.listeners.spawns.EndCreeperListener;
+import org.delta.listeners.spawns.MobEquipmentListener;
 import org.delta.listeners.spawns.PolarBear;
+import org.delta.listeners.spawns.UpgradedMobListener;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
 import org.delta.listeners.worldgen.WorldGenListener;
@@ -54,6 +58,7 @@ public class EventRegistry {
         pm.registerEvents(new PotionListener(), plugin);
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
+        pm.registerEvents(new EndAccessListener(), plugin);
 
         // Castigos
         pm.registerEvents(new CastigoListener(plugin.getCastigoManager()), plugin);
@@ -102,6 +107,10 @@ public class EventRegistry {
         pm.registerEvents(new ZombieSpawner(plugin), plugin);
         pm.registerEvents(new PolarBear(plugin), plugin);
         pm.registerEvents(new CustomMobListener(plugin), plugin);
+        pm.registerEvents(new MobEquipmentListener(), plugin);
+        pm.registerEvents(new CreeperVariantListener(), plugin);
+        pm.registerEvents(new UpgradedMobListener(), plugin);
+        pm.registerEvents(new EndCreeperListener(), plugin);
 
         // Items
         pm.registerEvents(new LanzapapasListener(), plugin);

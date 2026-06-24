@@ -16,6 +16,7 @@ import org.delta.pendulum;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 public class ArmorTrimManager {
@@ -24,38 +25,68 @@ public class ArmorTrimManager {
     private static final int DURATION = 60;
     private static final long INTERVAL = 20L;
 
-    private final pendulum plugin;
-    private final Map<TrimPattern, PotionEffectType> efectos = new HashMap<>();
-    private final Set<TrimMaterial> materialesValiosos = Set.of(
+    private static final Map<TrimPattern, PotionEffectType> EFECTOS = new HashMap<>();
+    private static final Set<TrimMaterial> MATERIALES_VALIOSOS = Set.of(
             TrimMaterial.DIAMOND,
             TrimMaterial.NETHERITE
     );
+    private static final TrimPattern[] PATRONES;
+    private static final TrimMaterial[] MATERIALES = {
+            TrimMaterial.QUARTZ,
+            TrimMaterial.IRON,
+            TrimMaterial.NETHERITE,
+            TrimMaterial.REDSTONE,
+            TrimMaterial.COPPER,
+            TrimMaterial.GOLD,
+            TrimMaterial.EMERALD,
+            TrimMaterial.DIAMOND,
+            TrimMaterial.LAPIS,
+            TrimMaterial.AMETHYST
+    };
+
+    static {
+        EFECTOS.put(TrimPattern.SENTRY, PotionEffectType.RESISTANCE);
+        EFECTOS.put(TrimPattern.DUNE, PotionEffectType.SPEED);
+        EFECTOS.put(TrimPattern.COAST, PotionEffectType.DOLPHINS_GRACE);
+        EFECTOS.put(TrimPattern.WILD, PotionEffectType.REGENERATION);
+        EFECTOS.put(TrimPattern.WARD, PotionEffectType.ABSORPTION);
+        EFECTOS.put(TrimPattern.EYE, PotionEffectType.NIGHT_VISION);
+        EFECTOS.put(TrimPattern.VEX, PotionEffectType.INVISIBILITY);
+        EFECTOS.put(TrimPattern.TIDE, PotionEffectType.WATER_BREATHING);
+        EFECTOS.put(TrimPattern.SNOUT, PotionEffectType.FIRE_RESISTANCE);
+        EFECTOS.put(TrimPattern.RIB, PotionEffectType.STRENGTH);
+        EFECTOS.put(TrimPattern.SPIRE, PotionEffectType.JUMP_BOOST);
+        EFECTOS.put(TrimPattern.WAYFINDER, PotionEffectType.SLOW_FALLING);
+        EFECTOS.put(TrimPattern.SHAPER, PotionEffectType.HASTE);
+        EFECTOS.put(TrimPattern.SILENCE, PotionEffectType.LUCK);
+        EFECTOS.put(TrimPattern.RAISER, PotionEffectType.HEALTH_BOOST);
+        EFECTOS.put(TrimPattern.HOST, PotionEffectType.HERO_OF_THE_VILLAGE);
+        EFECTOS.put(TrimPattern.FLOW, PotionEffectType.CONDUIT_POWER);
+        EFECTOS.put(TrimPattern.BOLT, PotionEffectType.SATURATION);
+        PATRONES = EFECTOS.keySet().toArray(new TrimPattern[0]);
+    }
+
+    public static PotionEffectType efectoDe(TrimPattern patron) {
+        return EFECTOS.get(patron);
+    }
+
+    public static boolean esValioso(TrimMaterial material) {
+        return MATERIALES_VALIOSOS.contains(material);
+    }
+
+    public static TrimPattern patronAleatorio(Random random) {
+        return PATRONES[random.nextInt(PATRONES.length)];
+    }
+
+    public static TrimMaterial materialAleatorio(Random random) {
+        return MATERIALES[random.nextInt(MATERIALES.length)];
+    }
+
+    private final pendulum plugin;
 
     public ArmorTrimManager(pendulum plugin) {
         this.plugin = plugin;
-        registrarEfectos();
         iniciar();
-    }
-
-    private void registrarEfectos() {
-        efectos.put(TrimPattern.SENTRY, PotionEffectType.RESISTANCE);
-        efectos.put(TrimPattern.DUNE, PotionEffectType.SPEED);
-        efectos.put(TrimPattern.COAST, PotionEffectType.DOLPHINS_GRACE);
-        efectos.put(TrimPattern.WILD, PotionEffectType.REGENERATION);
-        efectos.put(TrimPattern.WARD, PotionEffectType.ABSORPTION);
-        efectos.put(TrimPattern.EYE, PotionEffectType.NIGHT_VISION);
-        efectos.put(TrimPattern.VEX, PotionEffectType.INVISIBILITY);
-        efectos.put(TrimPattern.TIDE, PotionEffectType.WATER_BREATHING);
-        efectos.put(TrimPattern.SNOUT, PotionEffectType.FIRE_RESISTANCE);
-        efectos.put(TrimPattern.RIB, PotionEffectType.STRENGTH);
-        efectos.put(TrimPattern.SPIRE, PotionEffectType.JUMP_BOOST);
-        efectos.put(TrimPattern.WAYFINDER, PotionEffectType.SLOW_FALLING);
-        efectos.put(TrimPattern.SHAPER, PotionEffectType.HASTE);
-        efectos.put(TrimPattern.SILENCE, PotionEffectType.LUCK);
-        efectos.put(TrimPattern.RAISER, PotionEffectType.HEALTH_BOOST);
-        efectos.put(TrimPattern.HOST, PotionEffectType.HERO_OF_THE_VILLAGE);
-        efectos.put(TrimPattern.FLOW, PotionEffectType.CONDUIT_POWER);
-        efectos.put(TrimPattern.BOLT, PotionEffectType.SATURATION);
     }
 
     private void iniciar() {
@@ -80,11 +111,11 @@ public class ArmorTrimManager {
             ArmorTrim trim = meta.getTrim();
             if (patron == null) patron = trim.getPattern();
             else if (!patron.equals(trim.getPattern())) return;
-            if (!materialesValiosos.contains(trim.getMaterial())) todoValioso = false;
+            if (!MATERIALES_VALIOSOS.contains(trim.getMaterial())) todoValioso = false;
         }
 
         if (patron == null) return;
-        PotionEffectType tipo = efectos.get(patron);
+        PotionEffectType tipo = EFECTOS.get(patron);
         if (tipo == null) return;
 
         int amplificador = todoValioso ? 1 : 0;

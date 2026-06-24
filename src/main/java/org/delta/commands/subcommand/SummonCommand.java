@@ -2,11 +2,13 @@ package org.delta.commands.subcommand;
 
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.delta.customs.mobs.CustomMob;
 import org.delta.customs.mobs.MobRegistry;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
+import org.delta.managers.chargebase.ChargeBaseManager;
 import org.delta.pendulum;
 
 public class SummonCommand implements SubCommand {
@@ -61,7 +63,11 @@ public class SummonCommand implements SubCommand {
             return;
         }
 
-        customMob.build();
+        LivingEntity spawned = customMob.build();
+        ChargeBaseManager chargeBase = plugin.getChargeBaseManager();
+        if (chargeBase.isActive() && chargeBase.getSpawnManager() != null) {
+            chargeBase.getSpawnManager().registerSpawnedMob(spawned.getUniqueId(), customMob.getMobClass());
+        }
         player.sendMessage(MessageUtils.color("&a✔ Spawneaste &f" + mobKey
                 + " &aen &f" + (int) spawnLocation.getX()
                 + " " + (int) spawnLocation.getY()

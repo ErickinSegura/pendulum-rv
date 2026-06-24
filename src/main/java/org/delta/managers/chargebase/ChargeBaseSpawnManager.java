@@ -212,6 +212,12 @@ public class ChargeBaseSpawnManager {
         }
     }
 
+    public void registerSpawnedMob(UUID uid, MobClass mobClass) {
+        if (mobClass == null) return;
+        activeMobs.put(uid, mobClass);
+        allSpawned.add(uid);
+    }
+
     public boolean isManagedMob(UUID uid) {
         return activeMobs.containsKey(uid);
     }

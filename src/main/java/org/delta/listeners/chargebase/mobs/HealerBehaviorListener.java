@@ -4,16 +4,21 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.delta.customs.mobs.CustomMob;
+import org.delta.customs.mobs.MobRegistry;
+import org.delta.customs.mobs.chargebase.MobClass;
 import org.delta.managers.chargebase.ChargeBaseManager;
 import org.delta.pendulum;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -24,10 +29,10 @@ public class HealerBehaviorListener implements Listener {
     private final ChargeBaseManager manager;
     private final Random rng = new Random();
 
-    private static final double HEAL_RADIUS = 12.0;
-    private static final double HEAL_AMOUNT = 8.0;
+    private static final double HEAL_RADIUS = 20.0;
+    private static final double HEAL_AMOUNT = 18.0;
     private static final double RESURRECT_CHANCE = 0.35;
-    private static final double RESURRECT_RADIUS = 16.0;
+    private static final double RESURRECT_RADIUS = 30.0;
 
     private static final double POTION_THROW_CHANCE = 0.3;
     private final Set<UUID> potionCooldown = new HashSet<>();
@@ -42,7 +47,7 @@ public class HealerBehaviorListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!manager.isActive()) { cancel(); return; }
+                if (!manager.isActive()) return;
 
                 for (World world : Bukkit.getWorlds()) {
                     for (Entity e : world.getEntities()) {
@@ -70,9 +75,9 @@ public class HealerBehaviorListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onAllyDeath(EntityDeathEvent event) {
-        if (!manager.isActive()) return;
+        if (!manager.isActive() || manager.getSpawnManager() == null) return;
         LivingEntity dead = event.getEntity();
         if (dead instanceof Player) return;
         if (!manager.getSpawnManager().isManagedMob(dead.getUniqueId())) return;
@@ -104,14 +109,13 @@ public class HealerBehaviorListener implements Listener {
 
     private LivingEntity respawnMob(LivingEntity dead, Location loc) {
         for (String tag : dead.getScoreboardTags()) {
-            return switch (tag) {
-                case "atacante_basico"     -> new org.delta.customs.mobs.chargebase.atacante.AtacanteBasico(plugin, loc).build();
-                case "defensor_basico"     -> new org.delta.customs.mobs.chargebase.defensor.DefensorBasico(plugin, loc).build();
-                case "defensor_avanzado"   -> new org.delta.customs.mobs.chargebase.defensor.DefensorAvanzado(plugin, loc).build();
-                case "controlador_basico"  -> new org.delta.customs.mobs.chargebase.controlador.ControladorBasico(plugin, loc).build();
-                case "controlador_avanzado"-> new org.delta.customs.mobs.chargebase.controlador.ControladorAvanzado(plugin, loc).build();
-                default -> null;
-            };
+            Optional<CustomMob> custom = MobRegistry.get(tag, plugin, loc);
+            if (custom.isEmpty()) continue;
+            if (custom.get().getMobClass() == MobClass.HEALER) return null;
+
+            LivingEntity entity = custom.get().build();
+            manager.getSpawnManager().registerSpawnedMob(entity.getUniqueId(), custom.get().getMobClass());
+            return entity;
         }
         return null;
     }

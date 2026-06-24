@@ -41,6 +41,22 @@ public class TeamRepository {
         });
     }
 
+    public void clearPerk(String teamid) {
+        if (!db.isConnected()) return;
+        CompletableFuture.runAsync(() -> {
+            String sql = "UPDATE teams SET perk = null WHERE name = ?";
+            try (Connection conn = db.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, teamid);
+                stmt.executeUpdate();
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     private TeamData fromResultSet(ResultSet rs) {
         try {
             return new TeamData(

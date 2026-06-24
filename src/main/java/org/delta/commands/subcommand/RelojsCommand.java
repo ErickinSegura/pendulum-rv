@@ -123,8 +123,9 @@ public class RelojsCommand implements SubCommand {
             return;
         }
 
-        if (amount < 0 || amount > 3) {
-            player.sendMessage(MessageUtils.color("&cLa cantidad debe estar entre 0 y 3."));
+        int maxLives = PendulumSettings.getInstance().getVidas();
+        if (amount < 0 || amount > maxLives) {
+            player.sendMessage(MessageUtils.color("&cLa cantidad debe estar entre 0 y " + maxLives + "."));
             showUsage(player);
             return;
         }
@@ -148,8 +149,9 @@ public class RelojsCommand implements SubCommand {
 
         pendulum.getInstance().getLifeManager().resetLives(target);
 
-        player.sendMessage(MessageUtils.color("&aHas reseteado los relojs de &e" + target.getName() + " &aa &d3&a."));
-        target.sendMessage(MessageUtils.color("&eTus relojs han sido reseteados a ").append(getLifeDisplay(3)).append(MessageUtils.color("&e.")));
+        int maxLives = PendulumSettings.getInstance().getVidas();
+        player.sendMessage(MessageUtils.color("&aHas reseteado los relojs de &e" + target.getName() + " &aa &d" + maxLives + "&a."));
+        target.sendMessage(MessageUtils.color("&eTus relojs han sido reseteados a ").append(getLifeDisplay(maxLives)).append(MessageUtils.color("&e.")));
 
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.5f, 1.2f);
@@ -202,9 +204,10 @@ public class RelojsCommand implements SubCommand {
             return;
         }
 
+        int maxLives = PendulumSettings.getInstance().getVidas();
         int newReceiverLives = receiverLives + amount;
-        if (newReceiverLives > 3) {
-            executor.sendMessage(MessageUtils.color("&cEl receptor superaría el límite de 3 relojs."));
+        if (newReceiverLives > maxLives) {
+            executor.sendMessage(MessageUtils.color("&cEl receptor superaría el límite de " + maxLives + " relojs."));
             executor.sendMessage(MessageUtils.color("&cRelojs actuales: &d" + receiverLives + " &c| Resultado: &d" + newReceiverLives));
             executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
             return;
@@ -259,7 +262,8 @@ public class RelojsCommand implements SubCommand {
 
     private Component getLifeDisplay(int lives) {
         Component display = Component.empty();
-        for (int i = 0; i < 3; i++) {
+        int maxLives = PendulumSettings.getInstance().getVidas();
+        for (int i = 0; i < maxLives; i++) {
             display = display.append(i < lives ? Icons.ACTIVE_CLOCK : Icons.INACTIVE_CLOCK);
         }
         return display;

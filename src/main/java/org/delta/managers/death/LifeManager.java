@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.database.repositories.PlayerRepository;
 import org.delta.libs.Icons;
 import org.delta.libs.MessageUtils;
+import org.delta.libs.PendulumSettings;
 import org.delta.pendulum;
 
 import java.util.ArrayDeque;
@@ -19,7 +20,7 @@ import java.util.Queue;
 public class LifeManager {
 
     private final Plugin plugin;
-    private static final int MAX_LIVES = 3;
+    private final int maxLives;
 
     private final NamespacedKey livesKey;
     private boolean animating = false;
@@ -27,6 +28,7 @@ public class LifeManager {
 
     public LifeManager(Plugin plugin) {
         this.plugin = plugin;
+        this.maxLives = Math.max(1, PendulumSettings.getInstance().getVidas());
         this.livesKey = new NamespacedKey(plugin, "player_lives");
         startActionBarUpdater();
     }
@@ -44,17 +46,17 @@ public class LifeManager {
     public void initializePlayer(Player player) {
         PersistentDataContainer data = player.getPersistentDataContainer();
         if (!data.has(livesKey, PersistentDataType.INTEGER)) {
-            data.set(livesKey, PersistentDataType.INTEGER, MAX_LIVES);
+            data.set(livesKey, PersistentDataType.INTEGER, maxLives);
         }
     }
 
     public int getLives(Player player) {
         PersistentDataContainer data = player.getPersistentDataContainer();
-        return data.getOrDefault(livesKey, PersistentDataType.INTEGER, MAX_LIVES);
+        return data.getOrDefault(livesKey, PersistentDataType.INTEGER, maxLives);
     }
 
     public void setLives(Player player, int lives) {
-        int clamped = Math.max(0, Math.min(lives, MAX_LIVES));
+        int clamped = Math.max(0, Math.min(lives, maxLives));
         PersistentDataContainer data = player.getPersistentDataContainer();
         data.set(livesKey, PersistentDataType.INTEGER, clamped);
         updateHealthDisplay(player);
@@ -101,7 +103,7 @@ public class LifeManager {
         int lives = getLives(player);
         Component actionBar = Component.empty();
 
-        for (int i = 0; i < MAX_LIVES; i++) {
+        for (int i = 0; i < maxLives; i++) {
             if (i < lives) {
                 actionBar = actionBar.append(Icons.ACTIVE_CLOCK);
             } else {
@@ -160,7 +162,7 @@ public class LifeManager {
 
     private Component buildLossBar(String name, int lives, int lostIndex, boolean lostOn) {
         Component bar = MessageUtils.color("&5&l" + name + " &7perdió un reloj  ");
-        for (int i = 0; i < MAX_LIVES; i++) {
+        for (int i = 0; i < maxLives; i++) {
             if (i == lostIndex) {
                 bar = bar.append(lostOn ? Icons.ACTIVE_CLOCK : Icons.INACTIVE_CLOCK);
             } else if (i < lives) {
@@ -173,7 +175,7 @@ public class LifeManager {
     }
 
     public void resetLives(Player player) {
-        setLives(player, MAX_LIVES);
+        setLives(player, maxLives);
     }
 
     private record ClockLossData(String name, int lives) {}

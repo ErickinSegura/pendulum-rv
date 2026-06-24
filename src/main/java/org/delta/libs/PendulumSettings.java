@@ -23,6 +23,7 @@ public class PendulumSettings {
     private Castigo[] castigos;
     private int dia;
     private int jugadoresNoche;
+    private int vidas;
     private ItemStack stackPremio;
     private Reto retoActual;
     private Reto[] retosDisponibles;
@@ -121,6 +122,7 @@ public class PendulumSettings {
         op = config.getStringList("permisos").toArray(new String[0]);
         jugadoresNoche = config.getInt("mundo.jugadoresNoche");
         dia = config.getInt("mundo.dia");
+        vidas = config.getInt("mundo.vidas", 3);
 
         System.out.println("[Pendulum Debug] Carga completada:");
         System.out.println("- Retos disponibles: " + (retosDisponibles != null ? retosDisponibles.length : 0));
@@ -193,6 +195,10 @@ public class PendulumSettings {
 
     public int getDia() {
         return dia;
+    }
+
+    public int getVidas() {
+        return vidas;
     }
 
     public static PendulumSettings getInstance() {

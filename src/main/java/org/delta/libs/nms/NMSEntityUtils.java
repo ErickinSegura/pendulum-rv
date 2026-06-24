@@ -72,11 +72,6 @@ public class NMSEntityUtils {
             behaviorsField.setAccessible(true);
             ((java.util.Map<?, ?>) behaviorsField.get(brain)).clear();
 
-            java.lang.reflect.Field memoriesField =
-                    brain.getClass().getDeclaredField("memories");
-            memoriesField.setAccessible(true);
-            ((java.util.Map<?, ?>) memoriesField.get(brain)).clear();
-
             java.lang.reflect.Field sensorsField =
                     brain.getClass().getDeclaredField("sensors");
             sensorsField.setAccessible(true);

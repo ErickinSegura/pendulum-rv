@@ -8,6 +8,7 @@ database:
 mundo:
   dia: 20
   jugadoresNoche: 1
+  vidas: 3
 
 permisos:
   - iPancrema

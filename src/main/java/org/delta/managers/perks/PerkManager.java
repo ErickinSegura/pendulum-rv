@@ -97,15 +97,19 @@ public class PerkManager {
     public void removePerk(String teamId, Perk perk) {
         if (!activePerks.containsKey(teamId)) return;
         activePerks.get(teamId).remove(perk);
+        pendulum.getInstance().getDatabaseManager().teams().clearPerk(teamId);
         save();
     }
 
     public void resetTeam(String teamId) {
         activePerks.remove(teamId);
+        pendulum.getInstance().getDatabaseManager().teams().clearPerk(teamId);
         save();
     }
 
     public void resetAll() {
+        var db = pendulum.getInstance().getDatabaseManager();
+        activePerks.keySet().forEach(teamId -> db.teams().clearPerk(teamId));
         activePerks.clear();
         save();
     }

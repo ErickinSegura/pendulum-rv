@@ -1,7 +1,6 @@
 package org.delta.managers.chargebase;
 
 import org.bukkit.*;
-import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.util.Transformation;
@@ -13,18 +12,19 @@ import java.util.List;
 
 public class ChargeBaseZone {
 
-    // ── Escala SIEMPRE uniforme → sin stretch de textura ─────────────────
-    private static final float  CUBE_SCALE  = 0.40f;   // cubo perfecto
+    // ── Muro translúcido continuo ─────────────────────────────────────────
+    private static final double   WALL_SEGMENT    = 4.0;     // largo de cada panel
+    private static final float    WALL_HEIGHT     = 35.0f;    // alto del muro
+    private static final float    WALL_THICKNESS  = 0.2f;    // grosor del muro
+    private static final Material WALL_MATERIAL   = Material.MAGENTA_STAINED_GLASS;
+    private static final float    WALL_VIEW_RANGE = 4.0f;
 
-    // ── Pilares menores: agujas de amatista ───────────────────────────────
-    private static final int    MINOR_STACK = 4;        // 4 × 0.4 = 1.6 bl
-
-    // ── Pilares mayores: columna purpur + orbe ────────────────────────────
-    private static final int    MAJOR_STACK = 10;       // 10 × 0.4 = 4.0 bl
-    private static final float  ORB_SIZE    = 0.45f;    // cubo uniforme
-    private static final int    MAJOR_EVERY = 6;
-
-    private static final double ARC_SPACING = 18.0;
+    // ── Beams (haces de luz) en los puntos mayores ────────────────────────
+    private static final int      MAJOR_EVERY     = 5;       // 1 beam cada 5 paneles
+    private static final float    BEAM_WIDTH      = 0.6f;
+    private static final float    BEAM_HEIGHT     = 35.0f;
+    private static final Material BEAM_MATERIAL   = Material.SEA_LANTERN;
+    private static final float    BEAM_VIEW_RANGE = 8.0f;
 
     private static final AxisAngle4f NO_ROT = new AxisAngle4f(0, 0, 0, 1);
 
@@ -47,77 +47,76 @@ public class ChargeBaseZone {
         World world = center.getWorld();
         if (world == null) return;
 
-        int steps = (int) Math.max(16, (2 * Math.PI * currentRadius) / ARC_SPACING);
+        int steps = (int) Math.max(48, (2 * Math.PI * currentRadius) / WALL_SEGMENT);
+
+        double[] xs = new double[steps];
+        double[] zs = new double[steps];
+        double[] ys = new double[steps];
 
         for (int i = 0; i < steps; i++) {
             double angle = (2 * Math.PI / steps) * i;
             double x     = center.getX() + currentRadius * Math.cos(angle);
             double z     = center.getZ() + currentRadius * Math.sin(angle);
-            int    baseY = world.getHighestBlockYAt((int) x, (int) z);
-            Location base = new Location(world, x, baseY, z);
+            xs[i] = x;
+            zs[i] = z;
+            ys[i] = world.getHighestBlockYAt((int) Math.floor(x), (int) Math.floor(z));
+        }
 
-            if (i % MAJOR_EVERY == 0) spawnMajorPillar(world, base);
-            else                      spawnMinorPillar(world, base);
+        for (int i = 0; i < steps; i++) {
+            int next = (i + 1) % steps;
+            double dx = xs[next] - xs[i];
+            double dz = zs[next] - zs[i];
+            double width = Math.sqrt(dx * dx + dz * dz);
+            float  yaw   = (float) Math.atan2(-dz, dx);
+
+            Location base = new Location(world, xs[i], ys[i], zs[i]);
+            spawnWallPanel(world, base, width, yaw);
+
+            if (i % MAJOR_EVERY == 0) {
+                spawnBeam(world, base);
+            }
         }
     }
 
-    // ── Apila n cubos uniformes de un material dado ───────────────────────
+    // ── Panel del muro: cubo escalado y rotado tangente al círculo ────────
 
-    private void spawnStack(World world, Location base,
-                            Material mat, int count, float size, float viewRange) {
-        float half = size / 2f;
-        for (int j = 0; j < count; j++) {
-            final float yOff = j * size;
-            Location loc = base.clone().add(0, yOff, 0);
-            displays.add(world.spawn(loc, BlockDisplay.class, e -> {
-                e.setBlock(mat.createBlockData());
-                e.setPersistent(false);
-                e.setVisibleByDefault(true);
-                e.setViewRange(viewRange);
-                // translación centra X/Z; Y crece hacia arriba desde base
-                e.setTransformation(new Transformation(
-                        new Vector3f(-half, 0f, -half),
-                        NO_ROT,
-                        new Vector3f(size, size, size),
-                        NO_ROT
-                ));
-                e.setBrightness(new Display.Brightness(15, 15));
-            }));
-        }
-    }
+    private void spawnWallPanel(World world, Location base, double width, float yaw) {
+        float cos = (float) Math.cos(yaw);
+        float sin = (float) Math.sin(yaw);
+        Vector3f translation = new Vector3f(-(WALL_THICKNESS / 2f) * sin, 0f, -(WALL_THICKNESS / 2f) * cos);
+        AxisAngle4f rot = new AxisAngle4f(yaw, 0f, 1f, 0f);
 
-    // ── Pilar menor — agujas de amatista ──────────────────────────────────
-
-    private void spawnMinorPillar(World world, Location base) {
-        spawnStack(world, base, Material.AMETHYST_BLOCK, MINOR_STACK, CUBE_SCALE, 1.8f);
-    }
-
-    // ── Pilar mayor — columna de purpur + orbe sea lantern ────────────────
-
-    private void spawnMajorPillar(World world, Location base) {
-        // Base de dos cubos de amatista (acento de color)
-        spawnStack(world, base, Material.AMETHYST_BLOCK, 2, CUBE_SCALE, 2.5f);
-
-        // Cuerpo de purpur encima
-        Location shaftBase = base.clone().add(0, 2 * CUBE_SCALE, 0);
-        spawnStack(world, shaftBase, Material.PURPUR_BLOCK, MAJOR_STACK - 2, CUBE_SCALE, 2.5f);
-
-        // Orbe flotando en el tope (pequeño gap visual de 0.1)
-        double topY   = base.getY() + MAJOR_STACK * CUBE_SCALE + 0.1;
-        float  half   = ORB_SIZE / 2f;
-        Location orbLoc = new Location(world, base.getX(), topY, base.getZ());
-        displays.add(world.spawn(orbLoc, BlockDisplay.class, e -> {
-            e.setBlock(Material.SEA_LANTERN.createBlockData());
+        displays.add(world.spawn(base, BlockDisplay.class, e -> {
+            e.setBlock(WALL_MATERIAL.createBlockData());
             e.setPersistent(false);
             e.setVisibleByDefault(true);
-            e.setViewRange(2.5f);
+            e.setViewRange(WALL_VIEW_RANGE);
+            e.setBrightness(new Display.Brightness(15, 15));
+            e.setTransformation(new Transformation(
+                    translation,
+                    rot,
+                    new Vector3f((float) width, WALL_HEIGHT, WALL_THICKNESS),
+                    NO_ROT
+            ));
+        }));
+    }
+
+    // ── Beam: columna alta y brillante ────────────────────────────────────
+
+    private void spawnBeam(World world, Location base) {
+        float half = BEAM_WIDTH / 2f;
+        displays.add(world.spawn(base, BlockDisplay.class, e -> {
+            e.setBlock(BEAM_MATERIAL.createBlockData());
+            e.setPersistent(false);
+            e.setVisibleByDefault(true);
+            e.setViewRange(BEAM_VIEW_RANGE);
+            e.setBrightness(new Display.Brightness(15, 15));
             e.setTransformation(new Transformation(
                     new Vector3f(-half, 0f, -half),
                     NO_ROT,
-                    new Vector3f(ORB_SIZE, ORB_SIZE, ORB_SIZE),
+                    new Vector3f(BEAM_WIDTH, BEAM_HEIGHT, BEAM_WIDTH),
                     NO_ROT
             ));
-            e.setBrightness(new Display.Brightness(15, 15));
         }));
     }
 

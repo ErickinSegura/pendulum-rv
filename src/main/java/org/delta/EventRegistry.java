@@ -84,6 +84,10 @@ public class EventRegistry {
         pm.registerEvents(new HambreVorazListener(), plugin);
         pm.registerEvents(new EcoVacioListener(), plugin);
         pm.registerEvents(new VinculoDolorosoListener(), plugin);
+        pm.registerEvents(new SaltoDobleListener(), plugin);
+        pm.registerEvents(new PosturaFirmeListener(), plugin);
+        pm.registerEvents(new ImanGolpesListener(), plugin);
+        pm.registerEvents(new FotofobiaListener(), plugin);
 
         // TeamChest
         pm.registerEvents(new TeamChestListener(), plugin);

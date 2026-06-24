@@ -26,7 +26,9 @@ import org.delta.listeners.perks.impl.*;
 import org.delta.listeners.player.*;
 import org.delta.listeners.spawns.CreeperVariantListener;
 import org.delta.listeners.spawns.CustomMobListener;
+import org.delta.listeners.spawns.DragonaVacioListener;
 import org.delta.listeners.spawns.EndCreeperListener;
+import org.delta.listeners.spawns.EndermanHostileListener;
 import org.delta.listeners.spawns.MobEquipmentListener;
 import org.delta.listeners.spawns.PolarBear;
 import org.delta.listeners.spawns.UpgradedMobListener;
@@ -110,7 +112,9 @@ public class EventRegistry {
         pm.registerEvents(new MobEquipmentListener(), plugin);
         pm.registerEvents(new CreeperVariantListener(), plugin);
         pm.registerEvents(new UpgradedMobListener(), plugin);
-        pm.registerEvents(new EndCreeperListener(), plugin);
+        pm.registerEvents(new EndCreeperListener(plugin), plugin);
+        pm.registerEvents(new EndermanHostileListener(plugin), plugin);
+        pm.registerEvents(new DragonaVacioListener(plugin), plugin);
 
         // Items
         pm.registerEvents(new LanzapapasListener(), plugin);

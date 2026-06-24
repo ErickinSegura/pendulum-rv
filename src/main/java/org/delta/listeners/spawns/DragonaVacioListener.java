@@ -36,7 +36,7 @@ public class DragonaVacioListener implements Listener {
     private static final int DIA_MINIMO = 10;
     private static final double HEALTH_MULTIPLIER = 1.5;
 
-    private static final long ATTACK_INTERVAL = 12L;
+    private static final long ATTACK_INTERVAL =12L;
     private static final long ATTACK_INTERVAL_ENRAGE = 8L;
     private static final double ENRAGE_THRESHOLD = 0.5;
     private static final long TELEGRAPH_TICKS = 40L;
@@ -49,10 +49,10 @@ public class DragonaVacioListener implements Listener {
     private static final long PULL_PULSE_INTERVAL = 4L;
 
     private static final int LEVITATION_TICKS = 30;
-    private static final int LEVITATION_AMP = 8;
+    private static final int LEVITATION_AMP = 20;
 
-    private static final double IMPLOSION_RADIUS = 6.0;
-    private static final double IMPLOSION_DAMAGE = 8.0;
+    private static final double IMPLOSION_RADIUS = 10.0;
+    private static final double IMPLOSION_DAMAGE = 16.0;
     private static final double IMPLOSION_LAUNCH = 1.0;
 
     private static final int METEOR_COUNT = 6;

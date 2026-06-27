@@ -12,6 +12,7 @@ import org.delta.customs.mobs.chargebase.healer.HealerBasico;
 import org.delta.customs.mobs.chargebase.atacante.AtacanteBasico;
 import org.delta.customs.mobs.chargebase.controlador.ControladorBasico;
 import org.delta.customs.mobs.chargebase.hibrido.HibridoBasico;
+import org.delta.customs.mobs.boss.GuardianForja;
 import org.delta.pendulum;
 
 import java.util.*;
@@ -33,6 +34,9 @@ public class MobRegistry {
         register("controlador_avanzado", ControladorAvanzado::new);
         register("hibrido_basico", HibridoBasico::new);
         register("hibrido_avanzado", HibridoAvanzado::new);
+
+        // Boss
+        register("guardian_forja", GuardianForja::new);
     }
 
     private static void register(String key, BiFunction<pendulum, Location, CustomMob> factory) {

@@ -4,6 +4,7 @@ import org.bukkit.plugin.PluginManager;
 import org.delta.commands.subcommand.StructureDevCommand;
 import org.delta.listeners.achievements.AchievementListener;
 import org.delta.listeners.bingo.*;
+import org.delta.listeners.boss.GuardianForjaListener;
 import org.delta.listeners.castigo.CastigoListener;
 import org.delta.listeners.chargebase.AtacanteBehaviorListener;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
@@ -116,6 +117,9 @@ public class EventRegistry {
         pm.registerEvents(new EndCreeperListener(plugin), plugin);
         pm.registerEvents(new EndermanHostileListener(plugin), plugin);
         pm.registerEvents(new DragonaVacioListener(plugin), plugin);
+
+        // Boss
+        pm.registerEvents(new GuardianForjaListener(plugin), plugin);
 
         // Items
         pm.registerEvents(new LanzapapasListener(), plugin);

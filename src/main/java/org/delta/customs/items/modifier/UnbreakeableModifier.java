@@ -14,7 +14,7 @@ public class UnbreakeableModifier implements CustomItem {
     @Override
     public ItemStack buildItem() {
         return new ItemBuilder(Material.NETHER_BRICK)
-                .setDisplayName(ItemBuilder.format("&6Unbreakable Modifier"))
+                .setDisplayName(ItemBuilder.format("&6Irrompible Modifier"))
                 .setCustomModelData(1)
                 .build();
     }

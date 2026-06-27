@@ -8,6 +8,7 @@ import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
 import org.bukkit.plugin.Plugin;
 import org.delta.listeners.worldgen.PendingEntitySpawner;
+import org.delta.worldgen.structures.ForjaAncestral;
 import org.delta.worldgen.structures.RuinasTorre;
 
 import java.io.File;
@@ -71,6 +72,7 @@ public class StructurePopulator extends BlockPopulator {
         // Estructuras en código
         for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
             //register(new RuinasTorre(rot));
+            register(new ForjaAncestral(rot));
         }
 
         // Estructuras desde JSON

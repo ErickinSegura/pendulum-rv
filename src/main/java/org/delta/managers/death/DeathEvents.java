@@ -35,6 +35,7 @@ public class DeathEvents {
         PilarEvents.placeDeathPilar(player, location, event);
         placeDeathChest(player, location, event);
         broadcastDeathMessages(player);
+        broadcastDeathSound();
     }
 
     private void displayDeathClockAnimation(Player player) {
@@ -45,6 +46,13 @@ public class DeathEvents {
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             animateClockForPlayer(onlinePlayer, player.getName(), world, originalFullTime);
+        }
+    }
+
+    private static void broadcastDeathSound() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.playSound(player.getLocation(), "minecraft:entity.warden.sonic_boo", 1, 0.7f);
+            player.playSound(player.getLocation(), " minecraft:block.bell.resonate", 1, 0.7f);
         }
     }
 

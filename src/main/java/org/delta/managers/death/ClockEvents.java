@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
@@ -34,8 +35,9 @@ public class ClockEvents {
 
     private static void broadcastClockSound() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.playSound(player.getLocation(), "minecraft:ambient.cave", 1, 1);
-            player.playSound(player.getLocation(), "minecraft:block.glass.break", 1, 0.5f);
+            player.playSound(player.getLocation(), "minecraft:entity.warden.sonic_boo", 1, 2);
+            player.playSound(player.getLocation(), " minecraft:block.bell.resonate", 1, 2);
+            //world.playSound(boss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1.0f, 1.3f);
         }
     }
 

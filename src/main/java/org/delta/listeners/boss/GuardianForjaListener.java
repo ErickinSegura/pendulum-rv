@@ -158,7 +158,7 @@ public class GuardianForjaListener implements Listener {
 
     private void tironGravitatorio(LivingEntity boss) {
         World world = boss.getWorld();
-        world.playSound(boss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1.0f, 1.3f);
+        world.playSound(boss.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1.0f, 1.2f);
         world.spawnParticle(Particle.PORTAL, boss.getLocation().add(0, 1, 0), 60, 0.5, 1, 0.5, 0.4);
 
         for (Player player : nearbyPlayers(boss, 20.0)) {

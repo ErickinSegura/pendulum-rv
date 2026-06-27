@@ -6,6 +6,9 @@ import org.delta.customs.items.base.fragmentos.FragmentoControl;
 import org.delta.customs.items.base.fragmentos.FragmentoAtaque;
 import org.delta.customs.items.base.nucleos.*;
 import org.delta.customs.items.base.uniones.*;
+import org.delta.customs.items.modifier.UnbreakeableModifier;
+import org.delta.customs.items.modifier.LivianoModifier;
+import org.delta.customs.items.modifier.VampiricoModifier;
 import org.delta.customs.items.tools.Lanzapapas;
 import org.delta.customs.items.base.PapaExplosiva;
 import org.delta.customs.items.tools.Clawn;
@@ -43,11 +46,17 @@ public class ItemRegistry {
         register(new NucleoDefensor());
         register(new NucleoHeal());
         register(new NucleoControl());
+
         // Núcleos con unión híbrida
         register(new NucleoAtacanteHibrido());
         register(new NucleoDefensorHibrido());
         register(new NucleoHealHibrido());
         register(new NucleoControlHibrido());
+
+        // Modifiers
+        register(new UnbreakeableModifier());
+        register(new LivianoModifier());
+        register(new VampiricoModifier());
 
         register(new Placeholder());
 

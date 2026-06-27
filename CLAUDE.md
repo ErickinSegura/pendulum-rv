@@ -2,6 +2,10 @@
 
 Dont add any comment to the code
 
+Dont try to compile the project, just ask the user to do it
+
+Change the version on plugin.yml to SNAPSHOT-26w{WEEK_OF_YEAR} and a letter for the version, eg `SNAPSHOT-26w24a` for the first build of week 24, `SNAPSHOT-26w24b` for the second build of week 24, etc.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview

@@ -21,6 +21,7 @@ import org.delta.listeners.items.FrenesiListener;
 import org.delta.listeners.items.ZanahoriaRellenableListener;
 import org.delta.listeners.items.ZanahoriaRellenableCraftListener;
 import org.delta.listeners.items.PapaExplosivaListener;
+import org.delta.listeners.items.ModifierSmithingListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
 import org.delta.listeners.player.*;
@@ -128,6 +129,7 @@ public class EventRegistry {
         pm.registerEvents(new FrenesiListener(), plugin);
         pm.registerEvents(new ZanahoriaRellenableListener(), plugin);
         pm.registerEvents(new ZanahoriaRellenableCraftListener(), plugin);
+        pm.registerEvents(new ModifierSmithingListener(plugin), plugin);
 
         // World Generation
         WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());

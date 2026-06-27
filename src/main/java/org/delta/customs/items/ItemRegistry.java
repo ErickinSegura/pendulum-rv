@@ -8,7 +8,7 @@ import org.delta.customs.items.base.nucleos.*;
 import org.delta.customs.items.base.uniones.*;
 import org.delta.customs.items.modifier.UnbreakeableModifier;
 import org.delta.customs.items.modifier.LivianoModifier;
-import org.delta.customs.items.modifier.VampiricoModifier;
+import org.delta.customs.items.modifier.TempleModifier;
 import org.delta.customs.items.tools.Lanzapapas;
 import org.delta.customs.items.base.PapaExplosiva;
 import org.delta.customs.items.tools.Clawn;
@@ -56,7 +56,7 @@ public class ItemRegistry {
         // Modifiers
         register(new UnbreakeableModifier());
         register(new LivianoModifier());
-        register(new VampiricoModifier());
+        register(new TempleModifier());
 
         register(new Placeholder());
 

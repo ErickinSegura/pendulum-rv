@@ -8,7 +8,7 @@ import org.delta.libs.builders.ItemBuilder;
 public class ModifierLiviano extends StackeableArmorModifier {
 
     private static final NamespacedKey KEY = new NamespacedKey("delta", "modifier_liviano");
-    private static final String LORE = ItemBuilder.format("&fLiviano");
+    private static final String LORE = ItemBuilder.format("&f♫ Liviano");
 
     @Override
     public String getKey() {

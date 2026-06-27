@@ -18,7 +18,7 @@ public class ModifierRegistry {
     static {
         register(new ModifierIrrompible());
         register(new ModifierLiviano());
-        register(new ModifierVampirico());
+        register(new ModifierTemple());
     }
 
     private static void register(Modifier modifier) {

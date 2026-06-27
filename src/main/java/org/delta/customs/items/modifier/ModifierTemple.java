@@ -7,19 +7,19 @@ import org.delta.libs.builders.ItemBuilder;
 
 import java.util.Set;
 
-public class ModifierVampirico extends StackeableArmorModifier {
+public class ModifierTemple extends StackeableArmorModifier {
 
-    private static final NamespacedKey KEY = new NamespacedKey("delta", "modifier_vampirico");
-    private static final String LORE = ItemBuilder.format("&cPLACEHOLDER_NOMBRE");
+    private static final NamespacedKey KEY = new NamespacedKey("delta", "modifier_temple");
+    private static final String LORE = ItemBuilder.format("&c❤ Temple");
 
     @Override
     public String getKey() {
-        return "vampirico_modifier";
+        return "temple_modifier";
     }
 
     @Override
     public String getDisplayName() {
-        return "PLACEHOLDER_NOMBRE";
+        return "Temple";
     }
 
     @Override

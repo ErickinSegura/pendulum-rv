@@ -14,7 +14,7 @@ import java.util.Set;
 public class ModifierIrrompible implements Modifier {
 
     private static final NamespacedKey APPLIED_KEY = new NamespacedKey("delta", "modifier_irrompible");
-    private static final String LORE = ItemBuilder.format("&6Irrompible");
+    private static final String LORE = ItemBuilder.format("&6\uD83D\uDEE1 Irrompible");
 
     @Override
     public String getKey() {
@@ -28,7 +28,7 @@ public class ModifierIrrompible implements Modifier {
 
     @Override
     public Set<String> incompatibleWith() {
-        return Set.of("vampirico_modifier");
+        return Set.of("temple_modifier");
     }
 
     @Override

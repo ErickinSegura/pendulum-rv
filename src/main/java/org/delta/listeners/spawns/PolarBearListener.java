@@ -10,11 +10,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.libs.PendulumSettings;
 import org.delta.pendulum;
 
-public class PolarBear implements Listener {
+public class PolarBearListener implements Listener {
     private final PendulumSettings settings = PendulumSettings.getInstance();
     private final pendulum plugin;
 
-    public PolarBear(pendulum plugin) {
+    public PolarBearListener(pendulum plugin) {
         this.plugin = plugin;
     }
 

@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.delta.customs.items.ItemRegistry;
 import org.delta.customs.mobs.boss.GuardianForja;
+import org.delta.managers.achievements.Achievement;
 import org.delta.pendulum;
 
 import java.util.ArrayList;
@@ -40,7 +41,6 @@ public class GuardianForjaListener implements Listener {
     private static final long ATTACK_COOLDOWN = 90L;
     private static final double ACTIVATION_RANGE = 28.0;
     private static final double ENRAGE_THRESHOLD = 0.4;
-    private static final double MODIFIER_DROP_CHANCE = 0.20;
 
     private static final String[] MODIFIER_KEYS = {
             "unbreakable_modifier",
@@ -234,11 +234,16 @@ public class GuardianForjaListener implements Listener {
         attackCooldown.remove(id);
         enraged.remove(id);
 
+        Player killer = event.getEntity().getKiller();
+        if (killer != null) {
+            plugin.getAchievementManager().unlock(killer, Achievement.GUARDIAN_CAIDO);
+        }
+
         event.getDrops().clear();
         event.setDroppedExp(60);
 
-        if (rng.nextDouble() <= MODIFIER_DROP_CHANCE) {
-            String key = MODIFIER_KEYS[rng.nextInt(MODIFIER_KEYS.length)];
+        String key = MODIFIER_KEYS[rng.nextInt(MODIFIER_KEYS.length)];
+        if (rng.nextBoolean()) {
             ItemRegistry.get(key).ifPresent(item ->
                     event.getEntity().getWorld().dropItemNaturally(
                             event.getEntity().getLocation(), item.build()));

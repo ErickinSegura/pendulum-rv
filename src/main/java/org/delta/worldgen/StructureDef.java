@@ -35,8 +35,11 @@ public class StructureDef {
     private final List<EntityEntry>     entities;
     private final List<BlockDataEntry>  blockDataEntries;
     private final Map<Long, LootTable>  chestLoot;
+    private final Map<Long, EntityType> spawners;
     private final Set<Biome>            allowedBiomes;
     private final double                spawnChance;
+    private final int                   minDay;
+    private final String                notifyMessage;
     private final int                   maxRelX;
     private final int                   maxRelZ;
     private final SpawnMode             spawnMode;
@@ -53,6 +56,8 @@ public class StructureDef {
         this.id            = b.id;
         this.allowedBiomes = Collections.unmodifiableSet(new HashSet<>(b.allowedBiomes));
         this.spawnChance   = b.spawnChance;
+        this.minDay        = b.minDay;
+        this.notifyMessage = b.notifyMessage;
         this.spawnMode     = b.spawnMode;
         this.minClearance  = b.minClearance;
         this.minAirY       = b.minAirY;
@@ -63,11 +68,13 @@ public class StructureDef {
         List<EntityEntry>    rotatedEntities  = rotateEntities(b.entities, b.blocks, b.rotation);
         List<BlockDataEntry> rotatedBlockData = rotateBlockData(b.blockDataEntries, b.blocks, b.rotation);
         Map<Long, LootTable> rotatedLoot      = rotateLoot(b.chestLoot, b.blocks, b.rotation);
+        Map<Long, EntityType> rotatedSpawners = rotateSpawners(b.spawners, b.blocks, b.rotation);
 
         this.blocks           = Collections.unmodifiableList(rotatedBlocks);
         this.entities         = Collections.unmodifiableList(rotatedEntities);
         this.blockDataEntries = Collections.unmodifiableList(rotatedBlockData);
         this.chestLoot        = Collections.unmodifiableMap(rotatedLoot);
+        this.spawners         = Collections.unmodifiableMap(rotatedSpawners);
 
         this.maxRelX = this.blocks.stream().mapToInt(BlockEntry::relX).max().orElse(0);
         this.maxRelZ = this.blocks.stream().mapToInt(BlockEntry::relZ).max().orElse(0);
@@ -189,6 +196,23 @@ public class StructureDef {
         return result;
     }
 
+    private static Map<Long, EntityType> rotateSpawners(Map<Long, EntityType> originalSpawners,
+                                                        List<BlockEntry> originalBlocks,
+                                                        Rotation rot) {
+        if (rot == Rotation.ROT_0) return new HashMap<>(originalSpawners);
+        int[] norm = normOffset(originalBlocks, rot);
+        Map<Long, EntityType> result = new HashMap<>();
+        for (BlockEntry e : originalBlocks) {
+            long oldKey = posKey(e.relX(), e.relY(), e.relZ());
+            EntityType type = originalSpawners.get(oldKey);
+            if (type == null) continue;
+            int[] r = rotatePoint(e.relX(), e.relZ(), rot);
+            long newKey = posKey(r[0] - norm[0], e.relY(), r[1] - norm[1]);
+            result.put(newKey, type);
+        }
+        return result;
+    }
+
     // -------------------------------------------------------------------------
     // Getters
     // -------------------------------------------------------------------------
@@ -202,6 +226,8 @@ public class StructureDef {
     public int                  getMaxRelX()          { return maxRelX; }
     public int                  getMaxRelZ()          { return maxRelZ; }
     public SpawnMode            getSpawnMode()        { return spawnMode; }
+    public int                  getMinDay()           { return minDay; }
+    public String               getNotifyMessage()    { return notifyMessage; }
     public int                  getMinClearance()     { return minClearance; }
     public int                  getMinAirY()          { return minAirY; }
     public int                  getMaxAirY()          { return maxAirY; }
@@ -209,6 +235,10 @@ public class StructureDef {
 
     public LootTable getChestLoot(int relX, int relY, int relZ) {
         return chestLoot.get(posKey(relX, relY, relZ));
+    }
+
+    public EntityType getSpawnerType(int relX, int relY, int relZ) {
+        return spawners.get(posKey(relX, relY, relZ));
     }
 
     public boolean allowedIn(Biome biome) {
@@ -233,8 +263,11 @@ public class StructureDef {
         private final List<EntityEntry>    entities         = new ArrayList<>();
         private final List<BlockDataEntry> blockDataEntries = new ArrayList<>();
         private final Map<Long, LootTable> chestLoot        = new HashMap<>();
+        private final Map<Long, EntityType> spawners        = new HashMap<>();
         private final Set<Biome>           allowedBiomes    = new HashSet<>();
         private double    spawnChance  = 0.015;
+        private int       minDay       = 0;
+        private String    notifyMessage = null;
         private SpawnMode spawnMode    = SpawnMode.GROUND;
         private int       minClearance = 10;
         private int       minAirY      = 80;
@@ -250,6 +283,16 @@ public class StructureDef {
 
         public Builder spawnChance(double chance) {
             this.spawnChance = chance;
+            return this;
+        }
+
+        public Builder minDay(int day) {
+            this.minDay = day;
+            return this;
+        }
+
+        public Builder notifyOnGenerate(String message) {
+            this.notifyMessage = message;
             return this;
         }
 
@@ -310,6 +353,12 @@ public class StructureDef {
         public Builder chest(int relX, int relY, int relZ, Material chestType, LootTable lootTable) {
             blocks.add(new BlockEntry(relX, relY, relZ, chestType));
             chestLoot.put(posKey(relX, relY, relZ), lootTable);
+            return this;
+        }
+
+        public Builder spawner(int relX, int relY, int relZ, EntityType type) {
+            blocks.add(new BlockEntry(relX, relY, relZ, Material.SPAWNER));
+            spawners.put(posKey(relX, relY, relZ), type);
             return this;
         }
 

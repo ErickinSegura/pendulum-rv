@@ -32,7 +32,7 @@ import org.delta.listeners.spawns.DragonaVacioListener;
 import org.delta.listeners.spawns.EndCreeperListener;
 import org.delta.listeners.spawns.EndermanHostileListener;
 import org.delta.listeners.spawns.MobEquipmentListener;
-import org.delta.listeners.spawns.PolarBear;
+import org.delta.listeners.spawns.PolarBearListener;
 import org.delta.listeners.spawns.UpgradedMobListener;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
@@ -109,7 +109,7 @@ public class EventRegistry {
 
         // Spawns
         pm.registerEvents(new ZombieSpawner(plugin), plugin);
-        pm.registerEvents(new PolarBear(plugin), plugin);
+        pm.registerEvents(new PolarBearListener(plugin), plugin);
         pm.registerEvents(new CustomMobListener(plugin), plugin);
         pm.registerEvents(new MobEquipmentListener(), plugin);
         pm.registerEvents(new CreeperVariantListener(), plugin);

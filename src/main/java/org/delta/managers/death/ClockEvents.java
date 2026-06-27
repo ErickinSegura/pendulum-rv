@@ -35,9 +35,8 @@ public class ClockEvents {
 
     private static void broadcastClockSound() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.playSound(player.getLocation(), "minecraft:entity.warden.sonic_boo", 1, 2);
-            player.playSound(player.getLocation(), " minecraft:block.bell.resonate", 1, 2);
-            //world.playSound(boss.getLocation(), Sound.ENTITY_WARDEN_SONIC_BOOM, 1.0f, 1.3f);
+            player.playSound(player.getLocation(), "minecraft:entity.warden.sonic_boom", 1, 2f);
+            player.playSound(player.getLocation(), "minecraft:block.bell.resonate", 1, 2f);
         }
     }
 

@@ -109,7 +109,27 @@ public enum Achievement {
 
     PLENO_AL_BINGO("pleno_al_bingo", "Pleno al Bingo",
             "Completa una línea entera: fila, columna o diagonal.",
-            Material.EMERALD_BLOCK, Frame.CHALLENGE, "maestro_del_bingo", null);
+            Material.EMERALD_BLOCK, Frame.CHALLENGE, "maestro_del_bingo", null),
+
+    MAESTRO_HERRERO("maestro_herrero", "Maestro Herrero",
+            "Aplica un modificador a un objeto en la mesa de herrería.",
+            Material.SMITHING_TABLE, Frame.TASK, null, null),
+
+    A_PRUEBA_DE_TODO("a_prueba_de_todo", "A Prueba de Todo",
+            "Aplica el modificador Irrompible a una herramienta o armadura.",
+            Material.NETHERITE_CHESTPLATE, Frame.GOAL, "maestro_herrero", "unbreakable_modifier"),
+
+    PESO_PLUMA("peso_pluma", "Peso Pluma",
+            "Aplica el modificador Liviano a una pieza de armadura.",
+            Material.FEATHER, Frame.GOAL, "maestro_herrero", "liviano_modifier"),
+
+    TEMPLE_DE_ACERO("temple_de_acero", "Temple de Acero",
+            "Aplica el modificador Temple a una pieza de armadura.",
+            Material.NETHERITE_HELMET, Frame.GOAL, "maestro_herrero", "temple_modifier"),
+
+    GUARDIAN_CAIDO("guardian_caido", "Guardián Caído",
+            "Derrota al Guardián de la Forja en su torre.",
+            Material.WITHER_SKELETON_SKULL, Frame.CHALLENGE, null, null);
 
     public enum Frame {
         TASK("task"),

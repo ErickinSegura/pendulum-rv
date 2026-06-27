@@ -1,17 +1,22 @@
 package org.delta.listeners.worldgen;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.Plugin;
+import org.delta.libs.MessageUtils;
 import org.delta.worldgen.LootTable;
 
 import java.util.*;
@@ -29,9 +34,15 @@ public class PendingEntitySpawner implements Listener {
 
     public record PendingBlockData(int x, int y, int z, BlockData blockData) {}
 
-    private final Map<Long, List<PendingSpawn>>     pendingSpawns      = new ConcurrentHashMap<>();
-    private final Map<Long, List<PendingChestFill>> pendingChests      = new ConcurrentHashMap<>();
-    private final Map<Long, List<PendingBlockData>> pendingBlockData   = new ConcurrentHashMap<>();
+    public record PendingSpawner(int x, int y, int z, EntityType type) {}
+
+    public record PendingNotification(int x, int y, int z, String id, String message) {}
+
+    private final Map<Long, List<PendingSpawn>>        pendingSpawns        = new ConcurrentHashMap<>();
+    private final Map<Long, List<PendingChestFill>>    pendingChests        = new ConcurrentHashMap<>();
+    private final Map<Long, List<PendingBlockData>>    pendingBlockData     = new ConcurrentHashMap<>();
+    private final Map<Long, List<PendingSpawner>>      pendingSpawners      = new ConcurrentHashMap<>();
+    private final Map<Long, List<PendingNotification>> pendingNotifications = new ConcurrentHashMap<>();
 
     private final Plugin plugin;
     private final Logger logger;
@@ -70,6 +81,22 @@ public class PendingEntitySpawner implements Listener {
                 .add(new PendingBlockData(x, y, z, blockData));
     }
 
+    public void scheduleSpawner(int chunkX, int chunkZ,
+                                int x, int y, int z, EntityType type) {
+        pendingSpawners
+                .computeIfAbsent(chunkKey(chunkX, chunkZ),
+                        k -> Collections.synchronizedList(new ArrayList<>()))
+                .add(new PendingSpawner(x, y, z, type));
+    }
+
+    public void scheduleNotification(int chunkX, int chunkZ,
+                                     int x, int y, int z, String id, String message) {
+        pendingNotifications
+                .computeIfAbsent(chunkKey(chunkX, chunkZ),
+                        k -> Collections.synchronizedList(new ArrayList<>()))
+                .add(new PendingNotification(x, y, z, id, message));
+    }
+
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
         if (!event.isNewChunk()) return;
@@ -80,8 +107,11 @@ public class PendingEntitySpawner implements Listener {
         final List<PendingSpawn>     spawns     = pendingSpawns.remove(key);
         final List<PendingChestFill> chests     = pendingChests.remove(key);
         final List<PendingBlockData> blockDatas = pendingBlockData.remove(key);
+        final List<PendingSpawner>   spawners   = pendingSpawners.remove(key);
+        final List<PendingNotification> notifications = pendingNotifications.remove(key);
 
-        if (spawns == null && chests == null && blockDatas == null) return;
+        if (spawns == null && chests == null && blockDatas == null
+                && spawners == null && notifications == null) return;
 
         Bukkit.getScheduler().runTask(plugin, () -> {
 
@@ -112,6 +142,52 @@ public class PendingEntitySpawner implements Listener {
                         }
                     } catch (Exception e) {
                         logger.warning("[PendingEntitySpawner] Error cofre: " + e.getMessage());
+                    }
+                }
+            }
+
+            if (spawners != null) {
+                for (PendingSpawner pending : spawners) {
+                    try {
+                        Block      block = world.getBlockAt(pending.x(), pending.y(), pending.z());
+                        BlockState state = block.getState();
+                        if (state instanceof CreatureSpawner spawner) {
+                            spawner.setSpawnedType(pending.type());
+                            spawner.update();
+                        } else {
+                            logger.warning(String.format(
+                                    "[PendingEntitySpawner] Esperaba spawner en %d,%d,%d pero hay %s",
+                                    pending.x(), pending.y(), pending.z(), block.getType()));
+                        }
+                    } catch (Exception e) {
+                        logger.warning("[PendingEntitySpawner] Error spawner: " + e.getMessage());
+                    }
+                }
+            }
+
+            if (notifications != null) {
+                for (PendingNotification n : notifications) {
+                    try {
+                        Location loc = new Location(world, n.x(), n.y(), n.z());
+                        Player nearest = null;
+                        double best = Double.MAX_VALUE;
+                        for (Player p : world.getPlayers()) {
+                            double d = p.getLocation().distanceSquared(loc);
+                            if (d < best) {
+                                best = d;
+                                nearest = p;
+                            }
+                        }
+                        if (nearest != null) {
+                            nearest.sendMessage(MessageUtils.color(n.message()));
+                            nearest.playSound(nearest.getLocation(), Sound.BLOCK_BELL_RESONATE, 1f, 0.7f);
+                        }
+                        logger.info("[StructurePopulator] " + n.id() + " generada en "
+                                + n.x() + ", " + n.y() + ", " + n.z()
+                                + (nearest != null ? " (notificado a " + nearest.getName() + ")"
+                                                   : " (sin jugadores cerca)"));
+                    } catch (Exception e) {
+                        logger.warning("[PendingEntitySpawner] Error notificación: " + e.getMessage());
                     }
                 }
             }

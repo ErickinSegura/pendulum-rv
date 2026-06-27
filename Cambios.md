@@ -86,6 +86,33 @@ A partir del día 5, si llevas **las 4 piezas de armadura con trim del mismo mat
 
 ---
 
+## Día 15 — La Forja Ancestral
+
+### Sistema de modificadores
+- **Modificadores de equipo.** Objetos especiales que se aplican a herramientas/armas/armaduras en la **mesa de herrería** (smithing table): se pone el objeto en la ranura base y el modificador en la de material, sin plantilla. Se valida que sea el modificador real (no el material vanilla suelto). Hay tres:
+  - **Irrompible.** Vuelve indestructible cualquier objeto con durabilidad. No acumulable.
+  - **Liviano.** Para armadura: **+5% de velocidad** por pieza, acumulable (apilando el modificador y entre piezas).
+  - **Temple.** Para armadura: **+1 corazón** de vida máxima por aplicación, acumulable. **Incompatible con Irrompible** (no se pueden tener ambos en la misma pieza).
+
+### Guardián de la Forja (jefe)
+- **Boss personalizado** con barra de jefe, ~300 de vida, que se siente cercano a vanilla pero con **6 ataques**: golpe de yunque (AoE + empuje), llamarada, lluvia de fuego, salva de flechas, convocar escoria (magma cubes) y un tirón gravitatorio. Entra en **frenesí** por debajo del 40% de vida.
+- **Drops.** Al morir elige uno de los tres modificadores y tiene un **50%** de soltarlo.
+
+### Estructura: Forja Ancestral
+- **Torre por niveles** (no genera antes del día 15): planta de forja con estaciones de herrería, lava y **spawners** (blaze y esqueleto wither), segundo piso de armería con balcón, y **terraza almenada donde aguarda el Guardián**. Torres de esquina, pórtico de entrada y patio exterior.
+- **Variaciones de material:** clásica (blackstone), deepslate y nether.
+- **Aviso de generación:** al generarse, el jugador más cercano recibe un mensaje (sin coordenadas); en consola se registran las coordenadas.
+- **Botín** acorde al día 15+: diamantes, scrap/escombros de netherita, lingote de netherita (raro), plantillas de smithing, manzanas doradas/encantadas, y **muchas zanahorias y papas explosivas** por cofre.
+
+### Logros
+- **Maestro Herrero** — aplica un modificador en la mesa de herrería.
+- **A Prueba de Todo** — aplica el modificador Irrompible.
+- **Peso Pluma** — aplica el modificador Liviano.
+- **Temple de Acero** — aplica el modificador Temple.
+- **Guardián Caído** — derrota al Guardián de la Forja.
+
+---
+
 ## Día 20 — El tótem deja de ser garantía
 
 - **Riesgo en el tótem.** Desde el día 20, usar un tótem ya no es seguro al 100%: tiene un **1% de probabilidad de fallar**. Si falla, la resurrección se cancela, se reproducen partículas y sonido de ruptura, y se anuncia al servidor que el tótem del jugador falló. Antes del día 20 siempre funciona.

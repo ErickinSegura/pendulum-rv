@@ -3,13 +3,15 @@ package org.delta.worldgen;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.delta.customs.items.CustomItem;
+import org.delta.customs.items.ItemRegistry;
 
 import java.util.*;
 
 public class LootTable {
 
 
-    public record Entry(Material material, int minCount, int maxCount, int weight) {}
+    public record Entry(Material material, String customKey, int minCount, int maxCount, int weight) {}
 
     private final String      id;
     private final int         minRolls;
@@ -44,7 +46,16 @@ public class LootTable {
                     ? random.nextInt(entry.maxCount() - entry.minCount() + 1)
                     : 0);
 
-            inventory.setItem(slots.get(i), new ItemStack(entry.material(), count));
+            ItemStack stack;
+            if (entry.customKey() != null) {
+                stack = ItemRegistry.get(entry.customKey()).map(CustomItem::build).orElse(null);
+                if (stack == null) continue;
+                stack.setAmount(Math.min(count, stack.getMaxStackSize()));
+            } else {
+                stack = new ItemStack(entry.material(), count);
+            }
+
+            inventory.setItem(slots.get(i), stack);
         }
     }
 
@@ -78,11 +89,21 @@ public class LootTable {
 
 
         public Builder entry(Material material, int minCount, int maxCount, int weight) {
+            validate(minCount, maxCount, weight);
+            entries.add(new Entry(material, null, minCount, maxCount, weight));
+            return this;
+        }
+
+        public Builder entryCustom(String customKey, int minCount, int maxCount, int weight) {
+            validate(minCount, maxCount, weight);
+            entries.add(new Entry(null, customKey, minCount, maxCount, weight));
+            return this;
+        }
+
+        private void validate(int minCount, int maxCount, int weight) {
             if (weight <= 0)        throw new IllegalArgumentException("weight debe ser > 0");
             if (minCount < 1)       throw new IllegalArgumentException("minCount debe ser >= 1");
             if (maxCount < minCount) throw new IllegalArgumentException("maxCount < minCount");
-            entries.add(new Entry(material, minCount, maxCount, weight));
-            return this;
         }
 
         public LootTable build() {

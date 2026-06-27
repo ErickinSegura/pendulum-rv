@@ -3,8 +3,11 @@ package org.delta.listeners.items;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
@@ -13,6 +16,7 @@ import org.bukkit.inventory.SmithingTransformRecipe;
 import org.delta.customs.items.ItemRegistry;
 import org.delta.customs.items.modifier.Modifier;
 import org.delta.customs.items.modifier.ModifierRegistry;
+import org.delta.managers.achievements.Achievement;
 import org.delta.pendulum;
 
 import java.util.ArrayList;
@@ -86,5 +90,26 @@ public class ModifierSmithingListener implements Listener {
         result.setAmount(1);
         modifier.apply(result);
         event.setResult(result);
+    }
+
+    @EventHandler
+    public void onTakeResult(InventoryClickEvent event) {
+        if (!(event.getInventory() instanceof SmithingInventory inventory)) return;
+        if (event.getSlotType() != InventoryType.SlotType.RESULT) return;
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        ItemStack result = event.getCurrentItem();
+        if (result == null || result.getType().isAir()) return;
+
+        Modifier modifier = ModifierRegistry.fromItem(inventory.getItem(2)).orElse(null);
+        if (modifier == null) return;
+
+        plugin.getAchievementManager().unlock(player, Achievement.MAESTRO_HERRERO);
+        switch (modifier.getKey()) {
+            case "unbreakable_modifier" -> plugin.getAchievementManager().unlock(player, Achievement.A_PRUEBA_DE_TODO);
+            case "liviano_modifier" -> plugin.getAchievementManager().unlock(player, Achievement.PESO_PLUMA);
+            case "temple_modifier" -> plugin.getAchievementManager().unlock(player, Achievement.TEMPLE_DE_ACERO);
+            default -> { }
+        }
     }
 }

@@ -6,7 +6,9 @@ import org.bukkit.block.Biome;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
+import org.delta.libs.PendulumSettings;
 import org.delta.listeners.worldgen.PendingEntitySpawner;
 import org.delta.worldgen.structures.ForjaAncestral;
 import org.delta.worldgen.structures.RuinasTorre;
@@ -20,6 +22,7 @@ public class StructurePopulator extends BlockPopulator {
 
     private static final int BORDER_PADDING = 3;
     private static final int MIN_Y          = 60;
+    private static final int MAX_TERRAIN_VARIANCE = 12;
 
     private static final Set<Material> GROUND_MATERIALS = EnumSet.of(
             Material.GRASS_BLOCK, Material.DIRT, Material.COARSE_DIRT,
@@ -70,9 +73,10 @@ public class StructurePopulator extends BlockPopulator {
 
     private void registerDefaultStructures() {
         // Estructuras en código
-        for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
-            //register(new RuinasTorre(rot));
-            register(new ForjaAncestral(rot));
+        for (ForjaAncestral.Variant variant : ForjaAncestral.Variant.values()) {
+            for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
+                register(new ForjaAncestral(variant, rot));
+            }
         }
 
         // Estructuras desde JSON
@@ -120,32 +124,29 @@ public class StructurePopulator extends BlockPopulator {
         Biome biome = limitedRegion.getBiome(chunkCenterX, 64, chunkCenterZ);
 
         // ── Construcción de candidatos sin stream ──────────────────────────
+        int currentDay = PendulumSettings.getInstance().getDia();
         List<StructureDef> candidates = new ArrayList<>();
 
         for (StructureDef s : structures) {
+            if (currentDay < s.getMinDay()) {
+                continue;
+            }
             if (!s.allowedIn(biome)) {
-                logger.info("[DEBUG] " + s.getId() + " RECHAZADO por bioma: " + biome);
                 continue;
             }
             double roll = chunkRandom.nextDouble();
-            logger.info("[DEBUG] " + s.getId() + " roll=" + roll + " chance=" + s.getSpawnChance());
             if (roll <= s.getSpawnChance()) {
-                logger.info("[DEBUG] " + s.getId() + " ACEPTADO");
                 candidates.add(s);
             }
         }
         // ──────────────────────────────────────────────────────────────────
 
         if (candidates.isEmpty()) {
-            logger.info("[DEBUG] Estructuras totales: " + structures.size()
-                    + " | bioma: " + biome
-                    + " | candidatos finales: 0");
             return;
         }
 
         // 2. Select the structure
         StructureDef structure = candidates.get(chunkRandom.nextInt(candidates.size()));
-        logger.info("[DEBUG] Estructura elegida: " + structure.getId());
 
         // 3. NOW calculate worldX and worldZ since 'structure' has been defined
         int localX = 8 - (structure.getMaxRelX() / 2);
@@ -156,19 +157,15 @@ public class StructurePopulator extends BlockPopulator {
         int originY;
         if (structure.getSpawnMode() == StructureDef.SpawnMode.AIR) {
             originY = findAirLevel(limitedRegion, worldX, worldZ, structure, chunkRandom);
-            logger.info("[DEBUG] findAirLevel retornó: " + originY);
         } else {
             originY = findGroundLevel(limitedRegion, worldX, worldZ,
                     structure.getMaxRelX(), structure.getMaxRelZ());
-            logger.info("[DEBUG] findGroundLevel retornó: " + originY + " (MIN_Y=" + MIN_Y + ")");
             if (originY < MIN_Y) {
-                logger.info("[DEBUG] ABORTADO: originY < MIN_Y");
                 return;
             }
         }
 
         if (originY < 0) {
-            logger.info("[DEBUG] ABORTADO: originY < 0");
             return;
         }
 
@@ -199,8 +196,8 @@ public class StructurePopulator extends BlockPopulator {
         }
 
         if (minY == Integer.MAX_VALUE) return -1;
-        if (maxY - minY > 6) return -1;
-        return minY;
+        if (maxY - minY > MAX_TERRAIN_VARIANCE) return -1;
+        return maxY;
     }
 
     private int findAirLevel(LimitedRegion region, int originX, int originZ,
@@ -254,11 +251,16 @@ public class StructurePopulator extends BlockPopulator {
         if (!isAir) fillUnderBase(region, structure, originX, originY, originZ);
 
         scheduleChests(structure, originX, originY, originZ, chunkX, chunkZ);
+        scheduleSpawners(structure, originX, originY, originZ, chunkX, chunkZ);
         scheduleEntities(structure, originX, originY, originZ, chunkX, chunkZ);
-        scheduleBlockData(structure, originX, originY, originZ, chunkX, chunkZ); // <- nuevo
+        scheduleBlockData(structure, originX, originY, originZ, chunkX, chunkZ);
 
-        logger.info("[StructurePopulator] Colocando " + structure.getId()
-                + " en " + originX + ", " + (originY + 1) + ", " + originZ);
+        if (structure.getNotifyMessage() != null) {
+            int cx = originX + structure.getMaxRelX() / 2;
+            int cz = originZ + structure.getMaxRelZ() / 2;
+            entitySpawner.scheduleNotification(chunkX, chunkZ, cx, originY + 1, cz,
+                    structure.getId(), structure.getNotifyMessage());
+        }
     }
 
     private void scheduleBlockData(StructureDef structure,
@@ -327,6 +329,21 @@ public class StructurePopulator extends BlockPopulator {
             int wz = originZ + entry.relZ();
 
             entitySpawner.scheduleChest(chunkX, chunkZ, wx, wy, wz, loot);
+        }
+    }
+
+    private void scheduleSpawners(StructureDef structure,
+                                  int originX, int originY, int originZ,
+                                  int chunkX, int chunkZ) {
+        for (StructureDef.BlockEntry entry : structure.getBlocks()) {
+            EntityType type = structure.getSpawnerType(entry.relX(), entry.relY(), entry.relZ());
+            if (type == null) continue;
+
+            int wx = originX + entry.relX();
+            int wy = originY + 1 + entry.relY();
+            int wz = originZ + entry.relZ();
+
+            entitySpawner.scheduleSpawner(chunkX, chunkZ, wx, wy, wz, type);
         }
     }
 

@@ -89,7 +89,8 @@ public final class pendulum extends JavaPlugin {
         structurePopulator = new StructurePopulator(getLogger(), pendingEntitySpawner, this);
 
         for (org.bukkit.World world : getServer().getWorlds()) {
-            if (world.getEnvironment() == org.bukkit.World.Environment.NORMAL) {
+            if (world.getEnvironment() == org.bukkit.World.Environment.NORMAL
+                    || world.getEnvironment() == org.bukkit.World.Environment.THE_END) {
                 world.getPopulators().add(structurePopulator);
                 getLogger().info("[StructurePopulator] Añadido a mundo ya cargado: " + world.getName());
             }

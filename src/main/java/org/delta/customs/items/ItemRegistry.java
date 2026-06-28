@@ -17,6 +17,8 @@ import org.delta.customs.items.tools.VaritaCurativa;
 import org.delta.customs.items.tools.VaritaBarrera;
 import org.delta.customs.items.tools.VaritaBarreraMejorada;
 import org.delta.customs.items.tools.Frenesi;
+import org.delta.customs.items.tools.AnclaVinculo;
+import org.delta.customs.items.tools.FrascoVacio;
 import org.delta.customs.items.consumables.ZanahoriaEncantada;
 
 import java.util.HashMap;
@@ -67,6 +69,8 @@ public class ItemRegistry {
         register(new VaritaBarrera());
         register(new VaritaBarreraMejorada());
         register(new Frenesi());
+        register(new AnclaVinculo());
+        register(new FrascoVacio());
         register(new ZanahoriaEncantada());
     }
 

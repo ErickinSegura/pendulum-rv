@@ -129,7 +129,11 @@ public enum Achievement {
 
     GUARDIAN_CAIDO("guardian_caido", "Guardián Caído",
             "Derrota al Guardián de la Forja en su torre.",
-            Material.WITHER_SKELETON_SKULL, Frame.CHALLENGE, null, null);
+            Material.WITHER_SKELETON_SKULL, Frame.CHALLENGE, null, null),
+
+    VIGILIA_ROTA("vigilia_rota", "Vigilia Rota",
+            "Derrota al Custodio del Vacío en su santuario flotante.",
+            Material.DRAGON_HEAD, Frame.CHALLENGE, null, null);
 
     public enum Frame {
         TASK("task"),

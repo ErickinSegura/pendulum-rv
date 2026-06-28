@@ -65,6 +65,13 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setMaxStackSize(int size) {
+        this.im = this.is.getItemMeta();
+        this.im.setMaxStackSize(size);
+        this.is.setItemMeta(this.im);
+        return this;
+    }
+
     public ItemBuilder setDisplayName(String name) {
         this.im = this.is.getItemMeta();
         this.im.setDisplayName(name);

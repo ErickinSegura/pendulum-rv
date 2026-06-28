@@ -12,6 +12,7 @@ import org.delta.libs.PendulumSettings;
 import org.delta.listeners.worldgen.PendingEntitySpawner;
 import org.delta.worldgen.structures.ForjaAncestral;
 import org.delta.worldgen.structures.RuinasTorre;
+import org.delta.worldgen.structures.SantuarioVacio;
 
 import java.io.File;
 import java.util.*;
@@ -77,6 +78,9 @@ public class StructurePopulator extends BlockPopulator {
             for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
                 register(new ForjaAncestral(variant, rot));
             }
+        }
+        for (StructureDef.Rotation rot : StructureDef.Rotation.values()) {
+            register(new SantuarioVacio(rot));
         }
 
         // Estructuras desde JSON

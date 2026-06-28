@@ -5,6 +5,7 @@ import org.delta.commands.subcommand.StructureDevCommand;
 import org.delta.listeners.achievements.AchievementListener;
 import org.delta.listeners.bingo.*;
 import org.delta.listeners.boss.GuardianForjaListener;
+import org.delta.listeners.boss.CustodioVacioListener;
 import org.delta.listeners.castigo.CastigoListener;
 import org.delta.listeners.chargebase.AtacanteBehaviorListener;
 import org.delta.listeners.chargebase.ChargeBaseDeathListener;
@@ -23,6 +24,8 @@ import org.delta.listeners.items.ZanahoriaRellenableListener;
 import org.delta.listeners.items.ZanahoriaRellenableCraftListener;
 import org.delta.listeners.items.PapaExplosivaListener;
 import org.delta.listeners.items.ModifierSmithingListener;
+import org.delta.listeners.items.AnclaVinculoListener;
+import org.delta.listeners.items.FrascoVacioListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
 import org.delta.listeners.player.*;
@@ -120,6 +123,7 @@ public class EventRegistry {
 
         // Boss
         pm.registerEvents(new GuardianForjaListener(plugin), plugin);
+        pm.registerEvents(new CustodioVacioListener(plugin), plugin);
 
         // Items
         pm.registerEvents(new LanzapapasListener(), plugin);
@@ -134,6 +138,8 @@ public class EventRegistry {
         pm.registerEvents(new ZanahoriaRellenableListener(), plugin);
         pm.registerEvents(new ZanahoriaRellenableCraftListener(), plugin);
         pm.registerEvents(new ModifierSmithingListener(plugin), plugin);
+        pm.registerEvents(new AnclaVinculoListener(), plugin);
+        pm.registerEvents(new FrascoVacioListener(), plugin);
 
         // World Generation
         WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());

@@ -58,7 +58,7 @@ public class GuardianForja implements CustomMob {
                         .addItemFlag(ItemFlag.HIDE_ATTRIBUTES).build())
                 .setHelmet(new ItemBuilder(Material.NETHERITE_HELMET)
                         .setArmorTrim(TrimMaterial.NETHERITE, TrimPattern.SENTRY).build())
-                .setBossBar(plugin, "&5&l⚒ Guardián de la Forja", BarColor.PURPLE, BarStyle.SEGMENTED_12)
+                .setBossBar(plugin, "&5&lGuardián de la Forja", BarColor.PURPLE, BarStyle.SEGMENTED_12)
                 .setBossBarRange(50.0)
                 .build(location);
 

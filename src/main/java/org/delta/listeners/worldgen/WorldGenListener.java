@@ -17,7 +17,8 @@ public class WorldGenListener implements Listener {
     @EventHandler
     public void onWorldInit(WorldInitEvent event) {
         World world = event.getWorld();
-        if (world.getEnvironment() != World.Environment.NORMAL) return;
+        if (world.getEnvironment() != World.Environment.NORMAL
+                && world.getEnvironment() != World.Environment.THE_END) return;
 
         world.getPopulators().add(structurePopulator);
     }

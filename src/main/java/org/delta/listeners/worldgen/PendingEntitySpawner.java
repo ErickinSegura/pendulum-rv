@@ -153,6 +153,12 @@ public class PendingEntitySpawner implements Listener {
                         BlockState state = block.getState();
                         if (state instanceof CreatureSpawner spawner) {
                             spawner.setSpawnedType(pending.type());
+                            spawner.setMinSpawnDelay(60);
+                            spawner.setMaxSpawnDelay(160);
+                            spawner.setSpawnCount(4);
+                            spawner.setMaxNearbyEntities(8);
+                            spawner.setRequiredPlayerRange(16);
+                            spawner.setSpawnRange(4);
                             spawner.update();
                         } else {
                             logger.warning(String.format(

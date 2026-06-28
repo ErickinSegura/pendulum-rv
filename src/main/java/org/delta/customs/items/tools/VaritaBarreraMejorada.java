@@ -20,6 +20,7 @@ public class VaritaBarreraMejorada implements CustomItem {
                 .addEnchant(Enchantment.UNBREAKING, 2)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .setCustomModelData(2)
+                .setMaxStackSize(1)
                 .build();
     }
 }

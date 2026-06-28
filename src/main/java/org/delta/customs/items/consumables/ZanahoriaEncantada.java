@@ -29,6 +29,7 @@ public class ZanahoriaEncantada implements CustomItem {
                 .setDisplayName(ItemBuilder.format("&6Zanahoria Encantada"))
                 .addEnchant(Enchantment.INFINITY, 1)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+                .setMaxStackSize(1)
                 .build();
         setCharges(item, MAX_CHARGES);
         return item;

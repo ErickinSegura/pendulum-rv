@@ -84,6 +84,24 @@ A partir del día 5, si llevas **las 4 piezas de armadura con trim del mismo mat
 - **Mobs con equipamiento y mobs mejorados** (suben la dificultad general del mundo).
 - **Crafteo de núcleos híbridos** (atacante, defensor, control y heal), ligados a los roles de ChargeBase.
 
+### Santuario del Vacío (estructura flotante)
+- **Torre flotante en el End**, suspendida en el vacío de los biomas exteriores (Highlands/Midlands). Generación muy rara; al aparecer, el jugador más cercano recibe un aviso (sin coordenadas) y la consola registra dónde se generó.
+- **Por pisos:** isla de end stone, claustro de columnas de purpur en la base, torre central con una cámara intermedia y un **santuario abierto en lo alto** con el boss. Agujas en las esquinas y escalera de mano conectando los niveles.
+- **Spawners de enderman** en la planta baja y la cámara (generan rápido).
+- **Botín del End:** perlas, fruta chorus, obsidiana, ojos de ender, aliento de dragón, caparazones de shulker, cristales del End, scrap de netherita, y raros **élitros**, bloques de diamante y manzanas encantadas. Además, los **items del Vacío** (ver abajo).
+
+### Custodio del Vacío (jefe)
+- **Enderman gigante** con barra de jefe (~350 de vida) que custodia el santuario. Se mantiene agresivo y no cae al vacío (se reposiciona si queda sobre el abismo).
+- **Ataques:** parpadeo (teleporte + golpe), salva de proyectiles teledirigidos, pulso de levitación (peligrosísimo en una isla flotante), aliento del vacío (nube con Wither) y velo del vacío (oscuridad + lentitud). Entra en **frenesí** bajo el 40% de vida.
+- **Drops:** XP, aliento de dragón y **1 a 5 items del Vacío** al azar.
+
+### Items del Vacío
+- **Ancla de Vínculo.** Click derecho: abre un menú con tus compañeros de equipo conectados y te **teletransportas junto al elegido** (incluso entre mundos). Enfriamiento prolongado (5 min). No se apila.
+- **Frasco del Vacío.** **Click izquierdo** a un mob **pasivo o neutral** para guardarlo (conserva todo: domado, variante, color, montura/arnés, item que sujeta, vida, edad, nombre…); **click derecho al suelo** para liberarlo. No funciona con mobs hostiles, jefes ni mobs de eventos. No se apila. El lore muestra el nombre del mob (o su etiqueta si tiene una).
+
+### Logro
+- **Vigilia Rota** — derrota al Custodio del Vacío.
+
 ---
 
 ## Día 15 — La Forja Ancestral

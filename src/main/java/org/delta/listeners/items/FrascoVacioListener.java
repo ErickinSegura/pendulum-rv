@@ -1,12 +1,10 @@
 package org.delta.listeners.items;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.AbstractVillager;
-import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Allay;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
@@ -30,14 +28,14 @@ import org.bukkit.persistence.PersistentDataType;
 import org.delta.customs.items.CustomItem;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.builders.ItemBuilder;
+import org.delta.libs.nms.NMSEntityUtils;
 
 import java.util.List;
 
 public class FrascoVacioListener implements Listener {
 
     private static final NamespacedKey TYPE_KEY = new NamespacedKey("delta", "frasco_type");
-    private static final NamespacedKey NAME_KEY = new NamespacedKey("delta", "frasco_name");
-    private static final NamespacedKey BABY_KEY = new NamespacedKey("delta", "frasco_baby");
+    private static final NamespacedKey DATA_KEY = new NamespacedKey("delta", "frasco_data");
 
     @EventHandler
     public void onCapture(EntityDamageByEntityEvent event) {
@@ -63,15 +61,11 @@ public class FrascoVacioListener implements Listener {
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.set(TYPE_KEY, PersistentDataType.STRING, target.getType().name());
-        if (target.getCustomName() != null) {
-            pdc.set(NAME_KEY, PersistentDataType.STRING, target.getCustomName());
-        }
-        if (target instanceof Ageable ageable && !ageable.isAdult()) {
-            pdc.set(BABY_KEY, PersistentDataType.BYTE, (byte) 1);
-        }
+        pdc.set(DATA_KEY, PersistentDataType.BYTE_ARRAY, NMSEntityUtils.serializeEntity(target));
+        String display = target.getCustomName() != null ? target.getCustomName() : pretty(target.getType());
         meta.setCustomModelData(2);
         meta.setLore(List.of(
-                ItemBuilder.format("&7Contiene: &f" + pretty(target.getType())),
+                ItemBuilder.format("&7Contiene: &f" + display),
                 ItemBuilder.format("&7Click derecho al suelo para liberarlo.")
         ));
         item.setItemMeta(meta);
@@ -114,14 +108,8 @@ public class FrascoVacioListener implements Listener {
         }
 
         Entity spawned = loc.getWorld().spawnEntity(loc, type);
-        if (pdc.has(BABY_KEY, PersistentDataType.BYTE) && spawned instanceof Ageable ageable) {
-            ageable.setBaby();
-        }
-        String name = pdc.get(NAME_KEY, PersistentDataType.STRING);
-        if (name != null) {
-            spawned.setCustomName(name);
-            spawned.setCustomNameVisible(true);
-        }
+        NMSEntityUtils.applyNbt(spawned, pdc.get(DATA_KEY, PersistentDataType.BYTE_ARRAY));
+        spawned.teleport(loc);
 
         resetFrasco(item, meta, pdc);
 
@@ -131,10 +119,8 @@ public class FrascoVacioListener implements Listener {
 
     private void resetFrasco(ItemStack item, ItemMeta meta, PersistentDataContainer pdc) {
         pdc.remove(TYPE_KEY);
-        pdc.remove(NAME_KEY);
-        pdc.remove(BABY_KEY);
+        pdc.remove(DATA_KEY);
         meta.setCustomModelData(1);
-        meta.setDisplayName(ItemBuilder.format("&5Frasco del Vacío"));
         meta.setLore(List.of(
                 ItemBuilder.format("&7Click izquierdo a un mob pasivo o"),
                 ItemBuilder.format("&7neutral para guardarlo."),

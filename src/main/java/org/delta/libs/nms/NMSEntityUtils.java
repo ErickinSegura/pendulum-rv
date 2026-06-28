@@ -141,7 +141,42 @@ public class NMSEntityUtils {
         nms.invulnerableTime = ticks;
     }
 
+    public static byte[] serializeEntity(org.bukkit.entity.Entity bukkit) {
+        try {
+            net.minecraft.world.entity.Entity nms =
+                    ((org.bukkit.craftbukkit.entity.CraftEntity) bukkit).getHandle();
+            net.minecraft.world.level.storage.TagValueOutput output =
+                    net.minecraft.world.level.storage.TagValueOutput.createWithContext(
+                            net.minecraft.util.ProblemReporter.DISCARDING,
+                            nms.level().registryAccess());
+            nms.saveWithoutId(output);
+            net.minecraft.nbt.CompoundTag tag = output.buildResult();
+            tag.remove("UUID");
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            net.minecraft.nbt.NbtIo.writeCompressed(tag, out);
+            return out.toByteArray();
+        } catch (Exception e) {
+            return new byte[0];
+        }
+    }
 
-
+    public static void applyNbt(org.bukkit.entity.Entity bukkit, byte[] data) {
+        if (data == null || data.length == 0) return;
+        try {
+            net.minecraft.nbt.CompoundTag tag = net.minecraft.nbt.NbtIo.readCompressed(
+                    new java.io.ByteArrayInputStream(data),
+                    net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+            tag.remove("UUID");
+            net.minecraft.world.entity.Entity nms =
+                    ((org.bukkit.craftbukkit.entity.CraftEntity) bukkit).getHandle();
+            net.minecraft.world.level.storage.ValueInput input =
+                    net.minecraft.world.level.storage.TagValueInput.create(
+                            net.minecraft.util.ProblemReporter.DISCARDING,
+                            nms.level().registryAccess(),
+                            tag);
+            nms.load(input);
+        } catch (Exception ignored) {
+        }
+    }
 
 }

@@ -23,6 +23,7 @@ public class Lazo implements CustomItem {
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .setUnbrekeable(true)
                 .setCustomModelData(1)
+                .setMaxStackSize(1)
                 .build();
     }
 }

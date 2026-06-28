@@ -22,6 +22,7 @@ public class Frenesi implements CustomItem {
                 .addEnchant(Enchantment.UNBREAKING, 1)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .setCustomModelData(1)
+                .setMaxStackSize(1)
                 .build();
     }
 }

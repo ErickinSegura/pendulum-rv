@@ -1,5 +1,5 @@
 name: Pendulum
-version: 'SNAPSHOT-26w26ab'
+version: 'SNAPSHOT-26w26ag'
 main: org.delta.pendulum
 api-version: '1.21'
 authors: [ Erick Segura ]

@@ -18,6 +18,7 @@ public class Clawn implements CustomItem {
         return new ItemBuilder(Material.POPPED_CHORUS_FRUIT)
                 .setDisplayName(ItemBuilder.format("&6Clawn"))
                 .setCustomModelData(1)
+                .setMaxStackSize(1)
                 .build();
     }
 }

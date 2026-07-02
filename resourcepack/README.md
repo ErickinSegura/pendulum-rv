@@ -36,6 +36,17 @@ los modelos y las definiciones de item ya están hechos.
 | Papa Explosiva          | potato                 | 1   | papa_explosiva.png             |
 | Lanzapapas              | crossbow               | 1   | lanzapapas.png                 |
 | Placeholder (debug)     | stick                  | 1   | placeholder.png                |
+| Varita de Barrera       | end_rod                | 1   | varita_barrera.png             |
+| Varita Barrera Mejorada | breeze_rod             | 2   | varita_barrera_mejorada.png    |
+| Varita Curativa         | blaze_rod              | 1   | varita_curativa.png            |
+| Frenesí                 | blaze_powder           | 1   | frenesi.png                    |
+| Lazo                    | fishing_rod            | 1   | lazo.png                       |
+| Ancla de Vínculo        | recovery_compass       | 1   | ancla_vinculo.png              |
+| Frasco del Vacío        | shulker_shell          | 1   | frasco_vacio.png               |
+| Zanahoria Encantada     | golden_carrot          | 1   | zanahoria_encantada.png        |
+| Liviano (modifier)      | feather                | 1   | liviano_modifier.png           |
+| Irrompible (modifier)   | nether_brick           | 1   | unbreakable_modifier.png       |
+| Temple (modifier)       | ghast_tear             | 1   | temple_modifier.png            |
 
 ## Estructura
 

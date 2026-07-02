@@ -15,7 +15,7 @@ public class VaritaBarreraMejorada implements CustomItem {
 
     @Override
     public ItemStack buildItem() {
-        return new ItemBuilder(Material.END_ROD)
+        return new ItemBuilder(Material.BREEZE_ROD)
                 .setDisplayName(ItemBuilder.format("&bVarita de Barrera Mejorada"))
                 .addEnchant(Enchantment.UNBREAKING, 2)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)

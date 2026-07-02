@@ -1,10 +1,9 @@
 package org.delta.listeners.items;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,19 +13,22 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 import org.delta.customs.items.CustomItem;
+import org.delta.managers.achievements.Achievement;
 import org.delta.pendulum;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class VaritaBarreraListener implements Listener {
 
-    private static final Material BARRIER_BLOCK = Material.CYAN_STAINED_GLASS;
-    private static final int RADIUS = 3;
-    private static final int DURATION_TICKS = 200;   // 10 segundos
-    private static final int COOLDOWN_TICKS = 600;   // 30 segundos
+    private static final double RADIUS = 6.0;
+    private static final double KNOCKBACK_HORIZONTAL = 1.4;
+    private static final double KNOCKBACK_VERTICAL = 0.45;
+    private static final int SLOW_TICKS = 40;
+    private static final int RESISTANCE_TICKS = 100;
+    private static final int COOLDOWN_TICKS = 300;
 
     @EventHandler
     public void onUse(PlayerInteractEvent event) {
@@ -43,53 +45,39 @@ public class VaritaBarreraListener implements Listener {
         if (player.hasCooldown(item.getType())) return;
         player.setCooldown(item.getType(), COOLDOWN_TICKS);
 
-        List<Block> placed = buildDome(player);
-        pendulum.getInstance().getAchievementManager().unlock(player, org.delta.managers.achievements.Achievement.TRAS_EL_CRISTAL);
+        Team team = player.getScoreboard().getEntryTeam(player.getName());
 
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_PLACE, 0.8f, 1.2f);
+        for (Entity entity : player.getNearbyEntities(RADIUS, RADIUS, RADIUS)) {
+            if (!(entity instanceof LivingEntity target)) continue;
+            if (target.equals(player)) continue;
+            if (target instanceof Player other && team != null && team.hasEntry(other.getName())) continue;
 
-        // Revierte los bloques a aire tras la duración, sólo si siguen siendo
-        // nuestro cristal (no toca lo que el mundo o los jugadores hayan cambiado).
-        pendulum.getInstance().getServer().getScheduler().runTaskLater(pendulum.getInstance(), () -> {
-            for (Block block : placed) {
-                if (block.getType() == BARRIER_BLOCK) {
-                    block.setType(Material.AIR, false);
-                }
-            }
-            if (!placed.isEmpty()) {
-                Block first = placed.get(0);
-                first.getWorld().playSound(first.getLocation(), Sound.BLOCK_GLASS_BREAK, 0.8f, 1.0f);
-            }
-        }, DURATION_TICKS);
+            repel(player, target);
+            target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, SLOW_TICKS, 0, false, true));
+        }
+
+        player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, RESISTANCE_TICKS, 0, false, true));
+        pendulum.getInstance().getAchievementManager().unlock(player, Achievement.TRAS_EL_CRISTAL);
+
+        player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, player.getLocation().add(0, 1, 0),
+                24, RADIUS / 2, 0.6, RADIUS / 2, 0.0);
+        player.getWorld().spawnParticle(Particle.END_ROD, player.getLocation().add(0, 1, 0),
+                40, RADIUS / 2, 0.6, RADIUS / 2, 0.05);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.7f, 1.6f);
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 0.6f, 2.0f);
     }
 
-    /**
-     * Coloca una cáscara esférica de cristal alrededor del jugador, ocupando
-     * únicamente bloques de aire. Devuelve los bloques realmente colocados.
-     */
-    private List<Block> buildDome(Player player) {
-        List<Block> placed = new ArrayList<>();
-        World world = player.getWorld();
-        Block feet = player.getLocation().getBlock();
-        int cx = feet.getX();
-        int cy = feet.getY() + 1;   // centrado a la altura del torso
-        int cz = feet.getZ();
-
-        for (int dx = -RADIUS; dx <= RADIUS; dx++) {
-            for (int dy = -RADIUS; dy <= RADIUS; dy++) {
-                for (int dz = -RADIUS; dz <= RADIUS; dz++) {
-                    double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                    if (dist < RADIUS - 0.5 || dist > RADIUS + 0.5) continue;
-
-                    Block block = world.getBlockAt(cx + dx, cy + dy, cz + dz);
-                    if (!block.getType().isAir()) continue;
-
-                    block.setType(BARRIER_BLOCK, false);
-                    placed.add(block);
-                }
-            }
+    private void repel(Player source, LivingEntity target) {
+        Vector direction = target.getLocation().toVector().subtract(source.getLocation().toVector());
+        direction.setY(0);
+        if (direction.lengthSquared() < 1.0e-6) {
+            direction = source.getLocation().getDirection().setY(0);
         }
-        return placed;
+        if (direction.lengthSquared() < 1.0e-6) {
+            direction = new Vector(1, 0, 0);
+        }
+        direction.normalize().multiply(KNOCKBACK_HORIZONTAL).setY(KNOCKBACK_VERTICAL);
+        target.setVelocity(target.getVelocity().add(direction));
     }
 
     private boolean isWand(ItemStack item) {

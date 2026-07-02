@@ -41,9 +41,9 @@ Evento de defensa de base por oleadas. Aparecen mobs personalizados, cada uno co
   - *Híbrido Avanzado ("C Ñank F1"):* warden con 120 de vida, gran daño y enorme rango de detección.
 
 ### Ítems personalizados 
-- **Varita Barrera.** Click derecho: genera una cúpula esférica de cristal (radio 3 bloques) alrededor del jugador, usando solo espacios de aire. Dura 10 segundos y luego se rompe sola. Enfriamiento de 30 segundos.
-- **Varita Barrera Mejorada.** Versión grande: cúpula de **doble capa** de cristal (radio 8 bloques), dura 15 segundos, enfriamiento 25 segundos. Además otorga **Resistencia II** al usuario y a sus compañeros de equipo dentro del radio.
-- **Varita Curativa.** Click derecho: libera una onda de **Vida Instantánea II (4 corazones)** en radio de 5 bloques. Solo cura a los miembros de su equipo (o solo a sí mismo si no tiene equipo). Enfriamiento de 10 segundos, mostrado como el de las perlas de ender.
+- **Varita Barrera.** Click derecho: libera una **onda de repulsión** (radio 6 bloques) que empuja a los enemigos cercanos y les aplica Lentitud, mientras cubre al usuario con **Resistencia**. Enfriamiento de 15 segundos.
+- **Varita Barrera Mejorada.** Click derecho: **provoca** a todos los mobs cercanos (radio 10) para que ataquen al usuario, activa un **aura de espinas** que refleja el 25% del daño recibido durante 10 segundos, y otorga **Resistencia II** al usuario y a sus compañeros de equipo dentro del radio. Enfriamiento de 30 segundos.
+- **Varita Curativa.** Click derecho: cura **4 corazones** en radio de 5 bloques a los miembros de su equipo (o solo a sí mismo si no tiene equipo), les da corazones de **Absorción** y limpia **veneno y wither**. Enfriamiento de 10 segundos, mostrado como el de las perlas de ender.
 - **Lanzapapas.** Ballesta personalizada que se carga con una **Papa Explosiva** (tarda ~1.25 s en cargar) y la dispara como proyectil. Al impactar provoca una explosión (radio 3). Si el lanzador está a menos de 5 bloques del impacto, recibe daño por la onda.
 - **Papa Explosiva.** Comestible-trampa: al comerla, explota (radio 6) y mata al jugador en el acto, con mensaje de muerte propio ("se suicidó comiendo una Papa Explosiva"). También sirve de munición para el Lanzapapas, atribuyendo la muerte al lanzador.
 - **Zanahoria Rellenable.** Comestible con **cargas**: al comerla restaura hambre como una zanahoria dorada pero **no se consume**, solo gasta una carga. Se rellena agachándose o en la mesa de crafteo con zanahorias normales; vacía, avisa que hay que rellenarla.

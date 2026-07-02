@@ -15,6 +15,10 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.pendulum;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class EndermanHostileListener extends BaseMobSpawnListener {
 
     private static final int DIA_MINIMO = 10;
@@ -27,6 +31,7 @@ public class EndermanHostileListener extends BaseMobSpawnListener {
     private static final long TELEPORT_COOLDOWN_MS = 10_000L;
 
     private final pendulum plugin;
+    private final Map<UUID, Long> lastTeleportByPlayer = new ConcurrentHashMap<>();
 
     public EndermanHostileListener(pendulum plugin) {
         this.plugin = plugin;
@@ -44,8 +49,6 @@ public class EndermanHostileListener extends BaseMobSpawnListener {
 
     private void startAggro(Enderman enderman) {
         new BukkitRunnable() {
-            long lastTeleport = 0;
-
             @Override
             public void run() {
                 if (enderman.isDead() || !enderman.isValid()) {
@@ -56,10 +59,11 @@ public class EndermanHostileListener extends BaseMobSpawnListener {
                 LivingEntity target = enderman.getTarget();
                 if (target instanceof Player current && !current.isDead()) {
                     long now = System.currentTimeMillis();
-                    if (now - lastTeleport >= TELEPORT_COOLDOWN_MS
+                    Long last = lastTeleportByPlayer.get(current.getUniqueId());
+                    if ((last == null || now - last >= TELEPORT_COOLDOWN_MS)
                             && random.nextDouble() < TELEPORT_CHANCE
                             && teleport(enderman, current)) {
-                        lastTeleport = now;
+                        lastTeleportByPlayer.put(current.getUniqueId(), now);
                     }
                     return;
                 }

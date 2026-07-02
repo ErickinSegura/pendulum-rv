@@ -141,6 +141,18 @@ public class NMSEntityUtils {
         nms.invulnerableTime = ticks;
     }
 
+    public static void attachHook(org.bukkit.entity.Entity bukkitHook, org.bukkit.entity.Entity bukkitTarget) {
+        net.minecraft.world.entity.projectile.FishingHook hook =
+                (net.minecraft.world.entity.projectile.FishingHook)
+                        ((org.bukkit.craftbukkit.entity.CraftEntity) bukkitHook).getHandle();
+        net.minecraft.world.entity.Entity target =
+                ((org.bukkit.craftbukkit.entity.CraftEntity) bukkitTarget).getHandle();
+        // Al engancharlo a una entidad, el FishingHook pasa a HOOKED_IN_ENTITY:
+        // cliente y servidor lo fijan en la posición de esa entidad y dejan de
+        // aplicarle gravedad. El cambio se sincroniza por metadata (DATA_HOOKED_ENTITY).
+        hook.setHookedEntity(target);
+    }
+
     public static byte[] serializeEntity(org.bukkit.entity.Entity bukkit) {
         try {
             net.minecraft.world.entity.Entity nms =

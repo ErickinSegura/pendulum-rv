@@ -62,6 +62,11 @@ public class CombatLogListener implements Listener {
         Player player = event.getPlayer();
         if (!combatTagManager.isTagged(player)) return;
 
+        if (ClockEvents.isPendingBan(player)) {
+            combatTagManager.clear(player);
+            return;
+        }
+
         UUID killerUuid = combatTagManager.getLastAttackerUuid(player);
         String killerName = combatTagManager.getLastAttackerName(player);
         combatTagManager.clear(player);
@@ -72,7 +77,11 @@ public class CombatLogListener implements Listener {
         lifeManager.removeLife(player);
         int currentLives = lifeManager.getLives(player);
 
-        ClockEvents.handleCombatLogClockLoss(player, currentLives);
+        if (currentLives <= 0) {
+            ClockEvents.handleCombatLogElimination(player);
+        } else {
+            ClockEvents.handleCombatLogClockLoss(player, currentLives);
+        }
         recordCombatLog(player, killerUuid, killerName);
     }
 

@@ -67,6 +67,7 @@ public class EventRegistry {
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
         pm.registerEvents(new CombatLogListener(lifeManager, new CombatTagManager()), plugin);
+        pm.registerEvents(new BanProtectionListener(), plugin);
         pm.registerEvents(new EndAccessListener(), plugin);
 
         // Castigos

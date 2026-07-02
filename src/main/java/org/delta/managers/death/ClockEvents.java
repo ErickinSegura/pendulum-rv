@@ -1,5 +1,6 @@
 package org.delta.managers.death;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.BanList;
@@ -14,14 +15,24 @@ import org.delta.libs.MessageUtils;
 import org.delta.pendulum;
 
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import static org.bukkit.Bukkit.getServer;
 import static org.delta.managers.death.ChestEvents.placeDeathChest;
 
 public class ClockEvents {
     private static Plugin plugin;
 
+    private static final long BAN_DELAY_TICKS = 120L;
+    private static final Set<UUID> pendingBan = new HashSet<>();
+
     public static void setPlugin(Plugin pluginInstance) {
         plugin = pluginInstance;
+    }
+
+    public static boolean isPendingBan(Player player) {
+        return player != null && pendingBan.contains(player.getUniqueId());
     }
 
     public static void handlePlayerClockLoss(Player player, int currentLives, Location location, PlayerDeathEvent event) {
@@ -30,13 +41,33 @@ public class ClockEvents {
         placeDeathChest(player, location, event);
         broadcastClockSound();
         pendulum.getInstance().getLifeManager().playClockLossAnimation(player);
-        //temporaryBanPlayer(player);
+        temporaryBanPlayer(player);
     }
 
     public static void handleCombatLogClockLoss(Player player, int currentLives) {
         broadcastCombatLogMessages(player, currentLives);
         broadcastClockSound();
         pendulum.getInstance().getLifeManager().playClockLossAnimation(player);
+    }
+
+    public static void handleCombatLogElimination(Player player) {
+        if (player == null) return;
+        getServer().broadcast(MessageUtils.color("&5&l" + player.getName()
+                + "&r&d hizo combat log y perdió su último reloj. Ha sido eliminado."));
+        broadcastClockSound();
+        permanentBanPlayer(player);
+    }
+
+    public static void permanentBanPlayer(Player player) {
+        if (player == null) return;
+        applyBan(player.getPlayerProfile(), true);
+        if (player.isOnline()) {
+            player.kick(buildKickMessage(true));
+        }
+    }
+
+    public static void schedulePermanentBan(Player player) {
+        scheduleBan(player, true);
     }
 
     private static void broadcastCombatLogMessages(Player player, int currentLives) {
@@ -72,32 +103,59 @@ public class ClockEvents {
     }
 
     private static void temporaryBanPlayer(Player player) {
-        if (player != null) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (player.isOnline()) {
-                        BanList banList = getServer().getBanList(BanList.Type.PROFILE);
-                        Duration banDuration = Duration.ofSeconds(5);
-                        //Duration banDuration = Duration.ofHours(1);
-                        String banSource = "Sistema de Relojes";
+        scheduleBan(player, false);
+    }
 
-                        String timeRemaining = formatDuration(banDuration);
-                        String banReason = "Perdiste un reloj. Vuelve cuando pase el tiempo para revivir.";
+    private static void scheduleBan(Player player, boolean permanent) {
+        if (player == null) return;
 
-                        banList.addBan(player.getPlayerProfile(), banReason, banDuration, banSource);
+        final UUID uuid = player.getUniqueId();
+        final PlayerProfile profile = player.getPlayerProfile();
+        pendingBan.add(uuid);
 
-                        Component kickMessage = Component.text("═══════════════════════════\n\n", NamedTextColor.DARK_PURPLE)
-                                .append(Component.text("Perdiste un reloj\n\n", NamedTextColor.WHITE))
-                                .append(Component.text("Tiempo para revivir: ", NamedTextColor.GRAY))
-                                .append(Component.text(timeRemaining + "\n\n", NamedTextColor.LIGHT_PURPLE))
-                                .append(Component.text("═══════════════════════════", NamedTextColor.DARK_PURPLE));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                applyBan(profile, permanent);
+                pendingBan.remove(uuid);
 
-                        player.kick(kickMessage);
-                    }
+                Player online = getServer().getPlayer(uuid);
+                if (online != null && online.isOnline()) {
+                    online.kick(buildKickMessage(permanent));
                 }
-            }.runTaskLater(plugin, 120L); // 1 segundo = 20 ticks
+            }
+        }.runTaskLater(pendulum.getInstance(), BAN_DELAY_TICKS);
+    }
+
+    private static void applyBan(PlayerProfile profile, boolean permanent) {
+        BanList banList = getServer().getBanList(BanList.Type.PROFILE);
+        String banSource = "Sistema de Relojes";
+
+        if (permanent) {
+            banList.addBan(profile,
+                    "Perdiste todos tus relojes. Has sido eliminado permanentemente.",
+                    (Duration) null, banSource);
+        } else {
+            banList.addBan(profile,
+                    "Perdiste un reloj. Vuelve cuando pase el tiempo para revivir.",
+                    Duration.ofSeconds(5), banSource);
         }
+    }
+
+    private static Component buildKickMessage(boolean permanent) {
+        if (permanent) {
+            return Component.text("═══════════════════════════\n\n", NamedTextColor.DARK_PURPLE)
+                    .append(Component.text("Has sido eliminado\n\n", NamedTextColor.WHITE))
+                    .append(Component.text("Perdiste todos tus relojes\n\n", NamedTextColor.GRAY))
+                    .append(Component.text("═══════════════════════════", NamedTextColor.DARK_PURPLE));
+        }
+
+        String timeRemaining = formatDuration(Duration.ofSeconds(5));
+        return Component.text("═══════════════════════════\n\n", NamedTextColor.DARK_PURPLE)
+                .append(Component.text("Perdiste un reloj\n\n", NamedTextColor.WHITE))
+                .append(Component.text("Tiempo para revivir: ", NamedTextColor.GRAY))
+                .append(Component.text(timeRemaining + "\n\n", NamedTextColor.LIGHT_PURPLE))
+                .append(Component.text("═══════════════════════════", NamedTextColor.DARK_PURPLE));
     }
 
     private static String formatDuration(Duration duration) {

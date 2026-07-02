@@ -36,6 +36,7 @@ public class DeathEvents {
         placeDeathChest(player, location, event);
         broadcastDeathMessages(player);
         broadcastDeathSound();
+        ClockEvents.schedulePermanentBan(player);
     }
 
     private void displayDeathClockAnimation(Player player) {

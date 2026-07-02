@@ -105,7 +105,7 @@ public class ForjaAncestral extends StructureTemplate {
                 : "forja_ancestral_" + variant.name().toLowerCase();
 
         StructureDef.Builder b = new StructureDef.Builder(id)
-                .spawnChance(0.00004)
+                .spawnChance(0.0001)
                 .minDay(15)
                 .notifyOnGenerate("&eHas sentido el calor de una &6&lForja Ancestral &ecercana...")
                 .rotation(rotation)

@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -29,8 +30,10 @@ import org.delta.pendulum;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -40,12 +43,15 @@ public class CustodioVacioListener implements Listener {
     private static final String TAG = CustodioVacio.TAG;
     private static final long LOOP_INTERVAL = 20L;
     private static final long ATTACK_COOLDOWN = 70L;
-    private static final double ACTIVATION_RANGE = 32.0;
+    private static final double ACTIVATION_RANGE = 20.0;
+    private static final double DETECT_RANGE = 40.0;
+    private static final double LEASH_RANGE = 24.0;
     private static final double ENRAGE_THRESHOLD = 0.4;
 
     private final pendulum plugin;
     private final Set<UUID> attackCooldown = new HashSet<>();
     private final Set<UUID> enraged = new HashSet<>();
+    private final Map<UUID, Location> anclas = new HashMap<>();
     private final Random rng = new Random();
 
     public CustodioVacioListener(pendulum plugin) {
@@ -62,15 +68,24 @@ public class CustodioVacioListener implements Listener {
                         if (!(entity instanceof LivingEntity boss)) continue;
                         if (!boss.getScoreboardTags().contains(TAG)) continue;
 
+                        Location ancla = anclas.computeIfAbsent(
+                                boss.getUniqueId(), k -> boss.getLocation().clone());
+
+                        if (isOverVoid(boss)
+                                || boss.getLocation().distanceSquared(ancla) > LEASH_RANGE * LEASH_RANGE) {
+                            regresarAlAncla(boss, ancla);
+                            continue;
+                        }
+
                         Player target = nearestPlayer(boss);
                         if (target == null) continue;
 
+                        double distSq = boss.getLocation().distanceSquared(target.getLocation());
+                        if (distSq > DETECT_RANGE * DETECT_RANGE) continue;
                         if (boss instanceof Mob mob) mob.setTarget(target);
-                        if (isOverVoid(boss)) boss.teleport(target.getLocation());
 
                         if (attackCooldown.contains(boss.getUniqueId())) continue;
-                        if (boss.getLocation().distanceSquared(target.getLocation())
-                                > ACTIVATION_RANGE * ACTIVATION_RANGE) continue;
+                        if (distSq > ACTIVATION_RANGE * ACTIVATION_RANGE) continue;
 
                         performRandomAttack(boss, target);
                         startCooldown(boss.getUniqueId());
@@ -97,6 +112,15 @@ public class CustodioVacioListener implements Listener {
             case 3 -> alientoDelVacio(boss, target);
             default -> veloDelVacio(boss);
         }
+    }
+
+    private void regresarAlAncla(LivingEntity boss, Location ancla) {
+        World world = boss.getWorld();
+        world.spawnParticle(Particle.REVERSE_PORTAL, boss.getLocation().add(0, 1, 0), 20, 0.4, 0.6, 0.4, 0.05);
+        boss.teleport(ancla);
+        world.spawnParticle(Particle.PORTAL, ancla.clone().add(0, 1, 0), 20, 0.4, 0.6, 0.4, 0.1);
+        world.playSound(ancla, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 0.7f);
+        if (boss instanceof Mob mob) mob.setTarget(null);
     }
 
     private void parpadeo(LivingEntity boss, Player target) {
@@ -163,6 +187,15 @@ public class CustodioVacioListener implements Listener {
         }
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onShulkerHit(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity boss)) return;
+        if (!boss.getScoreboardTags().contains(TAG)) return;
+        if (event.getDamager() instanceof ShulkerBullet) {
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof LivingEntity boss)) return;
@@ -187,6 +220,7 @@ public class CustodioVacioListener implements Listener {
 
         attackCooldown.remove(id);
         enraged.remove(id);
+        anclas.remove(id);
 
         Player killer = event.getEntity().getKiller();
         if (killer != null) {
@@ -199,7 +233,7 @@ public class CustodioVacioListener implements Listener {
         Location loc = event.getEntity().getLocation();
 
         String endItem = rng.nextBoolean() ? "ancla_vinculo" : "frasco_vacio";
-        int amount = 1 + rng.nextInt(5);
+        int amount = endItem.equals("frasco_vacio") ? 1 + rng.nextInt(5) : 1;
         ItemRegistry.get(endItem).ifPresent(item -> {
             for (int i = 0; i < amount; i++) {
                 loc.getWorld().dropItemNaturally(loc, item.build());

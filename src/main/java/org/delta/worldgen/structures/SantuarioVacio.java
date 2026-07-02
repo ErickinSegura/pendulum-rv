@@ -133,11 +133,11 @@ public class SantuarioVacio extends StructureTemplate {
         b.fill(2, 11, 2, 2, 11, 18, BEAM);
         b.fill(18, 11, 2, 18, 11, 18, BEAM);
 
-        for (int x = 2; x <= 18; x++) {
+        for (int x = 3; x <= 17; x++) {
             b.blockData(x, 12, 2, stair(BlockFace.NORTH, true));
             b.blockData(x, 12, 18, stair(BlockFace.SOUTH, true));
         }
-        for (int z = 2; z <= 18; z++) {
+        for (int z = 3; z <= 17; z++) {
             b.blockData(2, 12, z, stair(BlockFace.WEST, true));
             b.blockData(18, 12, z, stair(BlockFace.EAST, true));
         }

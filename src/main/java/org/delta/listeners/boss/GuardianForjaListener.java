@@ -290,11 +290,9 @@ public class GuardianForjaListener implements Listener {
         event.setDroppedExp(60);
 
         String key = MODIFIER_KEYS[rng.nextInt(MODIFIER_KEYS.length)];
-        if (rng.nextBoolean()) {
-            ItemRegistry.get(key).ifPresent(item ->
-                    event.getEntity().getWorld().dropItemNaturally(
-                            event.getEntity().getLocation(), item.build()));
-        }
+        ItemRegistry.get(key).ifPresent(item ->
+                event.getEntity().getWorld().dropItemNaturally(
+                        event.getEntity().getLocation(), item.build()));
     }
 
     private void startCooldown(UUID id) {

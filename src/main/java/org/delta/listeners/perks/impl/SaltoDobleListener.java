@@ -5,46 +5,70 @@ import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.util.Vector;
 import org.delta.listeners.perks.BasePerkListener;
 import org.delta.managers.perks.Perk;
 import org.delta.pendulum;
+
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SaltoDobleListener extends BasePerkListener {
 
     private static final double JUMP_POWER = 0.8;
     private static final double FORWARD_BOOST = 0.35;
 
-    public SaltoDobleListener() {
-        Bukkit.getScheduler().runTaskTimer(pendulum.getInstance(), () -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                GameMode gm = player.getGameMode();
-                if (gm == GameMode.CREATIVE || gm == GameMode.SPECTATOR) continue;
+    private final Set<UUID> jumpHeld = ConcurrentHashMap.newKeySet();
+    private final Set<UUID> armed = ConcurrentHashMap.newKeySet();
+    private final Set<UUID> doubleJumped = ConcurrentHashMap.newKeySet();
 
-                boolean has = hasTeamPerk(player, Perk.SALTO_DOBLE);
-                if (has && player.isOnGround()) {
-                    player.setAllowFlight(true);
-                } else if (!has && player.getAllowFlight()) {
-                    player.setAllowFlight(false);
-                }
-            }
-        }, 0L, 5L);
+    public SaltoDobleListener() {
+        Bukkit.getScheduler().runTaskTimer(pendulum.getInstance(), this::tick, 0L, 1L);
     }
 
-    @EventHandler
-    public void onToggleFlight(PlayerToggleFlightEvent event) {
-        Player player = event.getPlayer();
-        GameMode gm = player.getGameMode();
-        if (gm == GameMode.CREATIVE || gm == GameMode.SPECTATOR) return;
-        if (!hasTeamPerk(player, Perk.SALTO_DOBLE)) return;
-        if (player.isFlying()) return;
+    private void tick() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            UUID id = player.getUniqueId();
+            GameMode gm = player.getGameMode();
 
-        event.setCancelled(true);
-        player.setAllowFlight(false);
-        player.setFlying(false);
+            if (gm == GameMode.CREATIVE || gm == GameMode.SPECTATOR
+                    || !hasTeamPerk(player, Perk.SALTO_DOBLE)) {
+                jumpHeld.remove(id);
+                armed.remove(id);
+                doubleJumped.remove(id);
+                continue;
+            }
 
+            boolean jumping = player.getCurrentInput().isJump();
+            boolean rising = jumping && !jumpHeld.contains(id);
+
+            if (player.isOnGround()) {
+                doubleJumped.remove(id);
+                armed.remove(id);
+            } else if (!jumping) {
+                armed.add(id);
+            }
+
+            if (rising
+                    && !player.isOnGround()
+                    && !player.isFlying()
+                    && !player.isGliding()
+                    && armed.contains(id)
+                    && doubleJumped.add(id)) {
+                armed.remove(id);
+                doubleJump(player);
+            }
+
+            if (jumping) {
+                jumpHeld.add(id);
+            } else {
+                jumpHeld.remove(id);
+            }
+        }
+    }
+
+    private void doubleJump(Player player) {
         Vector direction = player.getLocation().getDirection();
         Vector velocity = player.getVelocity();
         velocity.setY(JUMP_POWER);

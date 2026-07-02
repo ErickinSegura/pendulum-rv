@@ -5,8 +5,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.delta.libs.builders.ItemBuilder;
 
-import java.util.Set;
-
 public class ModifierTemple extends StackeableArmorModifier {
 
     private static final NamespacedKey KEY = new NamespacedKey("delta", "modifier_temple");
@@ -20,11 +18,6 @@ public class ModifierTemple extends StackeableArmorModifier {
     @Override
     public String getDisplayName() {
         return "Temple";
-    }
-
-    @Override
-    public Set<String> incompatibleWith() {
-        return Set.of("unbreakable_modifier");
     }
 
     @Override

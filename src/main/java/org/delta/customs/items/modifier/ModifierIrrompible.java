@@ -9,7 +9,6 @@ import org.delta.libs.builders.ItemBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class ModifierIrrompible implements Modifier {
 
@@ -27,15 +26,9 @@ public class ModifierIrrompible implements Modifier {
     }
 
     @Override
-    public Set<String> incompatibleWith() {
-        return Set.of("temple_modifier");
-    }
-
-    @Override
     public boolean canApply(ItemStack target) {
         if (target == null) return false;
         if (target.getType().getMaxDurability() <= 0) return false;
-        if (Modifier.hasIncompatible(this, target)) return false;
         return !isApplied(target);
     }
 

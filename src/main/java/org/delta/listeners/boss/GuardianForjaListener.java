@@ -42,6 +42,11 @@ public class GuardianForjaListener implements Listener {
     private static final double ACTIVATION_RANGE = 28.0;
     private static final double ENRAGE_THRESHOLD = 0.4;
 
+    private static final double MELEE_RANGE = 3.5;
+    private static final double YUNQUE_PRIORITY = 0.6;
+    private static final double SEISMIC_RADIUS = 6.0;
+    private static final double SEISMIC_BELOW_THRESHOLD = 1.0;
+
     private static final String[] MODIFIER_KEYS = {
             "unbreakable_modifier",
             "liviano_modifier",
@@ -82,7 +87,14 @@ public class GuardianForjaListener implements Listener {
     }
 
     private void performRandomAttack(LivingEntity boss, Player target) {
+        if (castigarAcantonado(boss)) return;
+
         double distance = boss.getLocation().distance(target.getLocation());
+
+        if (distance <= MELEE_RANGE && rng.nextDouble() < YUNQUE_PRIORITY) {
+            golpeDeYunque(boss);
+            return;
+        }
 
         List<Integer> pool = new ArrayList<>();
         if (distance <= 7.0) pool.add(0);
@@ -117,6 +129,41 @@ public class GuardianForjaListener implements Listener {
             if (knockback.lengthSquared() > 0) knockback.normalize();
             knockback.setY(0.7);
             player.setVelocity(player.getVelocity().add(knockback));
+        }
+    }
+
+    private boolean castigarAcantonado(LivingEntity boss) {
+        double squared = SEISMIC_RADIUS * SEISMIC_RADIUS;
+        double bossY = boss.getLocation().getY();
+        List<Player> ocultos = boss.getWorld().getPlayers().stream()
+                .filter(p -> !p.isDead() && p.getGameMode() == GameMode.SURVIVAL)
+                .filter(p -> p.getLocation().distanceSquared(boss.getLocation()) <= squared)
+                .filter(p -> p.getLocation().getY() < bossY - SEISMIC_BELOW_THRESHOLD
+                        || !boss.hasLineOfSight(p))
+                .toList();
+
+        if (ocultos.isEmpty()) return false;
+
+        ondaSismica(boss, ocultos);
+        return true;
+    }
+
+    private void ondaSismica(LivingEntity boss, List<Player> objetivos) {
+        World world = boss.getWorld();
+        world.playSound(boss.getLocation(), Sound.ENTITY_RAVAGER_ROAR, 1.4f, 0.5f);
+        world.playSound(boss.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.2f, 0.5f);
+        world.spawnParticle(Particle.EXPLOSION, boss.getLocation(), 6, 1, 0.4, 1, 0);
+        world.spawnParticle(Particle.BLOCK, boss.getLocation(), 60, 3, 0.4, 3,
+                Material.NETHERITE_BLOCK.createBlockData());
+
+        for (Player player : objetivos) {
+            player.damage(7.0, boss);
+            Vector jale = boss.getLocation().toVector()
+                    .subtract(player.getLocation().toVector());
+            jale.setY(0);
+            if (jale.lengthSquared() > 0) jale.normalize().multiply(0.8);
+            jale.setY(0.9);
+            player.setVelocity(jale);
         }
     }
 

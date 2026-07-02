@@ -269,46 +269,7 @@ public class ForjaAncestral extends StructureTemplate {
         ringWalls(b, 2, 2, 12, 12, 12, 12, WALL);
         crenellations(b, 2, 2, 12, 12, 13, WALL);
 
-        switch (variant.terraceStyle) {
-            case 1 -> {
-                terraceBrazier(b, 4, 4);
-                terraceBrazier(b, 10, 4);
-                terraceBrazier(b, 4, 10);
-                terraceBrazier(b, 10, 10);
-                obelisk(b, 7, 10);
-            }
-            case 2 -> {
-                terraceColumn(b, 4, 4);
-                terraceColumn(b, 10, 4);
-                terraceColumn(b, 4, 10);
-                terraceColumn(b, 10, 10);
-            }
-            default -> {
-                terraceBrazier(b, 4, 4);
-                terraceBrazier(b, 10, 4);
-                terraceBrazier(b, 4, 10);
-                terraceBrazier(b, 10, 10);
-            }
-        }
-
         b.chest(7, 12, 4, LOOT_FORJA);
-    }
-
-    private void terraceBrazier(StructureDef.Builder b, int x, int z) {
-        b.block(x, 12, z, PILLAR);
-        b.block(x, 13, z, Material.LAVA_CAULDRON);
-    }
-
-    private void terraceColumn(StructureDef.Builder b, int x, int z) {
-        b.column(x, 12, 15, z, PILLAR);
-        b.block(x, 16, z, BAND);
-        b.block(x, 17, z, Material.SOUL_CAMPFIRE);
-    }
-
-    private void obelisk(StructureDef.Builder b, int x, int z) {
-        b.column(x, 12, 16, z, PILLAR);
-        b.block(x, 17, z, BAND);
-        b.block(x, 18, z, Material.SEA_LANTERN);
     }
 
     // -------------------------------------------------------------------------

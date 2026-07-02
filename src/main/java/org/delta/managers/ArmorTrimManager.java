@@ -49,12 +49,12 @@ public class ArmorTrimManager {
 
     static {
         EFECTOS.put(TrimMaterial.QUARTZ, PotionEffectType.JUMP_BOOST);
-        EFECTOS.put(TrimMaterial.IRON, PotionEffectType.RESISTANCE);
-        EFECTOS.put(TrimMaterial.NETHERITE, PotionEffectType.FIRE_RESISTANCE);
+        EFECTOS.put(TrimMaterial.IRON, PotionEffectType.FIRE_RESISTANCE);
+        EFECTOS.put(TrimMaterial.NETHERITE, PotionEffectType.RESISTANCE);
         EFECTOS.put(TrimMaterial.REDSTONE, PotionEffectType.SPEED);
-        EFECTOS.put(TrimMaterial.COPPER, PotionEffectType.DOLPHINS_GRACE);
+        EFECTOS.put(TrimMaterial.COPPER, PotionEffectType.SLOW_FALLING);
         EFECTOS.put(TrimMaterial.GOLD, PotionEffectType.HASTE);
-        EFECTOS.put(TrimMaterial.EMERALD, PotionEffectType.HERO_OF_THE_VILLAGE);
+        EFECTOS.put(TrimMaterial.EMERALD, PotionEffectType.INVISIBILITY);
         EFECTOS.put(TrimMaterial.DIAMOND, PotionEffectType.STRENGTH);
         EFECTOS.put(TrimMaterial.LAPIS, PotionEffectType.WATER_BREATHING);
         EFECTOS.put(TrimMaterial.AMETHYST, PotionEffectType.NIGHT_VISION);

@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.pendulum;
 
@@ -28,6 +29,7 @@ public class EndermanHostileListener extends BaseMobSpawnListener {
 
     private static final double TELEPORT_CHANCE = 0.35;
     private static final double TELEPORT_RADIUS = 20.0;
+    private static final double TELEPORT_MAX_RANGE = 5.0;
     private static final long TELEPORT_COOLDOWN_MS = 10_000L;
 
     private final pendulum plugin;
@@ -47,6 +49,11 @@ public class EndermanHostileListener extends BaseMobSpawnListener {
         startAggro((Enderman) event.getEntity());
     }
 
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        lastTeleportByPlayer.remove(event.getPlayer().getUniqueId());
+    }
+
     private void startAggro(Enderman enderman) {
         new BukkitRunnable() {
             @Override
@@ -58,6 +65,11 @@ public class EndermanHostileListener extends BaseMobSpawnListener {
 
                 LivingEntity target = enderman.getTarget();
                 if (target instanceof Player current && !current.isDead()) {
+                    if (current.getWorld() != enderman.getWorld()
+                            || current.getLocation().distanceSquared(enderman.getLocation())
+                                    > TELEPORT_MAX_RANGE * TELEPORT_MAX_RANGE) {
+                        return;
+                    }
                     long now = System.currentTimeMillis();
                     Long last = lastTeleportByPlayer.get(current.getUniqueId());
                     if ((last == null || now - last >= TELEPORT_COOLDOWN_MS)

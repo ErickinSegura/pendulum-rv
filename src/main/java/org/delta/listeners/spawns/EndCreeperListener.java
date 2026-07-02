@@ -23,6 +23,7 @@ public class EndCreeperListener extends BaseMobSpawnListener {
     private static final String TAG = "ender_creeper";
 
     private static final long CHASE_INTERVAL = 60L;
+    private static final double CHASE_MIN_RADIUS = 2.5;
     private static final double CHASE_RADIUS = 5.0;
     private static final double DODGE_RADIUS = 8.0;
     private static final double DETECT_RANGE = 24.0;
@@ -56,7 +57,7 @@ public class EndCreeperListener extends BaseMobSpawnListener {
         if (!(event.getEntity() instanceof Creeper creeper)) return;
         if (!creeper.getScoreboardTags().contains(TAG)) return;
 
-        Location dest = puntoEnSuelo(creeper.getWorld(), creeper.getLocation(), DODGE_RADIUS);
+        Location dest = puntoEnSuelo(creeper.getWorld(), creeper.getLocation(), 0, DODGE_RADIUS);
         if (dest != null) parpadear(creeper, dest);
     }
 
@@ -72,7 +73,7 @@ public class EndCreeperListener extends BaseMobSpawnListener {
                 Player target = nearestPlayer(creeper);
                 if (target == null) return;
 
-                Location dest = puntoEnSuelo(creeper.getWorld(), target.getLocation(), CHASE_RADIUS);
+                Location dest = puntoEnSuelo(creeper.getWorld(), target.getLocation(), CHASE_MIN_RADIUS, CHASE_RADIUS);
                 if (dest != null) parpadear(creeper, dest);
             }
         }.runTaskTimer(plugin, CHASE_INTERVAL, CHASE_INTERVAL);
@@ -86,10 +87,12 @@ public class EndCreeperListener extends BaseMobSpawnListener {
         world.playSound(dest, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
     }
 
-    private Location puntoEnSuelo(World world, Location base, double radius) {
+    private Location puntoEnSuelo(World world, Location base, double minRadius, double maxRadius) {
         for (int intento = 0; intento < 6; intento++) {
-            int x = base.getBlockX() + (int) ((random.nextDouble() * 2 - 1) * radius);
-            int z = base.getBlockZ() + (int) ((random.nextDouble() * 2 - 1) * radius);
+            double angle = random.nextDouble() * 2 * Math.PI;
+            double dist = minRadius + random.nextDouble() * (maxRadius - minRadius);
+            int x = base.getBlockX() + (int) Math.round(Math.cos(angle) * dist);
+            int z = base.getBlockZ() + (int) Math.round(Math.sin(angle) * dist);
             Block highest = world.getHighestBlockAt(x, z);
             if (highest.getType().isSolid()) {
                 return highest.getLocation().add(0.5, 1, 0.5);

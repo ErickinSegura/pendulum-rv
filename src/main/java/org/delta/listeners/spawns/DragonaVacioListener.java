@@ -64,7 +64,7 @@ public class DragonaVacioListener implements Listener {
     private static final double TELEPORT_RADIUS_CENTRO = 100.0;
     private static final int TELEPORT_RETRIES = 16;
 
-    private static final long CRYSTAL_RESPAWN_DELAY = 1200L;
+    private static final long CRYSTAL_RESPAWN_DELAY = 18000L;
 
     private static final String TAG_REFORZADA = "dragona_vacio_reforzada";
 

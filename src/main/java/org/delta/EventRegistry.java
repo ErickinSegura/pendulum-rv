@@ -26,6 +26,7 @@ import org.delta.listeners.items.PapaExplosivaListener;
 import org.delta.listeners.items.ModifierSmithingListener;
 import org.delta.listeners.items.AnclaVinculoListener;
 import org.delta.listeners.items.FrascoVacioListener;
+import org.delta.listeners.items.DirtyHeartyListener;
 import org.delta.listeners.perks.*;
 import org.delta.listeners.perks.impl.*;
 import org.delta.listeners.player.*;
@@ -143,6 +144,7 @@ public class EventRegistry {
         pm.registerEvents(new ModifierSmithingListener(plugin), plugin);
         pm.registerEvents(new AnclaVinculoListener(), plugin);
         pm.registerEvents(new FrascoVacioListener(), plugin);
+        pm.registerEvents(new DirtyHeartyListener(), plugin);
 
         // World Generation
         WorldGenListener worldGenListener = new WorldGenListener(plugin.getStructurePopulator());

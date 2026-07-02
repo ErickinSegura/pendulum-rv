@@ -32,7 +32,7 @@ public class CommandCompletion implements TabCompleter {
         subCommandCompletions.put("basic", basicCommands);
 
         List<String> adminCommands = Arrays.asList(
-                "dia", "give", "summon", "chargebase", "structdev"
+                "dia", "give", "summon", "chargebase", "structdev", "dirtyhearty"
         );
         subCommandCompletions.put("admin", adminCommands);
 
@@ -190,6 +190,10 @@ public class CommandCompletion implements TabCompleter {
                 return filterCompletions(subCommandCompletions.get("structdev_admin"), args[1]);
             }
 
+            if (args[0].equalsIgnoreCase("dirtyhearty") && checkPermission(player)) {
+                return filterCompletions(List.of("reset"), args[1]);
+            }
+
 
         }
 
@@ -272,6 +276,12 @@ public class CommandCompletion implements TabCompleter {
                     args[1].equalsIgnoreCase("spawn") &&
                     checkPermission(player)) {
                 return filterCompletions(getStructureIds(), args[2]);
+            }
+
+            if (args[0].equalsIgnoreCase("dirtyhearty") &&
+                    args[1].equalsIgnoreCase("reset") &&
+                    checkPermission(player)) {
+                return getOnlinePlayerNames(args[2]);
             }
         }
 

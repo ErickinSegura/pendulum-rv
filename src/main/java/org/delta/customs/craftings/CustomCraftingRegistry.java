@@ -29,7 +29,9 @@ public class CustomCraftingRegistry {
             new ClawnCrafting(),
             new LazoCrafting(),
             new VaritaBarreraCrafting(),
-            new VaritaBarreraMejoradaCrafting()
+            new VaritaBarreraMejoradaCrafting(),
+            new DirtyHeartyCrafting(),
+            new ManzanaDoradaEncantadaCrafting()
     );
 
     public static void register(CustomCraftingListener listener) {

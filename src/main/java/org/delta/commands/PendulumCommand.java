@@ -30,6 +30,7 @@ public class PendulumCommand implements CommandExecutor {
         addSubCommand(new DiaCommand());
         addSubCommand(new BingoCommand(plugin));
         addSubCommand(new HealthCommand());
+        addSubCommand(new DirtyHeartyCommand());
         addSubCommand(new TeamChestCommand());
         addSubCommand(new PerkCommand());
         addSubCommand(new GiveCommand());

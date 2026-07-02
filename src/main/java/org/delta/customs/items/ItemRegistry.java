@@ -20,6 +20,7 @@ import org.delta.customs.items.tools.Frenesi;
 import org.delta.customs.items.tools.AnclaVinculo;
 import org.delta.customs.items.tools.FrascoVacio;
 import org.delta.customs.items.consumables.ZanahoriaEncantada;
+import org.delta.customs.items.consumables.DirtyHearty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -72,6 +73,7 @@ public class ItemRegistry {
         register(new AnclaVinculo());
         register(new FrascoVacio());
         register(new ZanahoriaEncantada());
+        register(new DirtyHearty());
     }
 
     private static void register(CustomItem item) {

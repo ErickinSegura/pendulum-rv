@@ -40,6 +40,7 @@ import org.delta.listeners.spawns.UpgradedMobListener;
 import org.delta.listeners.spawns.ZombieSpawner;
 import org.delta.listeners.teamChest.TeamChestListener;
 import org.delta.listeners.worldgen.WorldGenListener;
+import org.delta.managers.death.CombatTagManager;
 import org.delta.managers.death.LifeManager;
 
 public class EventRegistry {
@@ -65,6 +66,7 @@ public class EventRegistry {
         pm.registerEvents(new PotionListener(), plugin);
         pm.registerEvents(new BedListener(), plugin);
         pm.registerEvents(new JoinLeaveListener(lifeManager), plugin);
+        pm.registerEvents(new CombatLogListener(lifeManager, new CombatTagManager()), plugin);
         pm.registerEvents(new EndAccessListener(), plugin);
 
         // Castigos

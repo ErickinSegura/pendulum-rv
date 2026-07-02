@@ -33,6 +33,20 @@ public class ClockEvents {
         //temporaryBanPlayer(player);
     }
 
+    public static void handleCombatLogClockLoss(Player player, int currentLives) {
+        broadcastCombatLogMessages(player, currentLives);
+        broadcastClockSound();
+        pendulum.getInstance().getLifeManager().playClockLossAnimation(player);
+    }
+
+    private static void broadcastCombatLogMessages(Player player, int currentLives) {
+        if (player == null) return;
+        String playerName = player.getName();
+        getServer().broadcast(MessageUtils.color("&5&l" + playerName
+                + "&r&d hizo combat log y perdió un reloj! Le "
+                + (currentLives == 1 ? "queda &l" : "quedan &l") + currentLives + "&r&d."));
+    }
+
     private static void broadcastClockSound() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.playSound(player.getLocation(), "minecraft:entity.warden.sonic_boom", 1, 2f);

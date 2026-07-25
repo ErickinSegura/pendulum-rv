@@ -52,6 +52,7 @@ public class ClockEvents {
 
     public static void handleCombatLogElimination(Player player) {
         if (player == null) return;
+        DeathEvents.displayDeathClockAnimation(player);
         getServer().broadcast(MessageUtils.color("&5&l" + player.getName()
                 + "&r&d hizo combat log y perdió su último reloj. Ha sido eliminado."));
         broadcastClockSound();

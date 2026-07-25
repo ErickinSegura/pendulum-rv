@@ -39,10 +39,11 @@ public class DeathEvents {
         ClockEvents.schedulePermanentBan(player);
     }
 
-    private void displayDeathClockAnimation(Player player) {
-        if (player == null || !player.isOnline()) return;
+    public static void displayDeathClockAnimation(Player player) {
+        if (player == null) return;
 
         World world = player.getWorld();
+        if (world == null) return;
         long originalFullTime = world.getFullTime();
 
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -57,7 +58,7 @@ public class DeathEvents {
         }
     }
 
-    private void animateClockForPlayer(Player viewer, String deadPlayerName, World world, long originalFullTime) {
+    private static void animateClockForPlayer(Player viewer, String deadPlayerName, World world, long originalFullTime) {
         final int framesPerCycle = 63;
         final int totalFrames = framesPerCycle * CLOCK_CYCLES;
 
@@ -77,7 +78,7 @@ public class DeathEvents {
             final long delay = i * TICKS_PER_FRAME;
             final int frameNumber = i;
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Bukkit.getScheduler().runTaskLater(pendulum.getInstance(), () -> {
                 if (viewer.isOnline()) {
                     Component clockFrame = Icons.getClockFrame(frameIndex);
 
@@ -100,7 +101,7 @@ public class DeathEvents {
             }, delay);
         }
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Bukkit.getScheduler().runTaskLater(pendulum.getInstance(), () -> {
             if (SYNC_DAY_NIGHT) {
                 world.setFullTime(originalFullTime);
             }

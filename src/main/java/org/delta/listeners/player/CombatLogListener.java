@@ -1,5 +1,6 @@
 package org.delta.listeners.player;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -7,8 +8,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
 import org.delta.database.repositories.DeathRepository;
 import org.delta.libs.MessageUtils;
@@ -18,6 +21,8 @@ import org.delta.managers.death.CombatTagManager;
 import org.delta.managers.death.LifeManager;
 import org.delta.pendulum;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class CombatLogListener implements Listener {
@@ -25,6 +30,7 @@ public class CombatLogListener implements Listener {
     private final LifeManager lifeManager;
     private final CombatTagManager combatTagManager;
     private final DeathRepository deathRepo;
+    private final Map<UUID, BukkitTask> expiryTasks = new HashMap<>();
 
     public CombatLogListener(LifeManager lifeManager, CombatTagManager combatTagManager) {
         this.lifeManager = lifeManager;
@@ -40,12 +46,42 @@ public class CombatLogListener implements Listener {
         if (attacker.getUniqueId().equals(victim.getUniqueId())) return;
 
         if (combatTagManager.tag(attacker)) notifyEnteredCombat(attacker);
+        scheduleCombatExpiry(attacker);
         if (combatTagManager.tag(victim, attacker)) notifyEnteredCombat(victim);
+        scheduleCombatExpiry(victim);
     }
 
     private void notifyEnteredCombat(Player player) {
         player.sendMessage(MessageUtils.color(
                 "&c⚔ Entraste en combate. No te desconectes o perderás un reloj."));
+    }
+
+    private void scheduleCombatExpiry(Player player) {
+        UUID uuid = player.getUniqueId();
+        cancelExpiryTask(uuid);
+
+        long ticks = (CombatTagManager.TAG_DURATION_MS / 50L) + 5L;
+        BukkitTask task = Bukkit.getScheduler().runTaskLater(pendulum.getInstance(), () -> {
+            expiryTasks.remove(uuid);
+            Player online = Bukkit.getPlayer(uuid);
+            if (online == null || !online.isOnline()) return;
+            if (combatTagManager.isTagged(online)) return;
+            online.sendMessage(MessageUtils.color(
+                    "&a⚔ Saliste de combate. Ya puedes desconectarte sin penalización."));
+        }, ticks);
+        expiryTasks.put(uuid, task);
+    }
+
+    private void cancelExpiryTask(UUID uuid) {
+        BukkitTask task = expiryTasks.remove(uuid);
+        if (task != null) task.cancel();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        combatTagManager.clear(player);
+        cancelExpiryTask(player.getUniqueId());
     }
 
     private Player resolveAttacker(Entity damager) {
@@ -60,6 +96,7 @@ public class CombatLogListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        cancelExpiryTask(player.getUniqueId());
         if (!combatTagManager.isTagged(player)) return;
 
         if (ClockEvents.isPendingBan(player)) {

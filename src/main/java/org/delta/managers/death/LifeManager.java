@@ -132,11 +132,20 @@ public class LifeManager {
         updateNameDisplays(player, lives);
     }
 
-    private void updateNameDisplays(Player player, int lives) {
+    public Component getRelojesComponent(Player player) {
+        return buildClocks(getLives(player));
+    }
+
+    private Component buildClocks(int lives) {
         Component clocks = Component.empty();
         for (int i = 0; i < maxLives; i++) {
             clocks = clocks.append(i < lives ? Icons.ACTIVE_CLOCK : Icons.INACTIVE_CLOCK);
         }
+        return clocks;
+    }
+
+    private void updateNameDisplays(Player player, int lives) {
+        Component clocks = buildClocks(lives);
 
         if (belowNameObjective != null) {
             var score = belowNameObjective.getScore(player.getName());

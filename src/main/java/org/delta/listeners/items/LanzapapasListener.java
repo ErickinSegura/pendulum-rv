@@ -25,7 +25,6 @@ public class LanzapapasListener implements Listener {
 
     private static final long LOAD_TICKS = 25L;
     private final Set<UUID> loading = new HashSet<>();
-    private final Set<UUID> ready = new HashSet<>();
     private final Map<UUID, Player> papasEnVuelo = new HashMap<>();
 
 
@@ -82,7 +81,6 @@ public class LanzapapasListener implements Listener {
             ItemStack loadedItem = org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitCopy(nmsItem);
             player.getInventory().setItemInMainHand(loadedItem);
 
-            ready.add(player.getUniqueId());
             player.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1f, 1f);
 
         }, LOAD_TICKS);
@@ -95,9 +93,6 @@ public class LanzapapasListener implements Listener {
 
         event.setCancelled(true);
 
-        if (!ready.contains(player.getUniqueId())) return;
-
-        ready.remove(player.getUniqueId());
         unloadCrossbow(event.getBow());
 
         Snowball projectile = player.launchProjectile(Snowball.class);

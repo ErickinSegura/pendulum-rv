@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.rango.Rango;
+import org.delta.pendulum;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +63,12 @@ public class RangoManager {
     public Component getRangoComponent(Player player) {
         Rango rango = getRango(player);
         Component texto = MessageUtils.color(rango.getColor() + rango.getEtiqueta());
-        Component hover = MessageUtils.color(rango.getDescripcion());
+        Component hover = Component.empty()
+                .append(separador())
+                .append(Component.newline())
+                .append(MessageUtils.color(rango.getDescripcion()))
+                .append(Component.newline())
+                .append(separador());
         return texto.hoverEvent(HoverEvent.showText(hover));
     }
 
@@ -73,17 +79,38 @@ public class RangoManager {
             return texto;
         }
 
+        Component hover = Component.empty()
+                .append(separador())
+                .append(Component.newline())
+                .append(MessageUtils.color("&fEquipo "))
+                .append(MessageUtils.color(equipo.trim()))
+                .append(Component.newline())
+                .append(MessageUtils.color("&7Integrantes:"));
+
         List<String> miembros = getMiembrosEquipo(equipo);
-        Component hover = MessageUtils.color("&7Integrantes del equipo:");
         if (miembros.isEmpty()) {
-            hover = hover.append(MessageUtils.color("\n&8(ninguno)"));
+            hover = hover.append(Component.newline()).append(MessageUtils.color("&8» ninguno"));
         } else {
+            var lifeManager = pendulum.getInstance().getLifeManager();
             for (String nombre : miembros) {
-                boolean online = Bukkit.getPlayerExact(nombre) != null;
-                hover = hover.append(MessageUtils.color("\n" + (online ? "&a● " : "&7● ") + "&f" + nombre));
+                Player miembro = Bukkit.getPlayerExact(nombre);
+                if (miembro != null && lifeManager != null) {
+                    hover = hover.append(Component.newline())
+                            .append(MessageUtils.color("&a● &f" + nombre + " &8» "))
+                            .append(lifeManager.getRelojesComponent(miembro));
+                } else {
+                    hover = hover.append(Component.newline())
+                            .append(MessageUtils.color("&7● &f" + nombre + " &8» &7desconectado"));
+                }
             }
         }
+
+        hover = hover.append(Component.newline()).append(separador());
         return texto.hoverEvent(HoverEvent.showText(hover));
+    }
+
+    private Component separador() {
+        return MessageUtils.color("&8&m                                ");
     }
 
     private List<String> getMiembrosEquipo(String equipoPrefix) {

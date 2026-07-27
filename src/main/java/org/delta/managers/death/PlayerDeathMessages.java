@@ -30,7 +30,7 @@ public class PlayerDeathMessages {
                 configFile.createNewFile();
                 config = YamlConfiguration.loadConfiguration(configFile);
 
-                config.set("players.iPancrema", "Placeholder");
+                config.set("players.iPancrema.mensajeMuerte", "Placeholder");
 
                 saveConfig();
                 plugin.getLogger().info("Archivo players.yml creado con éxito");
@@ -52,13 +52,11 @@ public class PlayerDeathMessages {
 
 
     public String getCustomDeathMessage(String playerName) {
-        if (config.contains("players." + playerName)) {
-            return config.getString("players." + playerName);
-        }
-        return null;
+        return config.getString("players." + playerName + ".mensajeMuerte");
     }
 
     public boolean hasCustomMessage(String playerName) {
-        return config.contains("players." + playerName);
+        String mensaje = config.getString("players." + playerName + ".mensajeMuerte");
+        return mensaje != null && !mensaje.isEmpty();
     }
 }

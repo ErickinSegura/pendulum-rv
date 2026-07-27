@@ -1,5 +1,6 @@
 package org.delta.managers.death;
 
+import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -8,6 +9,10 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.delta.database.repositories.PlayerRepository;
 import org.delta.libs.Icons;
 import org.delta.libs.MessageUtils;
@@ -23,6 +28,7 @@ public class LifeManager {
     private final int maxLives;
 
     private final NamespacedKey livesKey;
+    private final Objective belowNameObjective;
     private boolean animating = false;
     private final Queue<ClockLossData> lossQueue = new ArrayDeque<>();
 
@@ -30,7 +36,18 @@ public class LifeManager {
         this.plugin = plugin;
         this.maxLives = Math.max(1, PendulumSettings.getInstance().getVidas());
         this.livesKey = new NamespacedKey(plugin, "player_lives");
+        this.belowNameObjective = setupBelowName();
         startActionBarUpdater();
+    }
+
+    private Objective setupBelowName() {
+        Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
+        Objective obj = board.getObjective("pdl_relojes");
+        if (obj == null) {
+            obj = board.registerNewObjective("pdl_relojes", Criteria.DUMMY, Component.empty());
+        }
+        obj.setDisplaySlot(DisplaySlot.BELOW_NAME);
+        return obj;
     }
 
     private void startActionBarUpdater() {
@@ -112,6 +129,33 @@ public class LifeManager {
         }
 
         player.sendActionBar(actionBar);
+        updateNameDisplays(player, lives);
+    }
+
+    private void updateNameDisplays(Player player, int lives) {
+        Component clocks = Component.empty();
+        for (int i = 0; i < maxLives; i++) {
+            clocks = clocks.append(i < lives ? Icons.ACTIVE_CLOCK : Icons.INACTIVE_CLOCK);
+        }
+
+        if (belowNameObjective != null) {
+            var score = belowNameObjective.getScore(player.getName());
+            score.setScore(lives);
+            score.numberFormat(NumberFormat.fixed(clocks));
+        }
+
+        var rangoManager = pendulum.getInstance().getRangoManager();
+        Component prefijo = rangoManager != null ? rangoManager.getPrefijo(player) : Component.empty();
+        Component nombre = rangoManager != null
+                ? rangoManager.getNombre(player)
+                : MessageUtils.color("&f" + player.getName());
+
+        Component tab = Component.empty()
+                .append(prefijo)
+                .append(nombre)
+                .append(MessageUtils.color("&f "))
+                .append(clocks);
+        player.playerListName(tab);
     }
 
 

@@ -70,6 +70,7 @@ public class EventRegistry {
         pm.registerEvents(new CombatLogListener(lifeManager, new CombatTagManager()), plugin);
         pm.registerEvents(new BanProtectionListener(), plugin);
         pm.registerEvents(new EndAccessListener(), plugin);
+        pm.registerEvents(new ChatListener(plugin.getRangoManager()), plugin);
 
         // Castigos
         pm.registerEvents(new CastigoListener(plugin.getCastigoManager()), plugin);

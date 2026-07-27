@@ -41,6 +41,7 @@ public final class pendulum extends JavaPlugin {
 
     public static String prefix = "&d&lPendulum&r";
     private LifeManager lifeManager;
+    private org.delta.managers.rango.RangoManager rangoManager;
     private AchievementManager achievementManager;
     private DatabaseManager databaseManager;
     private ChargeBaseManager chargeBaseManager;
@@ -73,6 +74,7 @@ public final class pendulum extends JavaPlugin {
 
         // Inicializar managers
         lifeManager = new LifeManager(this);
+        rangoManager = new org.delta.managers.rango.RangoManager(this);
         achievementManager = new AchievementManager(this);
         DeathEvents deathEvents = new DeathEvents();
         BingoDataManager bingoDataManager = BingoDataManager.getInstance(this);
@@ -171,6 +173,10 @@ public final class pendulum extends JavaPlugin {
 
     public LifeManager getLifeManager() {
         return lifeManager;
+    }
+
+    public org.delta.managers.rango.RangoManager getRangoManager() {
+        return rangoManager;
     }
 
     public AchievementManager getAchievementManager() {

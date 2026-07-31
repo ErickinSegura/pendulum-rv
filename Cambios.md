@@ -17,6 +17,17 @@ Esta lista describe qué se va desbloqueando conforme avanza el contador de día
 - **Equipos y Cofre de equipo (TeamChest).** Organización en equipos y almacenamiento compartido entre miembros.
 - **Pociones apilables**, **sistema de logros** y **reloj de eventos** con sonido.
 
+### Rangos, equipos y emblemas (chat y tab)
+- **Rangos.** Cada jugador tiene un rango (`admin`, `moderador`, `invitado`, `miembro`) que se muestra como etiqueta con color y descripción al pasar el cursor. Se configura en `players.yml`.
+- **Equipos.** Prefijo de equipo `[Nombre]` junto al nombre; al pasar el cursor muestra los integrantes del equipo y sus relojes/vidas.
+- **Emblema Founder.** Estrella dorada (✦) que aparece después del nombre de quienes participaron en Pendulum 1 (`founder: true` en `players.yml`). Al pasar el cursor indica "Founder — Participó en Pendulum 1".
+- **Mensaje de muerte personalizado** por jugador, también en `players.yml`.
+
+### Canje de códigos (easter eggs) — `/pdl canjear <código>`
+Códigos secretos escondidos por la web y el servidor; cada uno se canjea **una sola vez por jugador** y entrega una recompensa. Configurables en `canjes.yml` sin recompilar. Ejemplos de recompensas: tótems, stacks de recursos, pociones, discos de música aleatorios, cabezas, un **Estandarte del Fundador** conmemorativo, y el **Reloj Dorado del Péndulo**.
+
+- **Reloj Dorado del Péndulo.** Ítem de un solo uso: click derecho para otorgar **1 hora extra de día** al servidor; lo anuncia en el chat con partículas y sonido. Es un easter egg, se obtiene canjeando su código.
+
 ---
 
 ## Día 5 — Guerra de bases, trims y mundo más duro

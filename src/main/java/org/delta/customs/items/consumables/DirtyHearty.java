@@ -20,6 +20,7 @@ public class DirtyHearty implements CustomItem {
     public ItemStack buildItem() {
         return new ItemBuilder(Material.ROTTEN_FLESH)
                 .setDisplayName(ItemBuilder.format("&c&lDirty Hearty"))
+                .setCustomModelData(1)
                 .addEnchant(Enchantment.INFINITY, 1)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .build();

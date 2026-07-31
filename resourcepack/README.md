@@ -44,6 +44,7 @@ los modelos y las definiciones de item ya están hechos.
 | Ancla de Vínculo        | recovery_compass       | 1   | ancla_vinculo.png              |
 | Frasco del Vacío        | shulker_shell          | 1   | frasco_vacio.png               |
 | Zanahoria Encantada     | golden_carrot          | 1   | zanahoria_encantada.png        |
+| Dirty Hearty            | rotten_flesh           | 1   | dirty_hearty.png               |
 | Liviano (modifier)      | feather                | 1   | liviano_modifier.png           |
 | Irrompible (modifier)   | nether_brick           | 1   | unbreakable_modifier.png       |
 | Temple (modifier)       | ghast_tear             | 1   | temple_modifier.png            |

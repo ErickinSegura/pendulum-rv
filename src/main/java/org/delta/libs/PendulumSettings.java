@@ -199,6 +199,10 @@ public class PendulumSettings {
         return dia;
     }
 
+    public int getBloque() {
+        return (dia + 4) / 5;
+    }
+
     public int getVidas() {
         return vidas;
     }

@@ -126,7 +126,7 @@ public class DeathEvents {
     private void broadcastDeathMessages(Player player) {
         if (player != null) {
             String playerName = player.getName();
-            player.sendMessage(MessageUtils.color("&cTe quedaste sin relojs"));
+            player.sendMessage(MessageUtils.color("&cTe quedaste sin relojes"));
             getServer().broadcast(MessageUtils.color("&dA &5&l" + playerName + "&r&d se le ha acabado el tiempo..."));
 
             if (deathMessages.hasCustomMessage(playerName)) {

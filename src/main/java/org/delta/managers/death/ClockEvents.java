@@ -91,7 +91,7 @@ public class ClockEvents {
             String playerName = player.getName();
             switch (currentLives) {
                 case 2:
-                    player.sendMessage(Component.text("Te quedan " + currentLives + " relojs", NamedTextColor.GOLD));
+                    player.sendMessage(Component.text("Te quedan " + currentLives + " relojes", NamedTextColor.GOLD));
                     break;
                 case 1:
                     player.sendMessage(Component.text("Te queda " + currentLives + " reloj", NamedTextColor.GOLD));

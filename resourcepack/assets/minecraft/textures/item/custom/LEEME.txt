@@ -22,17 +22,6 @@ debe coincidir EXACTAMENTE con el de la lista de abajo (sin mayúsculas, .png):
   papa_explosiva.png
   lanzapapas.png
   placeholder.png
-  varita_barrera.png
-  varita_barrera_mejorada.png
-  varita_curativa.png
-  frenesi.png
-  lazo.png
-  ancla_vinculo.png
-  frasco_vacio.png
-  zanahoria_encantada.png
-  liviano_modifier.png
-  unbreakable_modifier.png
-  temple_modifier.png
 
 Cualquier item sin su PNG correspondiente se verá como textura faltante
 (cuadros negro/morado), pero NO rompe el resto del pack.

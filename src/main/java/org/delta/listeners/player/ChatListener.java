@@ -20,6 +20,7 @@ public class ChatListener implements Listener {
         event.renderer((source, sourceDisplayName, message, viewer) -> Component.empty()
                 .append(rangoManager.getPrefijo(source))
                 .append(rangoManager.getNombre(source))
+                .append(rangoManager.getSufijo(source))
                 .append(MessageUtils.color("&7: &f"))
                 .append(message));
     }

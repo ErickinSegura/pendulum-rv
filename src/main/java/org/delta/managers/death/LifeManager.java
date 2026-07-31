@@ -159,9 +159,11 @@ public class LifeManager {
                 ? rangoManager.getNombre(player)
                 : MessageUtils.color("&f" + player.getName());
 
+        Component sufijo = rangoManager != null ? rangoManager.getSufijo(player) : Component.empty();
         Component tab = Component.empty()
                 .append(prefijo)
                 .append(nombre)
+                .append(sufijo)
                 .append(MessageUtils.color("&f "))
                 .append(clocks);
         player.playerListName(tab);

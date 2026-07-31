@@ -29,113 +29,74 @@ registrar-canjes: true
 
 canjes:
 
+  # El Código Ancestral (Konami)
   PND-KONAMI-1UP:
-    descripcion: "&fUna vida extra &7(Tótem de la Inmortalidad)"
+    descripcion: "&fTótem de la Inmortalidad"
     items:
       - material: TOTEM_OF_UNDYING
         cantidad: 1
 
+  # Insistencia (10 clicks al logo)
   PND-LOGO-X10:
-    descripcion: "&fÉlitros &7+ &f4 cohetes"
+    descripcion: "&fUn stack de papas asadas"
     items:
-      - material: ELYTRA
-        cantidad: 1
-      - material: FIREWORK_ROCKET
-        cantidad: 4
+      - material: BAKED_POTATO
+        cantidad: 64
 
-  # (CUSTOM) Reloj dorado del Pendulo: reloj nombrado con brillo.
+  # (CUSTOM) La Palabra: Reloj Dorado del Pendulo, item comestible de un
+  # solo uso que otorga 1 hora extra de dia (RelojDorado / RelojDoradoListener).
   PND-TEMPUS-88:
-    descripcion: "&6Reloj Dorado del Péndulo"
+    descripcion: "&6Reloj Dorado del Péndulo &7(1 hora extra de día · un solo uso)"
     items:
-      - material: CLOCK
+      - custom_item: reloj_dorado
         cantidad: 1
-        nombre: "&6&lReloj Dorado del Péndulo"
-        brillo: true
-        lore:
-          - "&7El tiempo siempre vuelve al centro."
-          - "&8Easter Egg · Tempus"
 
-  # (CUSTOM) Cabeza de dev: por defecto usa el skin del owner del server.
-  #          Cambia 'cabeza_dueno' por el nick que quieras.
+  # Tras la Cortina (consola __pendulum())
   PND-DEV-0xC0DE:
-    descripcion: "&5Cabeza de Dev &7+ &fBloque de Netherita"
+    descripcion: "&fCabeza de Jeb &7+ &f1 Netherite Scrap"
     items:
       - material: PLAYER_HEAD
         cantidad: 1
-        nombre: "&5&lCabeza de Dev"
-        cabeza_dueno: "ErickinSegura"
-        lore:
-          - "&7Compilado con amor y bugs."
-          - "&8Easter Egg · 0xC0DE"
-      - material: NETHERITE_BLOCK
+        cabeza_dueno: "jeb_"
+      - material: NETHERITE_SCRAP
         cantidad: 1
 
-  # (CUSTOM) Botas de rapidez II: dan Velocidad II al equiparse mediante
-  #          un modificador de atributo en el slot FEET (+40% = Speed II).
+  # Speedrunner (recorrido en menos de 5s)
   PND-WR-4NAV:
-    descripcion: "&bBotas de Rapidez II &7+ &f16 de azúcar"
+    descripcion: "&f5 pociones de Velocidad I"
     items:
-      - material: DIAMOND_BOOTS
-        cantidad: 1
-        nombre: "&b&lBotas de Rapidez II"
-        inrompible: true
-        lore:
-          - "&7Otorgan &fVelocidad II &7al equiparse."
-          - "&8Easter Egg · World Record"
-        atributos:
-          - atributo: MOVEMENT_SPEED
-            cantidad: 0.40
-            operacion: ADD_SCALAR
-            slot: FEET
-      - material: SUGAR
-        cantidad: 16
-
-  # (CUSTOM) Farol eterno + pocion de vision nocturna extendida.
-  PND-WATCH-60:
-    descripcion: "&eFarol Eterno &7+ &9Visión Nocturna Extendida"
-    items:
-      - material: LANTERN
-        cantidad: 1
-        nombre: "&e&lFarol Eterno"
-        brillo: true
-        lore:
-          - "&7Nunca se apaga."
-          - "&8Easter Egg · Watch"
       - material: POTION
-        cantidad: 1
-        nombre: "&9Poción de Visión Nocturna Extendida"
-        pocion: LONG_NIGHT_VISION
+        cantidad: 5
+        pocion: SWIFTNESS
 
-  # (CUSTOM) Cabeza de buho + taza de cafe.
-  #          Pega una textura base64 de cabeza de buho en 'cabeza_textura'
-  #          si quieres el modelo real; por defecto es una cabeza nombrada.
-  PND-3AM-OWL:
-    descripcion: "&6Cabeza de Búho &7+ &fTaza de Café"
+  # Vigilante (inmovil 60s)
+  PND-WATCH-60:
+    descripcion: "&f64 antorchas"
     items:
-      - material: PLAYER_HEAD
-        cantidad: 1
-        nombre: "&6&lCabeza de Búho"
-        cabeza_textura: ""
-        lore:
-          - "&7Para los que nunca duermen."
-          - "&8Easter Egg · 3AM"
-      - material: HONEY_BOTTLE
-        cantidad: 1
-        nombre: "&6&lTaza de Café"
-        lore:
-          - "&7Un empujón para seguir despierto."
+      - material: TORCH
+        cantidad: 64
 
-  PND-5AM-LARK:
-    descripcion: "&fReloj &7+ &f8 zanahorias doradas"
+  # Trasnochador (entrar entre 3 y 4 am)
+  PND-3AM-OWL:
+    descripcion: "&fReloj &7+ &f32 zanahorias doradas"
     items:
       - material: CLOCK
         cantidad: 1
       - material: GOLDEN_CARROT
-        cantidad: 8
+        cantidad: 32
 
-  # (CUSTOM) Estandarte conmemorativo + totem.
+  # Madrugador (entrar entre 5 y 6 am)
+  PND-5AM-LARK:
+    descripcion: "&fReloj &7+ &f32 zanahorias doradas"
+    items:
+      - material: CLOCK
+        cantidad: 1
+      - material: GOLDEN_CARROT
+        cantidad: 32
+
+  # (CUSTOM) Fundador (entrar el dia del lanzamiento)
   PND-DAY1-FOUNDER:
-    descripcion: "&6Estandarte Conmemorativo &7+ &fTótem"
+    descripcion: "&6Estandarte Conmemorativo &7+ &fTótem de la Inmortalidad"
     items:
       - material: WHITE_BANNER
         cantidad: 1
@@ -150,51 +111,40 @@ canjes:
       - material: TOTEM_OF_UNDYING
         cantidad: 1
 
+  # (CUSTOM) El Pendulo (oscilar con el teclado)
   PND-SWING-LR:
-    descripcion: "&fBrújula encantada &7+ &f8 de lapislázuli"
+    descripcion: "&6Reloj Dorado del Péndulo &7(1 hora extra de día · un solo uso)"
     items:
-      - material: COMPASS
+      - custom_item: reloj_dorado
         cantidad: 1
-        nombre: "&bBrújula del Péndulo"
-        brillo: true
-      - material: LAPIS_LAZULI
-        cantidad: 8
 
-  # El mapa se entrega como filled_map nombrado (decorativo, no es un
-  # mapa de exploracion funcional).
+  # Cartografo (zoom maximo en el mapa)
   PND-MAP-MAXZOOM:
-    descripcion: "&fMapa del Tesoro &7+ &fCatalejo"
+    descripcion: "&f3 stacks de papel"
     items:
-      - material: FILLED_MAP
-        cantidad: 1
-        nombre: "&2&lMapa del Tesoro"
-        lore:
-          - "&7X marca el lugar."
-      - material: SPYGLASS
-        cantidad: 1
+      - material: PAPER
+        cantidad: 64
+      - material: PAPER
+        cantidad: 64
+      - material: PAPER
+        cantidad: 64
 
-  # (CUSTOM) Caja musical + disco de musica aleatorio.
+  # Melodia (teclear a s d f): jukebox + 3 discos aleatorios.
   PND-TUNE-ASDF:
-    descripcion: "&dCaja Musical &7+ &fDisco de música aleatorio"
+    descripcion: "&fJukebox &7+ &f3 discos de música aleatorios"
     items:
       - material: JUKEBOX
         cantidad: 1
-        nombre: "&d&lCaja Musical"
-        lore:
-          - "&7Deja sonar la melodía."
-          - "&8Easter Egg · Tune"
-      - material: MUSIC_DISC_CAT
+      - disco_aleatorio: true
         cantidad: 1
-        disco_aleatorio: true
+      - disco_aleatorio: true
+        cantidad: 1
+      - disco_aleatorio: true
+        cantidad: 1
 
-  # Command block decorativo (los jugadores sin op no pueden colocarlo).
+  # Bajo el Capo (leer el codigo fuente)
   PND-SRC-1337:
-    descripcion: "&fBloque de comandos &7+ &f8 esmeraldas"
+    descripcion: "&fBloque de comandos"
     items:
       - material: COMMAND_BLOCK
         cantidad: 1
-        nombre: "&c&lReliquia del Código Fuente"
-        lore:
-          - "&7Lo encontraste en el HTML."
-      - material: EMERALD
-        cantidad: 8

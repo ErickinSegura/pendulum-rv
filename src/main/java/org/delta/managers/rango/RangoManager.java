@@ -2,6 +2,7 @@ package org.delta.managers.rango;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -52,6 +53,26 @@ public class RangoManager {
 
     public String getEquipoPrefix(Player player) {
         return data.getString("players." + player.getName() + ".equipoPrefix", "");
+    }
+
+    public boolean esFounder(Player player) {
+        return data.getBoolean("players." + player.getName() + ".founder", false);
+    }
+
+    public Component getSufijo(Player player) {
+        if (!esFounder(player)) {
+            return Component.empty();
+        }
+        Component texto = MessageUtils.color(" &6✦").decoration(TextDecoration.BOLD, false);
+        Component hover = Component.empty()
+                .append(separador())
+                .append(Component.newline())
+                .append(MessageUtils.color("&6&lFounder"))
+                .append(Component.newline())
+                .append(MessageUtils.color("&7Participo en Pendulum 1."))
+                .append(Component.newline())
+                .append(separador());
+        return texto.hoverEvent(HoverEvent.showText(hover));
     }
 
     public boolean mismoEquipo(Player a, Player b) {

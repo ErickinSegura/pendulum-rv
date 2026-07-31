@@ -9,6 +9,7 @@ public class DirtyHeartyCrafting implements CustomCrafting {
     @Override
     public CustomRecipeBuilder.CustomRecipe build() {
         return CustomRecipeBuilder.of("dirty_hearty")
+                .maxDay(10)
                 .result(new DirtyHearty().build())
                 .ingredient(0, Material.GOLD_BLOCK, 1)
                 .ingredient(1, Material.GOLD_BLOCK, 1)

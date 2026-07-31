@@ -11,6 +11,7 @@ public class CustomRecipeBuilder {
     private final String id;
     private ItemStack result;
     private int minDay = 0;
+    private int maxDay = Integer.MAX_VALUE;
     private final Map<Integer, ItemStack> ingredients = new HashMap<>();
 
     private CustomRecipeBuilder(String id) {
@@ -49,10 +50,15 @@ public class CustomRecipeBuilder {
         return this;
     }
 
+    public CustomRecipeBuilder maxDay(int maxDay) {
+        this.maxDay = Math.max(0, maxDay);
+        return this;
+    }
+
     public CustomRecipe build() {
         if (result == null) throw new IllegalStateException("La receta '" + id + "' no tiene resultado definido");
         if (ingredients.isEmpty()) throw new IllegalStateException("La receta '" + id + "' no tiene ingredientes");
-        return new CustomRecipe(id, result, ingredients, minDay);
+        return new CustomRecipe(id, result, ingredients, minDay, maxDay);
     }
 
     public static class CustomRecipe {
@@ -61,17 +67,20 @@ public class CustomRecipeBuilder {
         private final ItemStack result;
         private final Map<Integer, ItemStack> ingredients;
         private final int minDay;
+        private final int maxDay;
 
-        private CustomRecipe(String id, ItemStack result, Map<Integer, ItemStack> ingredients, int minDay) {
+        private CustomRecipe(String id, ItemStack result, Map<Integer, ItemStack> ingredients, int minDay, int maxDay) {
             this.id = id;
             this.result = result;
             this.ingredients = Map.copyOf(ingredients);
             this.minDay = minDay;
+            this.maxDay = maxDay;
         }
 
         public String getId() { return id; }
         public ItemStack getResult() { return result.clone(); }
         public Map<Integer, ItemStack> getIngredients() { return ingredients; }
         public int getMinDay() { return minDay; }
+        public int getMaxDay() { return maxDay; }
     }
 }

@@ -43,6 +43,7 @@ public class CustomCraftingListener implements Listener {
         outer:
         for (CustomRecipeBuilder.CustomRecipe recipe : recipes) {
             if (diaActual < recipe.getMinDay()) continue;
+            if (diaActual > recipe.getMaxDay()) continue;
             Map<Integer, ItemStack> ingredients = recipe.getIngredients();
 
             for (int slot = 0; slot < 9; slot++) {

@@ -7,12 +7,12 @@ import java.util.Optional;
 
 public enum Achievement {
 
-    DEMASIADO_CERCA("demasiado_cerca", "Demasiado Cerca",
+    DEMASIADO_CERCA("escandaloso", "Escandaloso",
             "Te alcanza la explosión de un oso polar.",
-            Material.FIRE_CHARGE, Frame.GOAL, null, null),
+            Material.POLAR_BEAR_SPAWN_EGG, Frame.GOAL, null, null),
 
     TENTANDO_AL_DESTINO("tentando_al_destino", "Tentando al Destino",
-            "Sobrevive a un tótem cuando ya puede fallar (día 20+).",
+            "Sobrevive a un tótem cuando ya puede fallar.",
             Material.TOTEM_OF_UNDYING, Frame.CHALLENGE, null, null),
 
     ULTIMO_ALIENTO("ultimo_aliento", "Último Aliento",
@@ -48,11 +48,11 @@ public enum Achievement {
             Material.TARGET, Frame.CHALLENGE, "azote_de_la_zona", null),
 
     MODO_FRENESI("modo_frenesi", "Modo Frenesí",
-            "Activa el Frenesí (núcleo de ataque).",
+            "Activa el Frenesí.",
             Material.BLAZE_POWDER, Frame.TASK, null, "frenesi"),
 
     FUEGO_DE_PAPAS("fuego_de_papas", "¡Fuego de Papas!",
-            "Dispara el Lanzapapas (núcleo de ataque híbrido).",
+            "Dispara el Lanzapapas.",
             Material.CROSSBOW, Frame.CHALLENGE, "modo_frenesi", "lanzapapas"),
 
     ESTOMAGO_DE_HIERRO("estomago_de_hierro", "Estómago de Hierro",
@@ -61,57 +61,69 @@ public enum Achievement {
 
     FURIA_DESATADA("furia_desatada", "Furia Desatada",
             "Acaba con un enemigo mientras el Frenesí está activo.",
-            Material.NETHERITE_AXE, Frame.CHALLENGE, "modo_frenesi", null),
+            Material.NETHERITE_AXE, Frame.CHALLENGE, "modo_frenesi", "frenesi"),
 
-    GARRAS_FUERA("garras_fuera", "Garras Fuera",
-            "Empuña el Clawn (núcleo de control).",
+    GARRAS_FUERA("garras_fuera", "Máximo Alcance",
+            "Empuña el Clawn.",
             Material.POPPED_CHORUS_FRUIT, Frame.TASK, null, "clawn"),
 
-    COLUMPIO_URBANO("columpio_urbano", "Columpio Urbano",
-            "Balancéate con el Lazo (núcleo de control híbrido).",
+    COLUMPIO_URBANO("columpio_urbano", "Spider-Man",
+            "Balancéate con el gancho.",
             Material.FISHING_ROD, Frame.CHALLENGE, "garras_fuera", "lazo"),
 
-    TRAS_EL_CRISTAL("tras_el_cristal", "Tras el Cristal",
-            "Levanta una cúpula con la Varita Barrera (núcleo defensor).",
+    TRAS_EL_CRISTAL("tras_el_cristal", "Bañate",
+            "Despeja a los enemigos usando la onda expansiva de la varita de barrera.",
             Material.END_ROD, Frame.TASK, null, "varita_barrera"),
 
-    BASTION_DE_CRISTAL("bastion_de_cristal", "Bastión de Cristal",
-            "Despliega la cúpula doble de la Varita Barrera Mejorada (núcleo defensor híbrido).",
+    BASTION_DE_CRISTAL("bastion_de_cristal", "Buen bait bro",
+            "Atrae a los enemigos cercanos usando el cebo de la varita de barrera mejorada.",
             Material.END_ROD, Frame.CHALLENGE, "tras_el_cristal", "varita_barrera_mejorada"),
 
     RESERVAS_INFINITAS("reservas_infinitas", "Reservas Infinitas",
-            "Sáciate con una Zanahoria Encantada (núcleo de curación).",
+            "Sáciate con una Zanahoria Encantada.",
             Material.GOLDEN_CARROT, Frame.TASK, null, "zanahoria_encantada"),
 
     TOQUE_SANADOR("toque_sanador", "Toque Sanador",
-            "Cura a un compañero con la Varita Curativa (núcleo de curación híbrido).",
+            "Cura a un compañero con la Varita Curativa.",
             Material.GLISTERING_MELON_SLICE, Frame.CHALLENGE, "reservas_infinitas", "varita_curativa"),
 
     DESPENSA_LLENA("despensa_llena", "Despensa Llena",
             "Rellena una Zanahoria Encantada hasta el máximo de cargas.",
-            Material.GOLD_BLOCK, Frame.GOAL, "reservas_infinitas", null),
+            Material.GOLD_BLOCK, Frame.GOAL, "reservas_infinitas", "zanahoria_encantada"),
 
-    DESAFIO_SUPERADO("desafio_superado", "Desafío Superado",
-            "Entrega un reto de equipo completado.",
+    PRIMER_LATIDO("primer_latido", "Dirty",
+            "Cómete tu primera Dirty Hearty y gana un corazón permanente.",
+            Material.ROTTEN_FLESH, Frame.TASK, null, "dirty_hearty"),
+
+    CORAZON_COMPLETO("corazon_completo", "Hearty",
+            "Alcanza los 4 corazones permanentes de Dirty Hearty.",
+            Material.ROTTEN_FLESH, Frame.GOAL, "primer_latido", "dirty_hearty"),
+
+    YA_NO_CABE("ya_no_cabe", "Dirtiest",
+            "Intenta comer otra Dirty Hearty con los corazones ya al máximo.",
+            Material.ROTTEN_FLESH, Frame.CHALLENGE, "corazon_completo", "dirty_hearty"),
+
+    DESAFIO_SUPERADO("desafio_superado", "Fácil, no?",
+            "Entrega un reto.",
             Material.PAPER, Frame.TASK, null, null),
 
-    VETERANO_DE_RETOS("veterano_de_retos", "Veterano de Retos",
-            "Entrega 5 retos de equipo.",
+    VETERANO_DE_RETOS("veterano_de_retos", "GG EZ Trash",
+            "Entrega 5 retos.",
             Material.NETHER_STAR, Frame.GOAL, "desafio_superado", null),
 
-    CASILLA_MARCADA("casilla_marcada", "Casilla Marcada",
+    CASILLA_MARCADA("casilla_marcada", "Cheeeck",
             "Completa una casilla del bingo de tu equipo.",
             Material.MAP, Frame.TASK, null, null),
 
-    MAESTRO_DEL_BINGO("maestro_del_bingo", "Maestro del Bingo",
+    MAESTRO_DEL_BINGO("maestro_del_bingo", "Master Cheeeck",
             "Completa 5 casillas del bingo de tu equipo.",
             Material.FILLED_MAP, Frame.GOAL, "casilla_marcada", null),
 
-    PLENO_AL_BINGO("pleno_al_bingo", "Pleno al Bingo",
+    PLENO_AL_BINGO("pleno_al_bingo", "Cheeecker",
             "Completa una línea entera: fila, columna o diagonal.",
             Material.EMERALD_BLOCK, Frame.CHALLENGE, "maestro_del_bingo", null),
 
-    MAESTRO_HERRERO("maestro_herrero", "Maestro Herrero",
+    MAESTRO_HERRERO("maestro_herrero", "Modificador de Modificadores",
             "Aplica un modificador a un objeto en la mesa de herrería.",
             Material.SMITHING_TABLE, Frame.TASK, null, null),
 

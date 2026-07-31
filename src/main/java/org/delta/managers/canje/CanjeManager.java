@@ -164,6 +164,10 @@ public class CanjeManager {
     }
 
     private ItemStack parseItem(Map<?, ?> raw) {
+        if (raw.get("custom_item") != null) {
+            return parseCustomItem(raw);
+        }
+
         Object materialObj = raw.get("material");
         boolean discoAleatorio = Boolean.TRUE.equals(raw.get("disco_aleatorio"));
 
@@ -243,6 +247,21 @@ public class CanjeManager {
         }
 
         item.setItemMeta(meta);
+        return item;
+    }
+
+    private ItemStack parseCustomItem(Map<?, ?> raw) {
+        String key = raw.get("custom_item").toString();
+        var custom = org.delta.customs.items.ItemRegistry.get(key);
+        if (custom.isEmpty()) {
+            plugin.getLogger().warning("[Canjes] Ítem personalizado desconocido: " + key);
+            return null;
+        }
+
+        ItemStack item = custom.get().build();
+        if (raw.get("cantidad") instanceof Number n) {
+            item.setAmount(Math.max(1, n.intValue()));
+        }
         return item;
     }
 

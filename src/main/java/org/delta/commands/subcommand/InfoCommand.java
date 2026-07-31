@@ -51,6 +51,12 @@ public class InfoCommand implements SubCommand {
         sendStatistic(player, "Estado del Reto", getRetoStatus(retoCumplido));
         sendStatistic(player, "Día del servidor", "&e" + dia);
 
+        int bloque = settings.getBloque();
+        int inicioBloque = (bloque - 1) * 5 + 1;
+        int finBloque = bloque * 5;
+        int diaEnBloque = ((dia - 1) % 5) + 1;
+        sendStatistic(player, "Bloque", "&e" + bloque + " &7(días &e" + inicioBloque + "&7-&e" + finBloque + "&7, día &e" + diaEnBloque + "&7/&e5&7)");
+
         // Información Zona de Carga
         if (settings.getDia() >= 5) {
             if (charge.isActive()) {

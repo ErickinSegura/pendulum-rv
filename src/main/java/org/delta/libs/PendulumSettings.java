@@ -27,6 +27,7 @@ public class PendulumSettings {
     private ItemStack stackPremio;
     private Reto retoActual;
     private Reto[] retosDisponibles;
+    private boolean fuegoAmigo;
 
     private PendulumSettings() {}
 
@@ -120,6 +121,7 @@ public class PendulumSettings {
         }
 
         op = config.getStringList("permisos").toArray(new String[0]);
+        fuegoAmigo = config.getBoolean("equipos.fuegoAmigo", false);
         jugadoresNoche = config.getInt("mundo.jugadoresNoche");
         dia = config.getInt("mundo.dia");
         vidas = config.getInt("mundo.vidas", 3);
@@ -199,6 +201,10 @@ public class PendulumSettings {
 
     public int getVidas() {
         return vidas;
+    }
+
+    public boolean isFuegoAmigo() {
+        return fuegoAmigo;
     }
 
     public static PendulumSettings getInstance() {

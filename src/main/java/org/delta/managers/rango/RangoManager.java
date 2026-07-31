@@ -54,6 +54,12 @@ public class RangoManager {
         return data.getString("players." + player.getName() + ".equipoPrefix", "");
     }
 
+    public boolean mismoEquipo(Player a, Player b) {
+        String equipoA = getEquipoPrefix(a);
+        String equipoB = getEquipoPrefix(b);
+        return !equipoA.isEmpty() && equipoA.equals(equipoB);
+    }
+
     public Component getPrefijo(Player player) {
         return Component.empty()
                 .append(getRangoComponent(player))

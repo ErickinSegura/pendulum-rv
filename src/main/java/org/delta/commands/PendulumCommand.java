@@ -34,6 +34,7 @@ public class PendulumCommand implements CommandExecutor {
         addSubCommand(new TeamChestCommand());
         addSubCommand(new PerkCommand());
         addSubCommand(new GiveCommand());
+        addSubCommand(new CanjearCommand());
         addSubCommand(new SummonCommand(plugin));
         addSubCommand(new ChargeBaseCommand());
         addSubCommand(new StructureDevCommand(plugin.getStructurePopulator(), plugin.getDataFolder()));

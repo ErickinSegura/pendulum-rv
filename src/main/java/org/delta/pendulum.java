@@ -83,6 +83,7 @@ public final class pendulum extends JavaPlugin {
         chargeBaseManager = new ChargeBaseManager(this);
         new ArmorTrimManager(this);
         TeamChestManager.initialize(getDataFolder());
+        org.delta.managers.canje.CanjeManager.initialize(this);
         PerkManager.initialize(getDataFolder());
         PerkManager.getInstance();
         customCraftingListener = new CustomCraftingListener(this);

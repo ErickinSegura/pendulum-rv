@@ -1,5 +1,5 @@
 name: Pendulum
-version: 'SNAPSHOT-26w31a'
+version: 'SNAPSHOT-26w31d'
 main: org.delta.pendulum
 api-version: '1.21'
 authors: [ Erick Segura ]
@@ -8,3 +8,7 @@ commands:
   pendulum:
     description: Comando principal del plugin de Pendulum.
     aliases: pdl
+permissions:
+  pendulum.canjear:
+    description: Permite canjear códigos de easter egg con /pdl canjear.
+    default: true

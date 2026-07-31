@@ -13,6 +13,9 @@ mundo:
 permisos:
   - iPancrema
 
+equipos:
+  fuegoAmigo: false
+
 reto:
   retoActualIndex: 0
   castigoActualIndex: 0

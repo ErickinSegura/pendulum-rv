@@ -1,6 +1,6 @@
 package org.delta.listeners.items;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.delta.customs.items.CustomItem;
 import org.delta.customs.items.base.PapaExplosiva;
 import org.delta.pendulum;
@@ -24,7 +25,7 @@ import java.util.*;
 public class LanzapapasListener implements Listener {
 
     private static final long LOAD_TICKS = 25L;
-    private final Set<UUID> loading = new HashSet<>();
+    private final Map<UUID, BukkitRunnable> loading = new HashMap<>();
     private final Map<UUID, Player> papasEnVuelo = new HashMap<>();
 
 
@@ -42,48 +43,54 @@ public class LanzapapasListener implements Listener {
 
         event.setCancelled(true);
 
-        if (loading.contains(player.getUniqueId())) return;
-
+        UUID id = player.getUniqueId();
+        if (loading.containsKey(id)) return;
         if (!hasItem(player, "papa_explosiva")) return;
 
-        loading.add(player.getUniqueId());
         consumeItem(player, "papa_explosiva");
 
+        int slot = player.getInventory().getHeldItemSlot();
+        player.setCooldown(Material.CROSSBOW, (int) LOAD_TICKS);
         player.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_START, 1f, 1f);
 
-        org.bukkit.Bukkit.getScheduler().runTaskLater(pendulum.getInstance(), () -> {
-            loading.remove(player.getUniqueId());
+        BukkitRunnable task = new BukkitRunnable() {
+            int elapsed = 0;
+            boolean middlePlayed = false;
 
-            if (!player.isOnline()) {
-                giveBack(player);
-                return;
+            @Override
+            public void run() {
+                elapsed++;
+
+                if (!player.isOnline()) {
+                    cancelLoad(player, this, true);
+                    return;
+                }
+
+                ItemStack current = player.getInventory().getItem(slot);
+                if (player.getInventory().getHeldItemSlot() != slot
+                        || !isCustomItem(current, "lanzapapas")
+                        || !(current.getItemMeta() instanceof CrossbowMeta cm)
+                        || cm.hasChargedProjectiles()) {
+                    cancelLoad(player, this, true);
+                    return;
+                }
+
+                if (!middlePlayed && elapsed >= LOAD_TICKS / 2) {
+                    middlePlayed = true;
+                    player.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_MIDDLE, 1f, 1f);
+                }
+
+                if (elapsed >= LOAD_TICKS) {
+                    chargeCrossbow(player, slot, current);
+                    player.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1f, 1f);
+                    loading.remove(player.getUniqueId());
+                    cancel();
+                }
             }
-            ItemStack current = player.getInventory().getItemInMainHand();
-            if (!isCustomItem(current, "lanzapapas")) {
-                giveBack(player);
-                return;
-            }
+        };
 
-            net.minecraft.world.item.ItemStack nmsItem =
-                    org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(current);
-
-            net.minecraft.world.item.ItemStack nmsArrow =
-                    new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW);
-
-            net.minecraft.world.item.component.ChargedProjectiles charged =
-                    net.minecraft.world.item.component.ChargedProjectiles.of(nmsArrow);
-
-            nmsItem.set(
-                    net.minecraft.core.component.DataComponents.CHARGED_PROJECTILES,
-                    charged
-            );
-
-            ItemStack loadedItem = org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitCopy(nmsItem);
-            player.getInventory().setItemInMainHand(loadedItem);
-
-            player.playSound(player.getLocation(), Sound.ITEM_CROSSBOW_LOADING_END, 1f, 1f);
-
-        }, LOAD_TICKS);
+        loading.put(id, task);
+        task.runTaskTimer(pendulum.getInstance(), 1L, 1L);
     }
 
     @EventHandler
@@ -147,6 +154,34 @@ public class LanzapapasListener implements Listener {
         }
     }
 
+
+    private void chargeCrossbow(Player player, int slot, ItemStack current) {
+        net.minecraft.world.item.ItemStack nmsItem =
+                org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(current);
+
+        net.minecraft.world.item.ItemStack nmsArrow =
+                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW);
+
+        net.minecraft.world.item.component.ChargedProjectiles charged =
+                net.minecraft.world.item.component.ChargedProjectiles.of(nmsArrow);
+
+        nmsItem.set(
+                net.minecraft.core.component.DataComponents.CHARGED_PROJECTILES,
+                charged
+        );
+
+        ItemStack loadedItem = org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitCopy(nmsItem);
+        player.getInventory().setItem(slot, loadedItem);
+    }
+
+    private void cancelLoad(Player player, BukkitRunnable task, boolean refund) {
+        loading.remove(player.getUniqueId());
+        task.cancel();
+        if (player.isOnline()) {
+            player.setCooldown(Material.CROSSBOW, 0);
+        }
+        if (refund) giveBack(player);
+    }
 
     private void giveBack(Player player) {
         player.getInventory().addItem(new org.delta.customs.items.base.PapaExplosiva().build());

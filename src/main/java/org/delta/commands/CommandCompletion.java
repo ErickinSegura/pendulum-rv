@@ -27,7 +27,7 @@ public class CommandCompletion implements TabCompleter {
 
     private void initializeCompletions() {
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "relojes", "bingo", "health", "chest", "perk"
+                "reto", "info", "relojes", "bingo", "health", "chest", "perk", "canjear"
         );
         subCommandCompletions.put("basic", basicCommands);
 

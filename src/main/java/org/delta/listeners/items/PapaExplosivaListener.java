@@ -45,7 +45,7 @@ public class PapaExplosivaListener implements Listener {
             );
 
             if (!player.isDead()) {
-                player.damage(player.getMaxHealth());
+                player.setHealth(0);
             }
         } finally {
             currentPapaEater = null;

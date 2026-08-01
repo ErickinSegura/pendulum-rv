@@ -146,3 +146,119 @@ A partir del día 5, si llevas **las 4 piezas de armadura con trim del mismo mat
 
 - **Riesgo en el tótem.** Desde el día 20, usar un tótem ya no es seguro al 100%: tiene un **1% de probabilidad de fallar**. Si falla, la resurrección se cancela, se reproducen partículas y sonido de ruptura, y se anuncia al servidor que el tótem del jugador falló. Antes del día 20 siempre funciona.
 - **Logro "Tentando al destino"** por usar un tótem bajo riesgo.
+
+---
+
+## Recetas de crafteo (items personalizados)
+
+Todas se elaboran en la **mesa de crafteo (3×3)** con forma exacta (las casillas vacías deben quedar vacías). Los ingredientes marcados como *Fragmento*, *Unión* y *Núcleo* son los materiales personalizados de ChargeBase.
+
+### Núcleos base (día 5+)
+
+Los cuatro núcleos comparten la misma forma: **4 Fragmentos del rol + 1 Unión del rol** en el centro. Cada uno usa el fragmento y la unión de su propia clase (atacante, defensor, heal, control).
+
+```
+[      ][ Fragmento ][      ]
+[ Fragmento ][  Unión  ][ Fragmento ]
+[      ][ Fragmento ][      ]
+```
+
+### Núcleos híbridos (día 10+)
+
+Misma forma, pero con **4 Fragmentos del rol + 1 Unión Híbrida** en el centro. Requieren día 10 o superior. Hay uno por rol: atacante, defensor, heal y control.
+
+```
+[      ][ Fragmento ][      ]
+[ Fragmento ][ Unión Híbrida ][ Fragmento ]
+[      ][ Fragmento ][      ]
+```
+
+### Papa Explosiva
+
+```
+[         ][  Pólvora  ][         ]
+[ Polvo de Blaze ][   Papa   ][ Polvo de Blaze ]
+[         ][  Pólvora  ][         ]
+```
+
+### Lanzapapas (usa Núcleo Atacante Híbrido)
+
+```
+[ Lingote de Hierro ][   Ballesta   ][ Lingote de Hierro ]
+[   Cuerda   ][ Núcleo Atacante Híbrido ][   Cuerda   ]
+[  Pólvora  ][    Papa    ][  Pólvora  ]
+```
+
+### Frenesí (usa Núcleo Atacante)
+
+```
+[ Crema de Magma ][ Vara de Blaze ][ Crema de Magma ]
+[ Polvo de Blaze ][ Núcleo Atacante ][ Polvo de Blaze ]
+[ Crema de Magma ][   Pólvora   ][ Crema de Magma ]
+```
+
+### Zanahoria Rellenable (usa Núcleo Heal)
+
+```
+[ Lingote de Oro ][ Zanahoria Dorada ][ Lingote de Oro ]
+[ Zanahoria Dorada ][ Núcleo Heal ][ Zanahoria Dorada ]
+[ Lingote de Oro ][ Sandía Reluciente ][ Lingote de Oro ]
+```
+
+### Varita Curativa (usa Núcleo Heal Híbrido)
+
+```
+[ Polvo de Piedra Luminosa ][ Sandía Reluciente ][ Polvo de Piedra Luminosa ]
+[ Lágrima de Ghast ][ Núcleo Heal Híbrido ][ Lágrima de Ghast ]
+[ Sandía Reluciente ][ Vara de Blaze ][ Sandía Reluciente ]
+```
+
+### Clawn (usa Núcleo Control)
+
+```
+[ Bloque de Cobre ][ Lingote de Cobre ][         ]
+[ Lingote de Cobre ][ Núcleo Control ][         ]
+[ Bloque de Cobre ][ Lingote de Cobre ][         ]
+```
+
+### Gancho (usa Núcleo Control Híbrido)
+
+```
+[   Cuerda   ][ Gancho de Cuerda Trampa ][   Cuerda   ]
+[ Bola de Slime ][ Núcleo Control Híbrido ][ Bola de Slime ]
+[   Cuerda   ][ Caña de Pescar ][   Cuerda   ]
+```
+
+### Varita Barrera (usa Núcleo Defensor)
+
+```
+[ Vidrio Tintado Cian ][ Vara de End ][ Vidrio Tintado Cian ]
+[ Vidrio Tintado Cian ][ Núcleo Defensor ][ Vidrio Tintado Cian ]
+[ Lingote de Hierro ][   Escudo   ][ Lingote de Hierro ]
+```
+
+### Varita Barrera Mejorada (usa Núcleo Defensor Híbrido)
+
+```
+[ Diamante ][         ][ Diamante ]
+[ Vidrio Tintado Cian ][ Núcleo Defensor Híbrido ][ Vidrio Tintado Cian ]
+[ Diamante ][         ][ Diamante ]
+```
+
+### Dirty Hearty (solo hasta el día 10)
+
+```
+[ Bloque de Oro ][ Bloque de Oro ][ Bloque de Oro ]
+[ Bloque de Oro ][ Cabeza de Jugador ][ Bloque de Oro ]
+[ Bloque de Oro ][ Bloque de Oro ][ Bloque de Oro ]
+```
+
+### Manzana Dorada Encantada
+
+Cada casilla de oro requiere **2 Bloques de Oro** (16 en total).
+
+```
+[ Bloque de Oro x2 ][ Bloque de Oro x2 ][ Bloque de Oro x2 ]
+[ Bloque de Oro x2 ][   Manzana   ][ Bloque de Oro x2 ]
+[ Bloque de Oro x2 ][ Bloque de Oro x2 ][ Bloque de Oro x2 ]
+```

@@ -18,7 +18,7 @@ public class Lazo implements CustomItem {
     @Override
     public ItemStack buildItem() {
         return new ItemBuilder(Material.FISHING_ROD)
-                .setDisplayName(ItemBuilder.format("&aLazo"))
+                .setDisplayName(ItemBuilder.format("&aGancho"))
                 .addEnchant(Enchantment.UNBREAKING, 3)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
                 .setUnbrekeable(true)

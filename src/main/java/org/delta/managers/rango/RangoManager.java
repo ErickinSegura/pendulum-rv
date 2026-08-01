@@ -63,13 +63,13 @@ public class RangoManager {
         if (!esFounder(player)) {
             return Component.empty();
         }
-        Component texto = MessageUtils.color(" &6✦").decoration(TextDecoration.BOLD, false);
+        Component texto = MessageUtils.color(" ⅊").decoration(TextDecoration.BOLD, false);
         Component hover = Component.empty()
                 .append(separador())
                 .append(Component.newline())
                 .append(MessageUtils.color("&6&lFounder"))
                 .append(Component.newline())
-                .append(MessageUtils.color("&7Participo en Pendulum 1."))
+                .append(MessageUtils.color("&7Participó en la primera edición de Pendulum."))
                 .append(Component.newline())
                 .append(separador());
         return texto.hoverEvent(HoverEvent.showText(hover));

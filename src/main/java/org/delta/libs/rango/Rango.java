@@ -1,10 +1,10 @@
 package org.delta.libs.rango;
 
 public enum Rango {
-    ADMIN("&6", "A ", "&6&lAdministrador\n&7Encargado de dirigir y mantener el servidor."),
-    MODERADOR("&a", "M ", "&a&lModerador\n&7Vela por el orden y las reglas del servidor."),
-    INVITADO("&e", "+ ", "&e&lInvitado\n&7Jugador invitado especial al evento."),
-    MIEMBRO("&b", "M ", "&b&lMiembro\n&7Parte de la comunidad de Pendulum.");
+    ADMIN("", "℈", "&6&lAdministrador\n&7Su señor y salvador."),
+    MODERADOR("", "℞", "&a&lModerador\n&7Chalán del admin."),
+    INVITADO("", "℗", "&e&lInvitado\n&7Alex"),
+    MIEMBRO("", "℥", "&b&lMiembro\n&7Ese eres tú.");
 
     private final String color;
     private final String etiqueta;

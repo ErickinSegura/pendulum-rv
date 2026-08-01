@@ -50,6 +50,8 @@ public final class pendulum extends JavaPlugin {
     private CustomCraftingListener customCraftingListener;
     private StructurePopulator structurePopulator;
     private PendingEntitySpawner pendingEntitySpawner;
+    private org.delta.managers.AdminCompletionManager adminCompletionManager;
+    private org.delta.managers.event.EventManager eventManager;
 
 
     @Override
@@ -90,6 +92,8 @@ public final class pendulum extends JavaPlugin {
         CustomCraftingRegistry.register(customCraftingListener);
         pendingEntitySpawner = new PendingEntitySpawner(this);
         structurePopulator = new StructurePopulator(getLogger(), pendingEntitySpawner, this);
+        adminCompletionManager = new org.delta.managers.AdminCompletionManager(this);
+        eventManager = new org.delta.managers.event.EventManager(this);
 
         for (org.bukkit.World world : getServer().getWorlds()) {
             if (world.getEnvironment() == org.bukkit.World.Environment.NORMAL
@@ -165,7 +169,7 @@ public final class pendulum extends JavaPlugin {
 
     private void registerCommands() {
         Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setExecutor(new PendulumCommand(this));
-        Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setTabCompleter(new CommandCompletion(structurePopulator));
+        Objects.requireNonNull(getServer().getPluginCommand("pendulum")).setTabCompleter(new CommandCompletion(structurePopulator, adminCompletionManager));
     }
 
     public static pendulum getInstance(){
@@ -195,4 +199,8 @@ public final class pendulum extends JavaPlugin {
     public StructurePopulator getStructurePopulator() { return structurePopulator; }
 
     public PendingEntitySpawner getPendingEntitySpawner() { return pendingEntitySpawner; }
+
+    public org.delta.managers.AdminCompletionManager getAdminCompletionManager() { return adminCompletionManager; }
+
+    public org.delta.managers.event.EventManager getEventManager() { return eventManager; }
 }

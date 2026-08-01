@@ -73,6 +73,10 @@ public class EventRegistry {
         pm.registerEvents(new EndAccessListener(), plugin);
         pm.registerEvents(new ChatListener(plugin.getRangoManager()), plugin);
         pm.registerEvents(new FuegoAmigoListener(plugin.getRangoManager()), plugin);
+        pm.registerEvents(new CommandVisibilityListener(), plugin);
+
+        // Eventos
+        pm.registerEvents(new org.delta.listeners.event.EventRestrictionListener(plugin.getEventManager()), plugin);
 
         // Castigos
         pm.registerEvents(new CastigoListener(plugin.getCastigoManager()), plugin);

@@ -18,9 +18,12 @@ import java.util.stream.Collectors;
 public class CommandCompletion implements TabCompleter {
     private final Map<String, List<String>> subCommandCompletions;
     private final StructurePopulator structurePopulator;
+    private final org.delta.managers.AdminCompletionManager adminCompletionManager;
 
-    public CommandCompletion(StructurePopulator structurePopulator) {
+    public CommandCompletion(StructurePopulator structurePopulator,
+                             org.delta.managers.AdminCompletionManager adminCompletionManager) {
         this.structurePopulator = structurePopulator;
+        this.adminCompletionManager = adminCompletionManager;
         this.subCommandCompletions = new HashMap<>();
         initializeCompletions();
     }
@@ -32,9 +35,17 @@ public class CommandCompletion implements TabCompleter {
         subCommandCompletions.put("basic", basicCommands);
 
         List<String> adminCommands = Arrays.asList(
-                "dia", "give", "summon", "chargebase", "structdev", "dirtyhearty", "health"
+                "dia", "give", "summon", "chargebase", "structdev", "dirtyhearty", "health", "evento"
         );
         subCommandCompletions.put("admin", adminCommands);
+
+        subCommandCompletions.put("evento_admin", Arrays.asList(
+                "activar", "desactivar"
+        ));
+
+        subCommandCompletions.put("evento_eventos", Arrays.asList(
+                "inauguracion"
+        ));
 
         subCommandCompletions.put("reto", Arrays.asList(
                 "entregar"
@@ -100,6 +111,10 @@ public class CommandCompletion implements TabCompleter {
 
         if (args.length == 1) {
             List<String> completions = new ArrayList<>(subCommandCompletions.get("basic"));
+
+            if (esAdmin(player)) {
+                completions.add("completions");
+            }
 
             if (checkPermission(player)) {
                 List<String> adminCommands = subCommandCompletions.get("admin");
@@ -186,6 +201,10 @@ public class CommandCompletion implements TabCompleter {
 
             if (args[0].equalsIgnoreCase("structdev") && checkPermission(player)) {
                 return filterCompletions(subCommandCompletions.get("structdev_admin"), args[1]);
+            }
+
+            if (args[0].equalsIgnoreCase("evento") && checkPermission(player)) {
+                return filterCompletions(subCommandCompletions.get("evento_admin"), args[1]);
             }
 
             if (args[0].equalsIgnoreCase("dirtyhearty") && checkPermission(player)) {
@@ -281,6 +300,12 @@ public class CommandCompletion implements TabCompleter {
                     checkPermission(player)) {
                 return getOnlinePlayerNames(args[2]);
             }
+
+            if (args[0].equalsIgnoreCase("evento") &&
+                    args[1].equalsIgnoreCase("activar") &&
+                    checkPermission(player)) {
+                return filterCompletions(subCommandCompletions.get("evento_eventos"), args[2]);
+            }
         }
 
         if (args.length == 4) {
@@ -345,12 +370,16 @@ public class CommandCompletion implements TabCompleter {
                 .toList();
     }
 
-    private boolean checkPermission(Player player) {
+    private boolean esAdmin(Player player) {
         String[] ops = PendulumSettings.getInstance().getOp();
         if (ops == null) {
             return false;
         }
         return Arrays.asList(ops).contains(player.getName());
+    }
+
+    private boolean checkPermission(Player player) {
+        return esAdmin(player) && adminCompletionManager.isVisible(player);
     }
 
     private List<String> getOnlinePlayerNames(String partial) {

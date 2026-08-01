@@ -36,11 +36,14 @@ public class RelojDoradoListener implements Listener {
     }
 
     private void ejecutarEfecto(Player player) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                "ptl addtime " + player.getName() + " 3600");
+
         String comando = "tellraw @a [\"\",{\"text\":\"⏳ \",\"color\":\"gold\"},"
                 + "{\"text\":\"" + player.getName() + "\",\"color\":\"yellow\",\"bold\":true},"
                 + "{\"text\":\" usó el \",\"color\":\"gray\"},"
                 + "{\"text\":\"Reloj Dorado del Péndulo\",\"color\":\"gold\",\"bold\":true},"
-                + "{\"text\":\" (+1 hora de día).\",\"color\":\"gray\"}]";
+                + "{\"text\":\" (+1 hora de tiempo de juego).\",\"color\":\"gray\"}]";
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), comando);
     }

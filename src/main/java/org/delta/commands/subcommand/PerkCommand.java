@@ -2,6 +2,7 @@ package org.delta.commands.subcommand;
 
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.delta.managers.perks.Perk;
@@ -19,7 +20,13 @@ public class PerkCommand implements SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         if (args.length < 2) {
-            showUsage(player);
+            Team team = player.getScoreboard().getEntryTeam(player.getName());
+            if (team == null) {
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+                player.sendMessage(MessageUtils.color("&c✘ No perteneces a ningún equipo."));
+                return;
+            }
+            showTeamPerks(player, team.getName());
             return;
         }
 
@@ -66,26 +73,28 @@ public class PerkCommand implements SubCommand {
             }
             case "list" -> {
                 if (args.length < 3) { showUsage(player); return; }
-                String teamId = args[2];
-
-                var perks = PerkManager.getInstance().getTeamPerks(teamId);
-                player.sendMessage("");
-                player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lPERKS — " + teamId + "&r &d&l&k|&r &8&l≪"));
-                player.sendMessage("");
-                if (perks.isEmpty()) {
-                    player.sendMessage(MessageUtils.color("&8└ &7Sin perks activas."));
-                } else {
-                    perks.forEach(p -> {
-                        String color = p.getCategory() == Perk.PerkCategory.BENEFICIAL ? "&a" : "&c";
-                        String tag = p.getCategory() == Perk.PerkCategory.BENEFICIAL ? "&8[&a+&8]" : "&8[&c-&8]";
-                        player.sendMessage(MessageUtils.color("&8└ " + tag + " " + color + p.getDisplayName()));
-                    });
-                }
-                player.sendMessage("");
-                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
+                showTeamPerks(player, args[2]);
             }
             default -> showUsage(player);
         }
+    }
+
+    private void showTeamPerks(Player player, String teamId) {
+        var perks = PerkManager.getInstance().getTeamPerks(teamId);
+        player.sendMessage("");
+        player.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lPERKS — " + teamId + "&r &d&l&k|&r &8&l≪"));
+        player.sendMessage("");
+        if (perks.isEmpty()) {
+            player.sendMessage(MessageUtils.color("&8└ &7Sin perks activas."));
+        } else {
+            perks.forEach(p -> {
+                String color = p.getCategory() == Perk.PerkCategory.BENEFICIAL ? "&a" : "&c";
+                String tag = p.getCategory() == Perk.PerkCategory.BENEFICIAL ? "&8[&a+&8]" : "&8[&c-&8]";
+                player.sendMessage(MessageUtils.color("&8└ " + tag + " " + color + p.getDisplayName()));
+            });
+        }
+        player.sendMessage("");
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
     }
 
     private Perk parsePerk(Player player, String name) {

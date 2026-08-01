@@ -45,7 +45,7 @@ public class PapaExplosivaListener implements Listener {
             );
 
             if (!player.isDead()) {
-                player.setHealth(0);
+                player.damage(1000.0);
             }
         } finally {
             currentPapaEater = null;
@@ -60,7 +60,7 @@ public class PapaExplosivaListener implements Listener {
         }, 1L);
     }
 
-    @EventHandler
+    @EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
     public void onDeath(org.bukkit.event.entity.PlayerDeathEvent event) {
         Player player = event.getEntity();
 
@@ -68,7 +68,7 @@ public class PapaExplosivaListener implements Listener {
             player.getPersistentDataContainer().remove(COMIO_PAPA);
             event.setDeathMessage(
                     player.getName() +
-                            org.bukkit.ChatColor.GRAY + " se suicidó comiendo una Papa Explosiva"
+                            org.bukkit.ChatColor.GRAY + " blew themselves up eating an Explosive Potato"
             );
             return;
         }
@@ -76,8 +76,8 @@ public class PapaExplosivaListener implements Listener {
         if (currentPapaEater != null && player != currentPapaEater) {
             event.setDeathMessage(
                     player.getName() +
-                            org.bukkit.ChatColor.GRAY + " fue volado por la Papa Explosiva de " +
-                            currentPapaEater.getName()
+                            org.bukkit.ChatColor.GRAY + " was blown up by " +
+                            currentPapaEater.getName() + "'s Explosive Potato"
             );
         }
     }

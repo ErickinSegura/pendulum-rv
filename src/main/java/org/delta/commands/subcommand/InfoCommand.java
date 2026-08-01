@@ -74,6 +74,8 @@ public class InfoCommand implements SubCommand {
 
         // Sonido de finalización
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.5f, 1.0f);
+
+        Bukkit.dispatchCommand(player, "ptl info");
     }
 
     private void sendStatistic(Player player, String label, String value) {

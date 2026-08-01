@@ -3,7 +3,7 @@ package org.delta.libs.rango;
 public enum Rango {
     ADMIN("", "℈", "&6&lAdministrador\n&7Su señor y salvador."),
     MODERADOR("", "℞", "&a&lModerador\n&7Chalán del admin."),
-    INVITADO("", "℗", "&e&lInvitado\n&7Alex"),
+    INVITADO("", "℗", "&e&lInvitado +++++\n&7Alex"),
     MIEMBRO("", "℥", "&b&lMiembro\n&7Ese eres tú.");
 
     private final String color;

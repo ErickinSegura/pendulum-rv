@@ -27,12 +27,12 @@ public class CommandCompletion implements TabCompleter {
 
     private void initializeCompletions() {
         List<String> basicCommands = Arrays.asList(
-                "reto", "info", "relojes", "bingo", "health", "chest", "perk", "canjear"
+                "reto", "info", "relojes", "bingo", "chest", "perk", "canjear", "check"
         );
         subCommandCompletions.put("basic", basicCommands);
 
         List<String> adminCommands = Arrays.asList(
-                "dia", "give", "summon", "chargebase", "structdev", "dirtyhearty"
+                "dia", "give", "summon", "chargebase", "structdev", "dirtyhearty", "health"
         );
         subCommandCompletions.put("admin", adminCommands);
 
@@ -141,13 +141,11 @@ public class CommandCompletion implements TabCompleter {
                 return filterCompletions(bingoCompletions, args[1]);
             }
 
-            if (args[0].equalsIgnoreCase("health")) {
+            if (args[0].equalsIgnoreCase("health") && checkPermission(player)) {
                 List<String> healthCompletions = new ArrayList<>(getOnlinePlayerNames(args[1]));
-                if (checkPermission(player)) {
-                    List<String> healthAdminCompletions = subCommandCompletions.get("health_admin");
-                    if (healthAdminCompletions != null) {
-                        healthCompletions.addAll(healthAdminCompletions);
-                    }
+                List<String> healthAdminCompletions = subCommandCompletions.get("health_admin");
+                if (healthAdminCompletions != null) {
+                    healthCompletions.addAll(healthAdminCompletions);
                 }
                 return filterCompletions(healthCompletions, args[1]);
             }

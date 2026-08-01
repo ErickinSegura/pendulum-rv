@@ -21,7 +21,7 @@ public class RelojDorado implements CustomItem {
                 .setDisplayName(ItemBuilder.format("&6&lReloj Dorado del Péndulo"))
                 .setLore(List.of(
                         ItemBuilder.format("&7Click derecho para otorgar &e1 hora"),
-                        ItemBuilder.format("&7extra de día en el servidor."),
+                        ItemBuilder.format("&7extra de tiempo de juego en el servidor."),
                         ItemBuilder.format("&c&oUn solo uso."),
                         ItemBuilder.format("&8Easter Egg · Tempus")
                 ))

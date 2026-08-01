@@ -416,7 +416,6 @@ public class BingoCommand implements SubCommand {
 
         if (team == null) {
             player.sendMessage(MessageUtils.color("&c✘ No perteneces a ningún equipo."));
-            player.sendMessage(MessageUtils.color("&7Usa &d/pdl bingo debug &7para más información"));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
             return;
         }
@@ -527,7 +526,6 @@ public class BingoCommand implements SubCommand {
 
         if (team == null) {
             player.sendMessage(MessageUtils.color("&c✘ No perteneces a ningún equipo."));
-            player.sendMessage(MessageUtils.color("&7Usa &d/pdl bingo debug &7para más información"));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
             return;
         }

@@ -10,6 +10,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Team;
+import org.delta.database.BingoSyncManager;
 import org.delta.libs.MessageUtils;
 import org.delta.libs.PendulumSettings;
 import org.delta.libs.builders.ItemBuilder;
@@ -82,6 +83,14 @@ public class BingoCommand implements SubCommand {
                     return;
                 }
                 mostrarDebug(player);
+            }
+            case "resync" -> {
+                if (!checkPermission(player)) {
+                    player.sendMessage(MessageUtils.color("&c✘ No tienes permisos para este comando."));
+                    player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+                    return;
+                }
+                resincronizarBingo(player);
             }
             default -> {
                 player.sendMessage(MessageUtils.color("&c✘ Subcomando no reconocido."));
@@ -707,6 +716,42 @@ public class BingoCommand implements SubCommand {
         }
     }
 
+    private void resincronizarBingo(Player executor) {
+        BingoSyncManager sync = BingoSyncManager.getInstance();
+
+        if (sync == null || plugin.getDatabaseManager() == null || !plugin.getDatabaseManager().isConnected()) {
+            executor.sendMessage(MessageUtils.color("&c✘ La base de datos no está conectada."));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        if (sync.getCachedRoundId() == -1L) {
+            executor.sendMessage(MessageUtils.color("&c✘ No hay una ronda activa en la base de datos."));
+            executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+            return;
+        }
+
+        executor.playSound(executor.getLocation(), Sound.UI_BUTTON_CLICK, 0.5f, 1.2f);
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&8&l≫ &d&l&k|&r &6&lRESINCRONIZANDO BINGO&r &d&l&k|&r &8&l≪"));
+        executor.sendMessage("");
+        executor.sendMessage(MessageUtils.color("&7Reenviando progreso y puntuaciones reales a la base de datos..."));
+        executor.sendMessage("");
+
+        sync.resyncAll().whenComplete((v, e) -> Bukkit.getScheduler().runTask(plugin, () -> {
+            if (e != null) {
+                executor.sendMessage(MessageUtils.color("&c✘ Error durante la resincronización. Revisa la consola."));
+                executor.playSound(executor.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
+                return;
+            }
+
+            executor.sendMessage(MessageUtils.color("&a✔ Resincronización completada."));
+            executor.sendMessage(MessageUtils.color("&7La base de datos ahora refleja el estado real del juego."));
+            executor.sendMessage("");
+            executor.playSound(executor.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
+        }));
+    }
+
     private void sendBingoStat(Player player, String icon, String label, String value) {
         player.sendMessage(MessageUtils.color("&8└ " + icon + " &7" + label + ": &d" + value));
     }
@@ -737,6 +782,7 @@ public class BingoCommand implements SubCommand {
             player.sendMessage(MessageUtils.color("&d/pdl bingo debug &7- Ver información de debug &8(Admin)"));
             player.sendMessage(MessageUtils.color("&d/pdl bingo reset &7- Resetear todo el bingo &8(Admin)"));
             player.sendMessage(MessageUtils.color("&d/pdl bingo reset <equipo> &7- Resetear un equipo &8(Admin)"));
+            player.sendMessage(MessageUtils.color("&d/pdl bingo resync &7- Resincronizar la base de datos &8(Admin)"));
         }
 
         player.sendMessage("");

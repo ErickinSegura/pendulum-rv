@@ -105,9 +105,10 @@ canjes:
           - "&7Estuviste aquí desde el día uno."
           - "&8Easter Egg · Day 1"
         bandera_patrones:
-          - "gradient:YELLOW"
-          - "circle:ORANGE"
-          - "border:BLACK"
+          - "straight_cross:BLACK"
+          - "half_horizontal_bottom:WHITE"
+          - "half_vertical:WHITE"
+          - "border:YELLOW"
       - material: TOTEM_OF_UNDYING
         cantidad: 1
 

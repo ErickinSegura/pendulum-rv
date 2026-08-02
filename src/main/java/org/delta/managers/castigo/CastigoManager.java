@@ -78,7 +78,10 @@ public class CastigoManager {
 
     public void reaplicar(Player player) {
         CastigoActivo activo = activos.get(player.getUniqueId());
-        if (activo == null) return;
+        if (activo == null) {
+            limpiarResiduos(player);
+            return;
+        }
 
         Castigo castigo = activo.getCastigo();
         switch (castigo.getTipo()) {
@@ -96,6 +99,11 @@ public class CastigoManager {
         }
     }
 
+    private void limpiarResiduos(Player player) {
+        quitarReducirCorazones(player);
+        quitarBloquearSlots(player);
+    }
+
     public void quitar(Player player) {
         CastigoActivo activo = activos.get(player.getUniqueId());
         if (activo == null) return;
@@ -106,6 +114,19 @@ public class CastigoManager {
             default -> {
             }
         }
+    }
+
+    public java.util.concurrent.CompletableFuture<Void> levantarJugador(UUID uuid) {
+        Player online = Bukkit.getPlayer(uuid);
+        if (online != null) {
+            quitar(online);
+        }
+        activos.remove(uuid);
+        return repo.eliminar(uuid.toString())
+                .exceptionally(e -> {
+                    plugin.getLogger().warning("[Castigo] Error al limpiar castigo: " + e.getMessage());
+                    return null;
+                });
     }
 
     public java.util.concurrent.CompletableFuture<Void> levantarTodos() {

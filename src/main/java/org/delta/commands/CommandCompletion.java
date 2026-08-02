@@ -52,7 +52,7 @@ public class CommandCompletion implements TabCompleter {
         ));
 
         subCommandCompletions.put("reto_admin", Arrays.asList(
-                "reset", "ruleta", "lista"
+                "reset", "ruleta", "lista", "castigo"
         ));
 
         subCommandCompletions.put("relojes", Arrays.asList(
@@ -64,7 +64,7 @@ public class CommandCompletion implements TabCompleter {
         ));
 
         subCommandCompletions.put("bingo_admin", Arrays.asList(
-                "reset", "generate", "debug"
+                "reset", "generate", "debug", "resync"
         ));
 
         subCommandCompletions.put("health_admin", Arrays.asList(
@@ -216,7 +216,7 @@ public class CommandCompletion implements TabCompleter {
 
         if (args.length == 3) {
             if (args[0].equalsIgnoreCase("reto") &&
-                    args[1].equalsIgnoreCase("reset") &&
+                    (args[1].equalsIgnoreCase("reset") || args[1].equalsIgnoreCase("castigo")) &&
                     checkPermission(player)) {
                 return getOnlinePlayerNames(args[2]);
             }

@@ -47,7 +47,7 @@ public class DatabaseManager {
         try {
             HikariConfig config = new HikariConfig();
             config.setDriverClassName("org.pendulum.libs.postgresql.Driver");
-            config.setJdbcUrl("jdbc:postgresql://" + host + ":" + port + "/" + dbName + "?sslmode=require");
+            config.setJdbcUrl("jdbc:postgresql://" + host + ":" + port + "/" + dbName + "?sslmode=require&prepareThreshold=0");
             config.setUsername(user);
             config.setPassword(password);
             config.setMaximumPoolSize(5);

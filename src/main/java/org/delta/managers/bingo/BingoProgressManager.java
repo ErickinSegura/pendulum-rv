@@ -57,6 +57,13 @@ public class BingoProgressManager {
         return new HashMap<>(teamProgress.getOrDefault(teamName, new HashMap<>()));
     }
 
+    public Set<String> getAllTeamNames() {
+        Set<String> teams = new HashSet<>();
+        teams.addAll(teamProgress.keySet());
+        teams.addAll(completedChallenges.keySet());
+        return teams;
+    }
+
 
     public void completeChallenge(String teamName, int challengeId) {
         completedChallenges.computeIfAbsent(teamName, k -> new HashSet<>());

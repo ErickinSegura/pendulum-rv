@@ -82,6 +82,18 @@ public class RetoCommand implements SubCommand {
                     effectsManager.reproducirSonidoError(player);
                 }
             }
+            case "castigo" -> {
+                if (!requiresPermission() || checkPermission(player)) {
+                    if (args.length == 2) {
+                        limpiarCastigos(player);
+                    } else {
+                        limpiarCastigoJugador(args[2], player);
+                    }
+                } else {
+                    player.sendMessage(MessageUtils.color("&c✘ No tienes permisos para este comando."));
+                    effectsManager.reproducirSonidoError(player);
+                }
+            }
             default -> {
                 player.sendMessage(MessageUtils.color("&c✘ Subcomando no reconocido."));
                 showUsage(player);
@@ -266,6 +278,39 @@ public class RetoCommand implements SubCommand {
 
         if (!reseteado) {
             notificationManager.enviarMensajeErrorReset(executor, targetName);
+        }
+    }
+
+    private void limpiarCastigos(Player executor) {
+        org.delta.managers.castigo.CastigoManager castigoManager =
+                org.delta.pendulum.getInstance().getCastigoManager();
+
+        castigoManager.levantarTodos().thenRun(() -> Bukkit.getScheduler().runTask(
+                org.delta.pendulum.getInstance(),
+                () -> executor.sendMessage(MessageUtils.color(
+                        "&8[&cCastigo&8] &7Se limpiaron los castigos de &atodos&7 los jugadores."))));
+    }
+
+    private void limpiarCastigoJugador(String targetName, Player executor) {
+        org.delta.managers.castigo.CastigoManager castigoManager =
+                org.delta.pendulum.getInstance().getCastigoManager();
+
+        Player online = Bukkit.getPlayer(targetName);
+        if (online != null) {
+            castigoManager.levantarJugador(online.getUniqueId());
+            executor.sendMessage(MessageUtils.color(
+                    "&8[&cCastigo&8] &7Se limpió el castigo de &a" + online.getName() + "&7."));
+            return;
+        }
+
+        OfflinePlayer offline = Bukkit.getOfflinePlayer(targetName);
+        if (offline.hasPlayedBefore()) {
+            castigoManager.levantarJugador(offline.getUniqueId());
+            executor.sendMessage(MessageUtils.color(
+                    "&8[&cCastigo&8] &7Se limpió el castigo de &a" + targetName
+                            + "&7 &8(offline: los corazones se restauran al reconectar)&7."));
+        } else {
+            notificationManager.enviarMensajeJugadorNoEncontrado(executor, targetName);
         }
     }
 
@@ -521,6 +566,7 @@ public class RetoCommand implements SubCommand {
             player.sendMessage(MessageUtils.color("&d/pdl reto reset [jugador] &7- Resetear retos &8(Admin)"));
             player.sendMessage(MessageUtils.color("&d/pdl reto ruleta &7- Girar ruleta de retos &8(Admin)"));
             player.sendMessage(MessageUtils.color("&d/pdl reto lista &7- Ver jugadores que completaron &8(Admin)"));
+            player.sendMessage(MessageUtils.color("&d/pdl reto castigo [jugador] &7- Limpiar castigos &8(Admin)"));
         }
 
         player.sendMessage("");

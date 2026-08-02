@@ -62,6 +62,23 @@ public class BingoScoreRepository {
         ));
     }
 
+    public CompletableFuture<Void> insertRawScore(
+            long roundId,
+            long teamId,
+            String type,
+            String description,
+            int points,
+            int position
+    ) {
+        if (!db.isConnected()) {
+            return CompletableFuture.completedFuture(null);
+        }
+        return insertScoreEntry(new ScoreEntryData(
+                roundId, teamId, type, description, points, position,
+                null, null
+        ));
+    }
+
     public CompletableFuture<Void> resetTeamScores(long roundId, long teamId) {
         if (!db.isConnected()) {
             return CompletableFuture.completedFuture(null);

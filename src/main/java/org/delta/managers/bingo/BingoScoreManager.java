@@ -235,6 +235,14 @@ public class BingoScoreManager {
         return new ArrayList<>(teamScoreHistory.getOrDefault(teamName, new ArrayList<>()));
     }
 
+    public Map<String, List<ScoreEntry>> getAllScoreHistory() {
+        Map<String, List<ScoreEntry>> copy = new HashMap<>();
+        for (Map.Entry<String, List<ScoreEntry>> entry : teamScoreHistory.entrySet()) {
+            copy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
+        return copy;
+    }
+
     public Map<String, Integer> getLeaderboard() {
         Map<String, Integer> leaderboard = new HashMap<>();
         for (Map.Entry<String, List<ScoreEntry>> entry : teamScoreHistory.entrySet()) {

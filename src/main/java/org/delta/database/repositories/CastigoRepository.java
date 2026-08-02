@@ -115,6 +115,22 @@ public class CastigoRepository {
         });
     }
 
+    public CompletableFuture<Void> eliminar(String playerUuid) {
+        if (!db.isConnected()) {
+            return CompletableFuture.completedFuture(null);
+        }
+        return CompletableFuture.runAsync(() -> {
+            String sql = "DELETE FROM castigos_activos WHERE player_uuid = ?";
+            try (Connection conn = db.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, playerUuid);
+                stmt.executeUpdate();
+            } catch (Exception e) {
+                throw new RuntimeException("Error al eliminar castigo activo: " + e.getMessage(), e);
+            }
+        });
+    }
+
     public CompletableFuture<Void> eliminarTodos() {
         if (!db.isConnected()) {
             return CompletableFuture.completedFuture(null);

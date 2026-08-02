@@ -82,6 +82,12 @@ public final class pendulum extends JavaPlugin {
         BingoDataManager bingoDataManager = BingoDataManager.getInstance(this);
         BingoProgressManager bingoProgressManager = BingoProgressManager.getInstance();
         BingoSyncManager bingoSyncManager = BingoSyncManager.getInstance(this, databaseManager);
+        getServer().getScheduler().runTaskTimer(this, () -> {
+            if (databaseManager != null && databaseManager.isConnected()
+                    && bingoSyncManager.getCachedRoundId() != -1L) {
+                bingoSyncManager.resyncAll();
+            }
+        }, 6000L, 72000L);
         chargeBaseManager = new ChargeBaseManager(this);
         new ArmorTrimManager(this);
         TeamChestManager.initialize(getDataFolder());

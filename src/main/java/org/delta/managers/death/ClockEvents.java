@@ -139,7 +139,7 @@ public class ClockEvents {
         } else {
             banList.addBan(profile,
                     "Perdiste un reloj. Vuelve cuando pase el tiempo para revivir.",
-                    Duration.ofSeconds(5), banSource);
+                    Duration.ofHours(1), banSource);
         }
     }
 
@@ -151,7 +151,7 @@ public class ClockEvents {
                     .append(Component.text("═══════════════════════════", NamedTextColor.DARK_PURPLE));
         }
 
-        String timeRemaining = formatDuration(Duration.ofSeconds(5));
+        String timeRemaining = formatDuration(Duration.ofHours(1));
         return Component.text("═══════════════════════════\n\n", NamedTextColor.DARK_PURPLE)
                 .append(Component.text("Perdiste un reloj\n\n", NamedTextColor.WHITE))
                 .append(Component.text("Tiempo para revivir: ", NamedTextColor.GRAY))

@@ -1,0 +1,677 @@
+# ====================================================
+# LISTA MAESTRA DE RETOS DE BINGO
+# ====================================================
+# Esta es la lista completa de retos disponibles.
+# Cuando se genera una nueva tabla de bingo, se seleccionan
+# retos aleatorios de esta lista.
+#
+# Formato de cada reto:
+#   id:
+#     type: COLLECT_ITEM | KILL_MOB | MINE_BLOCK
+#     material: Material de Minecraft (para COLLECT_ITEM y MINE_BLOCK)
+#     mob: Tipo de mob (para KILL_MOB)
+#     amount: Cantidad requerida
+#     display-name: Nombre que se muestra (con codigos de color &)
+#     description: Descripcion del reto
+#     icon: Material usado como icono en el GUI
+#
+# NOTA: Los retos MINE_BLOCK usan bloques que NO dropean items
+#       (spawners, buds de amatista, reinforced deepslate, sculk),
+#       por lo que solo se pueden completar rompiendolos en el mundo.
+# ====================================================
+
+challenges:
+  # ==================== DIAMANTES Y GEMAS ====================
+  1:
+    type: COLLECT_ITEM
+    material: DIAMOND
+    amount: 24
+    display-name: "&bDiamantes Brillantes"
+    description: "&7Consigue 24 diamantes"
+    icon: DIAMOND
+
+  2:
+    type: COLLECT_ITEM
+    material: DIAMOND
+    amount: 48
+    display-name: "&bColeccionista de Diamantes"
+    description: "&7Consigue 48 diamantes"
+    icon: DIAMOND
+
+  3:
+    type: COLLECT_ITEM
+    material: EMERALD
+    amount: 16
+    display-name: "&aEsmeraldas Valiosas"
+    description: "&7Consigue 16 esmeraldas"
+    icon: EMERALD
+
+  4:
+    type: COLLECT_ITEM
+    material: EMERALD
+    amount: 32
+    display-name: "&aMercader Rico"
+    description: "&7Consigue 32 esmeraldas"
+    icon: EMERALD
+
+  # ==================== ROMPER BLOQUES (SIN DROP) - MAZMORRAS ====================
+  5:
+    type: MINE_BLOCK
+    material: SPAWNER
+    amount: 1
+    display-name: "&cRompe Generadores"
+    description: "&7Rompe 1 generador de monstruos"
+    icon: SPAWNER
+
+  6:
+    type: MINE_BLOCK
+    material: SPAWNER
+    amount: 2
+    display-name: "&4Saqueador de Mazmorras"
+    description: "&7Rompe 2 generadores de monstruos"
+    icon: SPAWNER
+
+  # ==================== ROMPER BLOQUES (SIN DROP) - GEODAS ====================
+  7:
+    type: MINE_BLOCK
+    material: BUDDING_AMETHYST
+    amount: 2
+    display-name: "&dDestructor de Geodas"
+    description: "&7Rompe 2 amatistas germinantes"
+    icon: BUDDING_AMETHYST
+
+  8:
+    type: MINE_BLOCK
+    material: BUDDING_AMETHYST
+    amount: 4
+    display-name: "&5Fin de la Geoda"
+    description: "&7Rompe 4 amatistas germinantes"
+    icon: BUDDING_AMETHYST
+
+  9:
+    type: MINE_BLOCK
+    material: SMALL_AMETHYST_BUD
+    amount: 24
+    display-name: "&dBrotes Pequenos"
+    description: "&7Rompe 24 brotes pequenos de amatista"
+    icon: SMALL_AMETHYST_BUD
+
+  10:
+    type: MINE_BLOCK
+    material: MEDIUM_AMETHYST_BUD
+    amount: 16
+    display-name: "&dBrotes Medianos"
+    description: "&7Rompe 16 brotes medianos de amatista"
+    icon: MEDIUM_AMETHYST_BUD
+
+  11:
+    type: MINE_BLOCK
+    material: LARGE_AMETHYST_BUD
+    amount: 10
+    display-name: "&dBrotes Grandes"
+    description: "&7Rompe 10 brotes grandes de amatista"
+    icon: LARGE_AMETHYST_BUD
+
+  # ==================== ROMPER BLOQUES (SIN DROP) - DEEP DARK ====================
+  12:
+    type: MINE_BLOCK
+    material: REINFORCED_DEEPSLATE
+    amount: 4
+    display-name: "&8Vandalo Ancestral"
+    description: "&7Rompe 4 pizarra profunda reforzada"
+    icon: REINFORCED_DEEPSLATE
+
+  13:
+    type: MINE_BLOCK
+    material: REINFORCED_DEEPSLATE
+    amount: 8
+    display-name: "&8Ruina de la Ciudad Antigua"
+    description: "&7Rompe 8 pizarra profunda reforzada"
+    icon: REINFORCED_DEEPSLATE
+
+  14:
+    type: MINE_BLOCK
+    material: SCULK_SHRIEKER
+    amount: 4
+    display-name: "&3Silenciador del Sculk"
+    description: "&7Rompe 4 chillones de sculk"
+    icon: SCULK_SHRIEKER
+
+  15:
+    type: MINE_BLOCK
+    material: SCULK_SHRIEKER
+    amount: 8
+    display-name: "&3Fin del Chillido"
+    description: "&7Rompe 8 chillones de sculk"
+    icon: SCULK_SHRIEKER
+
+  16:
+    type: MINE_BLOCK
+    material: SCULK_CATALYST
+    amount: 3
+    display-name: "&3Rompe Catalizadores"
+    description: "&7Rompe 3 catalizadores de sculk"
+    icon: SCULK_CATALYST
+
+  17:
+    type: MINE_BLOCK
+    material: SCULK_CATALYST
+    amount: 6
+    display-name: "&3Purga del Catalizador"
+    description: "&7Rompe 6 catalizadores de sculk"
+    icon: SCULK_CATALYST
+
+  18:
+    type: MINE_BLOCK
+    material: SCULK_SENSOR
+    amount: 8
+    display-name: "&3Sordo al Sculk"
+    description: "&7Rompe 8 sensores de sculk"
+    icon: SCULK_SENSOR
+
+  19:
+    type: MINE_BLOCK
+    material: SCULK_SENSOR
+    amount: 16
+    display-name: "&3Silencio Total"
+    description: "&7Rompe 16 sensores de sculk"
+    icon: SCULK_SENSOR
+
+  20:
+    type: MINE_BLOCK
+    material: SCULK
+    amount: 64
+    display-name: "&3Limpieza del Sculk"
+    description: "&7Rompe 64 bloques de sculk"
+    icon: SCULK
+
+  21:
+    type: MINE_BLOCK
+    material: SCULK_VEIN
+    amount: 48
+    display-name: "&3Arranca Venas"
+    description: "&7Rompe 48 venas de sculk"
+    icon: SCULK_VEIN
+
+  # ==================== MOBS HOSTILES ====================
+  22:
+    type: KILL_MOB
+    mob: ZOMBIE
+    amount: 75
+    display-name: "&cMatador de Zombies"
+    description: "&7Mata 75 zombies"
+    icon: ROTTEN_FLESH
+
+  23:
+    type: KILL_MOB
+    mob: ZOMBIE
+    amount: 150
+    display-name: "&cApocalipsis Zombie"
+    description: "&7Mata 150 zombies"
+    icon: ROTTEN_FLESH
+
+  24:
+    type: KILL_MOB
+    mob: SKELETON
+    amount: 60
+    display-name: "&fCazador de Esqueletos"
+    description: "&7Mata 60 esqueletos"
+    icon: BONE
+
+  25:
+    type: KILL_MOB
+    mob: SKELETON
+    amount: 120
+    display-name: "&fArquero Profesional"
+    description: "&7Mata 120 esqueletos"
+    icon: BOW
+
+  26:
+    type: KILL_MOB
+    mob: CREEPER
+    amount: 40
+    display-name: "&aExplosivo"
+    description: "&7Mata 40 creepers"
+    icon: GUNPOWDER
+
+  27:
+    type: KILL_MOB
+    mob: CREEPER
+    amount: 80
+    display-name: "&aDesactivador de Bombas"
+    description: "&7Mata 80 creepers"
+    icon: TNT
+
+  28:
+    type: KILL_MOB
+    mob: SPIDER
+    amount: 80
+    display-name: "&8Exterminador de Aranas"
+    description: "&7Mata 80 aranas"
+    icon: SPIDER_EYE
+
+  29:
+    type: KILL_MOB
+    mob: SPIDER
+    amount: 120
+    display-name: "&8Aracnofobia"
+    description: "&7Mata 120 aranas"
+    icon: STRING
+
+  30:
+    type: KILL_MOB
+    mob: ENDERMAN
+    amount: 20
+    display-name: "&5Cazador del End"
+    description: "&7Mata 20 enderman"
+    icon: ENDER_PEARL
+
+  31:
+    type: KILL_MOB
+    mob: ENDERMAN
+    amount: 45
+    display-name: "&5Maestro del Teletransporte"
+    description: "&7Mata 45 enderman"
+    icon: ENDER_EYE
+
+  # ==================== MOBS DEL NETHER ====================
+  32:
+    type: KILL_MOB
+    mob: BLAZE
+    amount: 40
+    display-name: "&eApagafuegos"
+    description: "&7Mata 40 blazes"
+    icon: BLAZE_ROD
+
+  33:
+    type: KILL_MOB
+    mob: BLAZE
+    amount: 80
+    display-name: "&eResistente al Fuego"
+    description: "&7Mata 80 blazes"
+    icon: BLAZE_POWDER
+
+  34:
+    type: KILL_MOB
+    mob: GHAST
+    amount: 15
+    display-name: "&fCazador de Ghasts"
+    description: "&7Mata 15 ghasts"
+    icon: GHAST_TEAR
+
+  35:
+    type: KILL_MOB
+    mob: GHAST
+    amount: 30
+    display-name: "&fPrecision Aerea"
+    description: "&7Mata 30 ghasts"
+    icon: FIRE_CHARGE
+
+  36:
+    type: KILL_MOB
+    mob: PIGLIN
+    amount: 50
+    display-name: "&dProblemas con Piglins"
+    description: "&7Mata 50 piglins"
+    icon: GOLD_INGOT
+
+  37:
+    type: KILL_MOB
+    mob: WITHER_SKELETON
+    amount: 25
+    display-name: "&8Calaveras Oscuras"
+    description: "&7Mata 25 wither skeletons"
+    icon: WITHER_SKELETON_SKULL
+
+  # ==================== ITEMS ESPECIALES ====================
+  38:
+    type: COLLECT_ITEM
+    material: GOLDEN_APPLE
+    amount: 4
+    display-name: "&6Manzana Dorada"
+    description: "&7Consigue 4 manzanas doradas"
+    icon: GOLDEN_APPLE
+
+  39:
+    type: COLLECT_ITEM
+    material: ENCHANTED_GOLDEN_APPLE
+    amount: 1
+    display-name: "&6Manzana del Dios"
+    description: "&7Consigue 1 manzana dorada encantada"
+    icon: ENCHANTED_GOLDEN_APPLE
+
+  40:
+    type: COLLECT_ITEM
+    material: ENDER_PEARL
+    amount: 24
+    display-name: "&5Perlas del End"
+    description: "&7Consigue 24 perlas de ender"
+    icon: ENDER_PEARL
+
+  41:
+    type: COLLECT_ITEM
+    material: ENDER_EYE
+    amount: 12
+    display-name: "&aOjos de Ender"
+    description: "&7Consigue 12 ojos de ender"
+    icon: ENDER_EYE
+
+  42:
+    type: COLLECT_ITEM
+    material: BLAZE_ROD
+    amount: 16
+    display-name: "&eVaras Flamigeras"
+    description: "&7Consigue 16 varas de blaze"
+    icon: BLAZE_ROD
+
+  43:
+    type: COLLECT_ITEM
+    material: BLAZE_ROD
+    amount: 32
+    display-name: "&ePocion Master"
+    description: "&7Consigue 32 varas de blaze"
+    icon: BLAZE_ROD
+
+  44:
+    type: COLLECT_ITEM
+    material: GHAST_TEAR
+    amount: 8
+    display-name: "&fLagrimas Espectrales"
+    description: "&7Consigue 8 lagrimas de ghast"
+    icon: GHAST_TEAR
+
+  45:
+    type: COLLECT_ITEM
+    material: NETHER_STAR
+    amount: 1
+    display-name: "&fEstrella del Nether"
+    description: "&7Consigue 1 estrella del nether"
+    icon: NETHER_STAR
+
+  # ==================== ITEMS DE CRAFTEO ====================
+  46:
+    type: COLLECT_ITEM
+    material: IRON_BLOCK
+    amount: 16
+    display-name: "&fBloques de Hierro"
+    description: "&7Consigue 16 bloques de hierro"
+    icon: IRON_BLOCK
+
+  47:
+    type: COLLECT_ITEM
+    material: GOLD_BLOCK
+    amount: 8
+    display-name: "&6Bloques de Oro"
+    description: "&7Consigue 8 bloques de oro"
+    icon: GOLD_BLOCK
+
+  48:
+    type: COLLECT_ITEM
+    material: DIAMOND_BLOCK
+    amount: 4
+    display-name: "&bBloques de Diamante"
+    description: "&7Consigue 4 bloques de diamante"
+    icon: DIAMOND_BLOCK
+
+  49:
+    type: COLLECT_ITEM
+    material: NETHERITE_INGOT
+    amount: 2
+    display-name: "&4Lingotes de Netherita"
+    description: "&7Consigue 2 lingotes de netherita"
+    icon: NETHERITE_INGOT
+
+  50:
+    type: COLLECT_ITEM
+    material: NETHERITE_PICKAXE
+    amount: 1
+    display-name: "&4Pico de Netherita"
+    description: "&7Craftea 1 pico de netherita"
+    icon: NETHERITE_PICKAXE
+
+  # ==================== COMIDA ====================
+  51:
+    type: COLLECT_ITEM
+    material: COOKED_BEEF
+    amount: 96
+    display-name: "&cChef de Carnes"
+    description: "&7Consigue 96 filetes cocinados"
+    icon: COOKED_BEEF
+
+  52:
+    type: COLLECT_ITEM
+    material: BREAD
+    amount: 128
+    display-name: "&ePanadero"
+    description: "&7Consigue 128 panes"
+    icon: BREAD
+
+  53:
+    type: COLLECT_ITEM
+    material: CAKE
+    amount: 3
+    display-name: "&dRepostero"
+    description: "&7Consigue 3 pasteles"
+    icon: CAKE
+
+  # ==================== BLOQUES DE CONSTRUCCION ====================
+  54:
+    type: COLLECT_ITEM
+    material: OAK_LOG
+    amount: 192
+    display-name: "&6Lenador"
+    description: "&7Consigue 192 troncos de roble"
+    icon: OAK_LOG
+
+  55:
+    type: COLLECT_ITEM
+    material: COBBLESTONE
+    amount: 640
+    display-name: "&7Cantero"
+    description: "&7Consigue 640 piedras"
+    icon: COBBLESTONE
+
+  56:
+    type: COLLECT_ITEM
+    material: GLASS
+    amount: 192
+    display-name: "&bVidriero"
+    description: "&7Consigue 192 bloques de vidrio"
+    icon: GLASS
+
+  # ==================== RECURSOS RAROS ====================
+  57:
+    type: COLLECT_ITEM
+    material: SLIME_BALL
+    amount: 48
+    display-name: "&aCazador de Slimes"
+    description: "&7Consigue 48 bolas de slime"
+    icon: SLIME_BALL
+
+  58:
+    type: COLLECT_ITEM
+    material: PRISMARINE_SHARD
+    amount: 96
+    display-name: "&bExplorador Oceanico"
+    description: "&7Consigue 96 fragmentos de prismarina"
+    icon: PRISMARINE_SHARD
+
+  59:
+    type: COLLECT_ITEM
+    material: NAUTILUS_SHELL
+    amount: 8
+    display-name: "&9Tesoro Marino"
+    description: "&7Consigue 8 conchas de nautilus"
+    icon: NAUTILUS_SHELL
+
+  60:
+    type: COLLECT_ITEM
+    material: HEART_OF_THE_SEA
+    amount: 1
+    display-name: "&bCorazon del Mar"
+    description: "&7Consigue 1 corazon del mar"
+    icon: HEART_OF_THE_SEA
+
+  # ==================== MOBS PACIFICOS ====================
+  61:
+    type: KILL_MOB
+    mob: COW
+    amount: 60
+    display-name: "&6Ganadero"
+    description: "&7Mata 60 vacas"
+    icon: LEATHER
+
+  62:
+    type: KILL_MOB
+    mob: PIG
+    amount: 60
+    display-name: "&dGranjero de Cerdos"
+    description: "&7Mata 60 cerdos"
+    icon: PORKCHOP
+
+  63:
+    type: KILL_MOB
+    mob: CHICKEN
+    amount: 90
+    display-name: "&fCriador de Pollos"
+    description: "&7Mata 90 pollos"
+    icon: FEATHER
+
+  64:
+    type: KILL_MOB
+    mob: SHEEP
+    amount: 75
+    display-name: "&fPastor"
+    description: "&7Mata 75 ovejas"
+    icon: WHITE_WOOL
+
+  # ==================== EXPLORACION ====================
+  65:
+    type: COLLECT_ITEM
+    material: MAP
+    amount: 1
+    display-name: "&eCartografo"
+    description: "&7Crea 1 mapa"
+    icon: MAP
+
+  66:
+    type: COLLECT_ITEM
+    material: RECOVERY_COMPASS
+    amount: 1
+    display-name: "&cBrujula de Recuperacion"
+    description: "&7Crea 1 brujula de recuperacion"
+    icon: RECOVERY_COMPASS
+
+  67:
+    type: COLLECT_ITEM
+    material: CLOCK
+    amount: 3
+    display-name: "&6Relojero"
+    description: "&7Consigue 3 relojes"
+    icon: CLOCK
+
+  # ==================== ENCANTAMIENTOS ====================
+  68:
+    type: COLLECT_ITEM
+    material: ENCHANTING_TABLE
+    amount: 1
+    display-name: "&5Mesa de Encantamientos"
+    description: "&7Crea 1 mesa de encantamientos"
+    icon: ENCHANTING_TABLE
+
+  69:
+    type: COLLECT_ITEM
+    material: BOOKSHELF
+    amount: 45
+    display-name: "&6Bibliotecario"
+    description: "&7Consigue 45 estanterias"
+    icon: BOOKSHELF
+
+  70:
+    type: COLLECT_ITEM
+    material: EXPERIENCE_BOTTLE
+    amount: 32
+    display-name: "&aColeccionista de XP"
+    description: "&7Consigue 32 botellas de experiencia"
+    icon: EXPERIENCE_BOTTLE
+
+  # ==================== TEMATICOS CHARGE BASE ====================
+  71:
+    type: KILL_MOB
+    mob: WITCH
+    amount: 20
+    display-name: "&5Cazador de Brujas"
+    description: "&7Mata 20 brujas en las oleadas"
+    icon: GLASS_BOTTLE
+
+  72:
+    type: KILL_MOB
+    mob: WITCH
+    amount: 40
+    display-name: "&5Purga de Brujas"
+    description: "&7Mata 40 brujas en las oleadas"
+    icon: REDSTONE
+
+  73:
+    type: KILL_MOB
+    mob: PILLAGER
+    amount: 40
+    display-name: "&2Rompe Saqueos"
+    description: "&7Mata 40 pillagers"
+    icon: CROSSBOW
+
+  74:
+    type: KILL_MOB
+    mob: VINDICATOR
+    amount: 25
+    display-name: "&2Filo contra Filo"
+    description: "&7Mata 25 vindicators"
+    icon: IRON_AXE
+
+  75:
+    type: KILL_MOB
+    mob: EVOKER
+    amount: 10
+    display-name: "&2Rompe Hechizos"
+    description: "&7Mata 10 evokers"
+    icon: TOTEM_OF_UNDYING
+
+  76:
+    type: KILL_MOB
+    mob: RAVAGER
+    amount: 8
+    display-name: "&4Domador de Bestias"
+    description: "&7Mata 8 ravagers en las oleadas"
+    icon: SADDLE
+
+  77:
+    type: KILL_MOB
+    mob: ALLAY
+    amount: 12
+    display-name: "&bCorazon Roto"
+    description: "&7Derrota 12 allays"
+    icon: AMETHYST_SHARD
+
+  78:
+    type: KILL_MOB
+    mob: SNIFFER
+    amount: 5
+    display-name: "&aFin del Rastreador"
+    description: "&7Derrota 5 sniffers"
+    icon: SNIFFER_EGG
+
+  79:
+    type: KILL_MOB
+    mob: PHANTOM
+    amount: 30
+    display-name: "&8Terror Nocturno"
+    description: "&7Mata 30 phantoms"
+    icon: PHANTOM_MEMBRANE
+
+  80:
+    type: COLLECT_ITEM
+    material: TOTEM_OF_UNDYING
+    amount: 3
+    display-name: "&eTotems de la Inmortalidad"
+    description: "&7Consigue 3 totems de la inmortalidad"
+    icon: TOTEM_OF_UNDYING

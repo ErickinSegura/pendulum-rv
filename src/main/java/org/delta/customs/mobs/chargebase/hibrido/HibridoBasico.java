@@ -29,7 +29,7 @@ public class HibridoBasico implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.CREEPER)
-                .setCustomName("&d&lHibrido Básico")
+                .setCustomName("&d&lJosé Juan")
                 .setCustomNameVisible(true)
                 .setMaxHealth(80)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.42)

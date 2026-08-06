@@ -18,6 +18,8 @@ import java.util.Set;
 
 public class TeamChestManager {
 
+    private static final char SEP = '\u0000';
+
     private static TeamChestManager instance;
     private final File dataFile;
     private final File configFile;
@@ -52,24 +54,54 @@ public class TeamChestManager {
         return instance;
     }
 
+    private static YamlConfiguration newYaml() {
+        YamlConfiguration cfg = new YamlConfiguration();
+        cfg.options().pathSeparator(SEP);
+        return cfg;
+    }
+
+    private static YamlConfiguration loadYaml(File file) {
+        YamlConfiguration cfg = newYaml();
+        if (file.exists()) {
+            try {
+                cfg.load(file);
+            } catch (Exception e) {
+                backupCorrupt(file);
+            }
+        }
+        return cfg;
+    }
+
+    private static void backupCorrupt(File file) {
+        File backup = new File(file.getParentFile(), file.getName() + ".corrupt-" + System.currentTimeMillis());
+        try {
+            java.nio.file.Files.copy(file.toPath(), backup.toPath());
+            Bukkit.getLogger().severe("[TeamChest] No se pudo parsear " + file.getName()
+                    + ", respaldo creado: " + backup.getName());
+        } catch (IOException ex) {
+            Bukkit.getLogger().severe("[TeamChest] No se pudo parsear ni respaldar " + file.getName());
+        }
+    }
+
+    private static String path(String... parts) {
+        return String.join(String.valueOf(SEP), parts);
+    }
+
     private void loadConfig() {
-        if (!configFile.exists()) {
+        config = loadYaml(configFile);
+        if (!config.contains("default_rows")) {
             try {
                 configFile.getParentFile().mkdirs();
-                configFile.createNewFile();
-                config = YamlConfiguration.loadConfiguration(configFile);
                 config.set("default_rows", 3);
                 config.save(configFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            config = YamlConfiguration.loadConfiguration(configFile);
         }
 
         if (config.getConfigurationSection("teams") != null) {
             for (String team : config.getConfigurationSection("teams").getKeys(false)) {
-                int rows = config.getInt("teams." + team + ".rows", 3);
+                int rows = config.getInt(path("teams", team, "rows"), 3);
                 teamChestSizes.put(team.toLowerCase(), rows);
             }
         }
@@ -78,7 +110,7 @@ public class TeamChestManager {
     private void saveConfig() {
         try {
             for (Map.Entry<String, Integer> entry : teamChestSizes.entrySet()) {
-                config.set("teams." + entry.getKey() + ".rows", entry.getValue());
+                config.set(path("teams", entry.getKey(), "rows"), entry.getValue());
             }
             config.save(configFile);
         } catch (IOException e) {
@@ -225,20 +257,17 @@ public class TeamChestManager {
 
     public void saveData() {
         try {
-            if (!dataFile.exists()) {
-                dataFile.getParentFile().mkdirs();
-                dataFile.createNewFile();
-            }
+            dataFile.getParentFile().mkdirs();
 
-            dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+            dataConfig = newYaml();
 
             for (Map.Entry<String, Inventory> entry : teamChests.entrySet()) {
                 String teamName = entry.getKey();
                 Inventory inv = entry.getValue();
 
                 String serialized = serializeInventory(inv);
-                dataConfig.set("teams." + teamName + ".inventory", serialized);
-                dataConfig.set("teams." + teamName + ".size", inv.getSize());
+                dataConfig.set(path("teams", teamName, "inventory"), serialized);
+                dataConfig.set(path("teams", teamName, "size"), inv.getSize());
             }
 
             dataConfig.save(dataFile);
@@ -252,14 +281,14 @@ public class TeamChestManager {
             return;
         }
 
-        dataConfig = YamlConfiguration.loadConfiguration(dataFile);
+        dataConfig = loadYaml(dataFile);
 
         if (dataConfig.getConfigurationSection("teams") == null) {
             return;
         }
 
         for (String teamName : dataConfig.getConfigurationSection("teams").getKeys(false)) {
-            String inventoryData = dataConfig.getString("teams." + teamName + ".inventory");
+            String inventoryData = dataConfig.getString(path("teams", teamName, "inventory"));
             int rows = getTeamChestRows(teamName);
             int size = rows * 9;
 

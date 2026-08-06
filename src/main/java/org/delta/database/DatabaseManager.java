@@ -33,6 +33,11 @@ public class DatabaseManager {
         File configFile = new File(plugin.getDataFolder(), "settings.yml");
         FileConfiguration fileConfig = YamlConfiguration.loadConfiguration(configFile);
 
+        if (!fileConfig.getBoolean("database.enabled", true)) {
+            plugin.getLogger().warning("'database.enabled' en false — modo desconectado, no se enviarán datos a la DB.");
+            return;
+        }
+
         String host     = fileConfig.getString("database.host");
         String port     = fileConfig.getString("database.port", "5432");
         String dbName   = fileConfig.getString("database.name", "postgres");

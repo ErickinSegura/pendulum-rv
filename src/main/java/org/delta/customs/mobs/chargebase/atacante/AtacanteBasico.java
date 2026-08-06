@@ -37,7 +37,7 @@ public class AtacanteBasico implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.ZOMBIE)
-                .setCustomName("&c&lAtacante Básico")
+                .setCustomName("&c&lLa Cebolla")
                 .setCustomNameVisible(true)
                 .setMaxHealth(60)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.32)
@@ -69,9 +69,6 @@ public class AtacanteBasico implements CustomMob {
         eq.setLeggingsDropChance(0f);
         eq.setBootsDropChance(0f);
     }
-
-    @Override
-    public double getKnockbackStrength() { return 6.0; }
 
     private void applyNMSBehavior(LivingEntity bukkit) {
         PathfinderMob nms = NMSEntityUtils.toNMS(bukkit);

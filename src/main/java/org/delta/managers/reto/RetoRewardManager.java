@@ -1,5 +1,7 @@
 package org.delta.managers.reto;
 
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +24,10 @@ public class RetoRewardManager {
         ItemStack premio = settings.getStackPremio();
 
         if (premio != null && premio.getType() != Material.AIR) {
-            player.getInventory().addItem(premio);
+            Map<Integer, ItemStack> sobrantes = player.getInventory().addItem(premio);
+            for (ItemStack sobrante : sobrantes.values()) {
+                player.getWorld().dropItemNaturally(player.getLocation(), sobrante);
+            }
         }
     }
 

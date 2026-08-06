@@ -43,6 +43,37 @@ public class BingoDataManager {
         return instance;
     }
 
+    private static final char SEP = '\u0000';
+
+    private static YamlConfiguration newProgressYaml() {
+        YamlConfiguration cfg = new YamlConfiguration();
+        cfg.options().pathSeparator(SEP);
+        return cfg;
+    }
+
+    private YamlConfiguration loadProgressYaml(File file) {
+        YamlConfiguration cfg = newProgressYaml();
+        if (file.exists()) {
+            try {
+                cfg.load(file);
+            } catch (Exception e) {
+                backupCorrupt(file);
+            }
+        }
+        return cfg;
+    }
+
+    private void backupCorrupt(File file) {
+        File backup = new File(file.getParentFile(), file.getName() + ".corrupt-" + System.currentTimeMillis());
+        try {
+            java.nio.file.Files.copy(file.toPath(), backup.toPath());
+            plugin.getLogger().severe("No se pudo parsear " + file.getName()
+                    + ", respaldo creado: " + backup.getName());
+        } catch (IOException ex) {
+            plugin.getLogger().severe("No se pudo parsear ni respaldar " + file.getName());
+        }
+    }
+
     private void loadConfiguration() {
         bingoFile = new File(plugin.getDataFolder(), "bingo.yml");
 
@@ -53,14 +84,7 @@ public class BingoDataManager {
         bingoConfig = YamlConfiguration.loadConfiguration(bingoFile);
 
         progressFile = new File(plugin.getDataFolder(), "bingo-progress.yml");
-        if (!progressFile.exists()) {
-            try {
-                progressFile.createNewFile();
-            } catch (IOException e) {
-                plugin.getLogger().severe("Error al crear bingo-progress.yml: " + e.getMessage());
-            }
-        }
-        progressConfig = YamlConfiguration.loadConfiguration(progressFile);
+        progressConfig = loadProgressYaml(progressFile);
     }
 
     private void createDefaultConfig() {
@@ -238,15 +262,13 @@ public class BingoDataManager {
             BingoProgressManager progressManager = BingoProgressManager.getInstance();
             Map<String, Object> data = progressManager.getProgressData();
 
-            for (String key : progressConfig.getKeys(false)) {
-                progressConfig.set(key, null);
-            }
-
+            YamlConfiguration out = newProgressYaml();
             for (Map.Entry<String, Object> entry : data.entrySet()) {
-                progressConfig.set(entry.getKey(), entry.getValue());
+                out.set(entry.getKey(), entry.getValue());
             }
 
-            progressConfig.save(progressFile);
+            out.save(progressFile);
+            progressConfig = out;
 
             BingoScoreManager.getInstance().saveScoreData();
 
@@ -278,8 +300,6 @@ public class BingoDataManager {
                 plugin.getLogger().info("No hay progreso previo de bingo para cargar");
                 return;
             }
-
-            progressConfig = YamlConfiguration.loadConfiguration(progressFile);
 
             Set<String> keys = progressConfig.getKeys(false);
             if (keys.isEmpty()) {

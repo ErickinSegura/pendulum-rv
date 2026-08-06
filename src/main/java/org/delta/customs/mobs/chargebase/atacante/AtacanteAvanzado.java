@@ -34,7 +34,7 @@ public class AtacanteAvanzado implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.WITHER_SKELETON)
-                .setCustomName("&c&lAtacante Avanzado")
+                .setCustomName("&c&lEl Hueso")
                 .setCustomNameVisible(true)
                 .setMaxHealth(80)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.35)
@@ -59,9 +59,6 @@ public class AtacanteAvanzado implements CustomMob {
         eq.setLeggingsDropChance(0f);
         eq.setBootsDropChance(0f);
     }
-
-    @Override
-    public double getKnockbackStrength() { return 10.0; }
 
     private void applyNMSBehavior(LivingEntity bukkit) {
         PathfinderMob nms = NMSEntityUtils.toNMS(bukkit);

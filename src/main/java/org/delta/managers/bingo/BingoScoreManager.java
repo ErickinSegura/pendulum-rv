@@ -25,6 +25,8 @@ public class BingoScoreManager {
     private static final int FULL_BINGO_BASE_POINTS = 1000;
     private static final int FULL_BINGO_MIN_POINTS = 500;
 
+    private static final char SEP = '\u0000';
+
     private final Map<Integer, List<String>> challengeCompletions;
     private final Map<String, List<String>> lineCompletions;
     private final List<String> fullBingoCompletions;
@@ -54,16 +56,38 @@ public class BingoScoreManager {
         return instance;
     }
 
-    private void loadConfiguration() {
-        scoreFile = new File(plugin.getDataFolder(), "bingo-scores.yml");
-        if (!scoreFile.exists()) {
+    private static YamlConfiguration newYaml() {
+        YamlConfiguration cfg = new YamlConfiguration();
+        cfg.options().pathSeparator(SEP);
+        return cfg;
+    }
+
+    private YamlConfiguration loadYaml(File file) {
+        YamlConfiguration cfg = newYaml();
+        if (file.exists()) {
             try {
-                scoreFile.createNewFile();
-            } catch (IOException e) {
-                plugin.getLogger().severe("Error al crear bingo-scores.yml: " + e.getMessage());
+                cfg.load(file);
+            } catch (Exception e) {
+                backupCorrupt(file);
             }
         }
-        scoreConfig = YamlConfiguration.loadConfiguration(scoreFile);
+        return cfg;
+    }
+
+    private void backupCorrupt(File file) {
+        File backup = new File(file.getParentFile(), file.getName() + ".corrupt-" + System.currentTimeMillis());
+        try {
+            java.nio.file.Files.copy(file.toPath(), backup.toPath());
+            plugin.getLogger().severe("No se pudo parsear " + file.getName()
+                    + ", respaldo creado: " + backup.getName());
+        } catch (IOException ex) {
+            plugin.getLogger().severe("No se pudo parsear ni respaldar " + file.getName());
+        }
+    }
+
+    private void loadConfiguration() {
+        scoreFile = new File(plugin.getDataFolder(), "bingo-scores.yml");
+        scoreConfig = loadYaml(scoreFile);
     }
 
     private long resolveTeamId(String teamName) {
@@ -261,17 +285,15 @@ public class BingoScoreManager {
 
     public void saveScoreData() {
         try {
-            for (String key : scoreConfig.getKeys(false)) {
-                scoreConfig.set(key, null);
-            }
+            YamlConfiguration out = newYaml();
 
             Map<String, List<String>> challengeCompletionsData = new HashMap<>();
             for (Map.Entry<Integer, List<String>> entry : challengeCompletions.entrySet()) {
                 challengeCompletionsData.put(String.valueOf(entry.getKey()), entry.getValue());
             }
-            scoreConfig.set("challenge-completions", challengeCompletionsData);
-            scoreConfig.set("line-completions", lineCompletions);
-            scoreConfig.set("full-bingo-completions", fullBingoCompletions);
+            out.set("challenge-completions", challengeCompletionsData);
+            out.set("line-completions", lineCompletions);
+            out.set("full-bingo-completions", fullBingoCompletions);
 
             Map<String, List<Map<String, Object>>> historyData = new HashMap<>();
             for (Map.Entry<String, List<ScoreEntry>> entry : teamScoreHistory.entrySet()) {
@@ -287,9 +309,10 @@ public class BingoScoreManager {
                 }
                 historyData.put(entry.getKey(), entries);
             }
-            scoreConfig.set("score-history", historyData);
+            out.set("score-history", historyData);
 
-            scoreConfig.save(scoreFile);
+            out.save(scoreFile);
+            scoreConfig = out;
             plugin.getLogger().info("Puntuaciones de bingo guardadas exitosamente");
         } catch (IOException e) {
             plugin.getLogger().severe("Error al guardar puntuaciones: " + e.getMessage());
@@ -302,8 +325,6 @@ public class BingoScoreManager {
                 plugin.getLogger().info("No hay puntuaciones previas de bingo para cargar");
                 return;
             }
-
-            scoreConfig = YamlConfiguration.loadConfiguration(scoreFile);
 
             if (scoreConfig.contains("challenge-completions")) {
                 var section = scoreConfig.getConfigurationSection("challenge-completions");

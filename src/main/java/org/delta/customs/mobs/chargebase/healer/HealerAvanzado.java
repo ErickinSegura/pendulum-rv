@@ -29,7 +29,7 @@ public class HealerAvanzado implements CustomMob {
     @Override
     public LivingEntity build() {
         LivingEntity entity = new MobBuilder(EntityType.ALLAY)
-                .setCustomName("&a&lHealer Avanzado")
+                .setCustomName("&a&lAntonio")
                 .setCustomNameVisible(true)
                 .setMaxHealth(140)
                 .setAttribute(Attribute.MOVEMENT_SPEED, 0.38)
